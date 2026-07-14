@@ -412,11 +412,10 @@ try {
   );
   assertAtomicCache(await cacheState(page), 'v1', 'primeira instalação');
 
-  // Reabre uma vez sob o controller v1. Esta instância passa a ouvir a futura
-  // troca de controller; esse reload é explícito do teste, não da instalação.
-  await page.reload({ waitUntil: 'load' });
+  // A própria aba da primeira instalação precisa continuar ouvindo a próxima
+  // troca de controller; não recarregamos manualmente para provar esse caso.
   await waitForRegistrationIdle(page);
-  assertVersionPair(await pageVersions(page), 'v1', 'aba controlada por v1');
+  assertVersionPair(await pageVersions(page), 'v1', 'primeira aba controlada por v1');
   assert.equal(
     await page.evaluate(async () => (await navigator.serviceWorker.getRegistration())?.updateViaCache),
     'none',

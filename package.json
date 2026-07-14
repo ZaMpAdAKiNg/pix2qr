@@ -1,0 +1,9 @@
+{
+  "name": "pix2qr",
+  "private": true,
+  "description": "Tooling de build/teste do pix2qr. Instale com npm ci; o build gera em dist/ somente a allowlist pública do site estático.",
+  "devDependencies": {
+    "esbuild": "0.25.5",
+    "playwright-core": "1.53.0"
+  }
+}

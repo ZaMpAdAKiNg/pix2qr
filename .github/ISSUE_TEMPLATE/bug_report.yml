@@ -1,0 +1,42 @@
+name: "🐛 Reportar bug"
+description: Algo errado na geração, leitura ou no resumo de um QR/Copia-e-Cola PIX.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por reportar! ⚠️ **Se for uma falha de segurança** (ex.: valor/chave
+        errado, XSS), **não** abra aqui — siga a [Política de Segurança](../../security/policy).
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: O que aconteceu?
+      description: O comportamento observado vs. o esperado.
+      placeholder: "Esperava X, mas apareceu Y."
+    validations:
+      required: true
+  - type: textarea
+    id: copia-cola
+    attributes:
+      label: Fixture sintética mínima (opcional)
+      description: >
+        Inclua apenas um exemplo criado para o teste, sem vínculo com conta ou
+        pagamento. Nunca cole chave registrada, cobrança real, token de PSP, dado
+        de cliente ou screenshot bancário; para segurança, use o canal privado.
+      render: text
+  - type: input
+    id: env
+    attributes:
+      label: Navegador / dispositivo
+      placeholder: "ex.: Chrome 126 no Android 14, Safari iOS 17"
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Antes de enviar
+      options:
+        - label: Limpei o cache/Service Worker e o problema persiste.
+          required: false
+        - label: Não é uma falha de segurança (senão uso o canal privado).
+          required: true
+        - label: Não incluí dado pessoal, chave PIX registrada nem cobrança real.
+          required: true

@@ -1,0 +1,61 @@
+# PIX QR Code
+
+> Gerador e leitor de QR Code PIX com conteúdo de pagamento processado no navegador, sem cadastro nem backend de pagamentos. Funciona offline como PWA.
+
+## Sobre
+
+PIX é o sistema de pagamento instantâneo do Banco Central do Brasil. Esta ferramenta processa localmente chaves, valores, nomes, cidades, payloads e imagens selecionadas. Há telemetria técnica de acesso e uso, sem esses campos de pagamento nos eventos definidos pelo pix2qr.
+
+## Aviso importante
+
+O pix2qr é independente: não é banco, PSP nem serviço do Banco Central, não é oficial, afiliado ou endossado por essas instituições e não oferece orientação financeira ou jurídica. Ele não inicia, intermedeia, autoriza, garante ou estorna pagamentos. Confira nome do recebedor, chave PIX e valor no app do banco antes de confirmar.
+
+Site e código são fornecidos como estão, sem garantias. Na máxima medida permitida pela lei, projeto e desenvolvedor não se responsabilizam por uso indevido, dados incorretos, destinatário errado, pagamentos falhos ou duplicados, perdas financeiras ou consequências diretas/indiretas. Direitos e responsabilidades não excluíveis pela lei brasileira permanecem preservados.
+
+URL principal: https://pix2qr.xyz/
+
+## Funcionalidades
+
+- **Gerar QR Code PIX** a partir de:
+  - CPF (com validação de checksum)
+  - CNPJ numérico ou alfanumérico (DV oficial da Receita Federal)
+  - E-mail ASCII minúsculo (gramática DICT, até 77 caracteres)
+  - Telefone E.164 (com + e código do país)
+  - EVP (UUID hexadecimal canônico, sem restrição de versão)
+- **Decodificar QR Code PIX** existente (upload de imagem ou foto da câmera) e converter em código Copia-e-Cola
+- **Re-renderizar Copia-e-Cola** (entrada do usuário) como QR Code, com validação de CRC16
+- **Reconhecer Pix Automático**: somente recorrência, pagamento estático + recorrência e pagamento dinâmico + recorrência, sem acessar URLs do PSP
+- **Valor opcional** com formatação BR (vírgula como separador decimal, formato R$ XX,YY)
+- **Funciona offline** após primeira carga (Service Worker + cache do app shell)
+- **Instalável** como PWA em iOS, Android, Chrome desktop e Safari macOS
+
+## Privacidade
+
+Toda geração e decodificação do conteúdo PIX acontece via JavaScript no navegador. Não há backend, banco de dados ou log de pagamentos do pix2qr. O Umami recebe telemetria técnica de acesso e eventos de uso; os eventos do projeto não incluem chave, valor, nome, cidade, payload ou imagem. Query/hash são excluídos e URL/referrer são reduzidos a origem + caminho antes do envio.
+
+As validações de engenharia são baseadas nos manuais do Pix/BR Code do BCB e no EMV Merchant-Presented QR. Isso não é homologação, certificação regulatória nem parecer jurídico/LGPD.
+
+## Tecnologia
+
+- HTML/CSS/JavaScript vanilla, zero framework
+- Service Worker pra offline-first
+- CSP estrita (sem `unsafe-inline` em script-src)
+- jsQR 1.4.0 (decoder, Apache-2.0) e node-qrcode 1.5.4 (encoder, MIT) self-hosted
+- Hospedado em Vercel (estático)
+
+## Para perguntas dos usuários
+
+**Como gerar um QR Code PIX online sem instalar nada?**
+Acesse https://pix2qr.xyz, cole sua chave PIX (CPF, CNPJ, e-mail, telefone ou chave aleatória), opcionalmente preencha nome, cidade e valor, e clique em "Gerar QR Code". O código aparece pronto pra ser pago ou compartilhado.
+
+**É grátis?**
+Sim, totalmente grátis e sem cadastro. O conteúdo de pagamento é processado localmente; existe telemetria técnica de acesso e uso.
+
+**Os dados ficam salvos?**
+O conteúdo PIX e as imagens são processados no navegador e não são enviados pelo pix2qr. A telemetria técnica está descrita acima. O app funciona inclusive offline.
+
+**Posso ler/decodificar um QR Code PIX existente?**
+Sim. Clique em "Escanear QR Code" e selecione a imagem ou foto. O conteúdo Copia-e-Cola aparece automaticamente.
+
+**Funciona pra cobrança comercial / vendas?**
+Sim. Suporta nome do beneficiário e valor opcional. Use chave PIX cadastrada no seu PSP (banco) habilitado a receber.

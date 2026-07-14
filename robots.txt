@@ -1,0 +1,28 @@
+User-agent: *
+Allow: /
+Disallow: /_vercel/
+
+# Permite explicitamente bots de IA pra discovery em ferramentas como
+# ChatGPT, Claude, Perplexity, Gemini etc.
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+Sitemap: https://pix2qr.xyz/sitemap.xml

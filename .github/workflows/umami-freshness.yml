@@ -1,0 +1,67 @@
+name: umami-freshness
+
+# Vigia o frescor do script vendored do Umami (/umami.js): compara semanalmente
+# com o publicado em cloud.umami.is/script.js e ABRE/ATUALIZA uma issue quando
+# diverge. É alerta, nunca gate: atualizar o tracker deve ser uma decisão
+# explícita (diff revisado + third-party.lock.json atualizado), não um bloqueio
+# de CI — e a divergência nunca pode ser silenciosa (o padrão "tracking quebrou
+# e ninguém viu" já zerou o painel no passado).
+on:
+  schedule:
+    - cron: '0 12 * * 1'   # segundas, 12:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+
+      - name: Compara vendored vs upstream
+        id: cmp
+        run: |
+          if ! curl -fsSL --max-time 30 https://cloud.umami.is/script.js -o /tmp/upstream.js; then
+            echo "upstream indisponível — sem veredito nesta rodada (transiente, não alerta)"
+            exit 0
+          fi
+          local_hash=$(sha256sum umami.js | cut -d' ' -f1)
+          upstream_hash=$(sha256sum /tmp/upstream.js | cut -d' ' -f1)
+          echo "local=${local_hash}"
+          echo "upstream=${upstream_hash}"
+          if [ "$local_hash" != "$upstream_hash" ]; then
+            echo "diverge=1" >> "$GITHUB_OUTPUT"
+            echo "upstream_hash=${upstream_hash}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Abre/atualiza issue de divergência
+        if: steps.cmp.outputs.diverge == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          UP: ${{ steps.cmp.outputs.upstream_hash }}
+        run: |
+          gh label create umami-freshness --force --color D93F0B \
+            --description "umami.js vendored divergiu do upstream" >/dev/null 2>&1 || true
+          existing=$(gh issue list --label umami-freshness --state open --json number --jq '.[0].number')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "Ainda divergente em $(date -u +%F). Upstream sha256: \`${UP}\`"
+          else
+            printf -v issue_body '%s\n' \
+              'O script publicado em https://cloud.umami.is/script.js divergiu do umami.js vendored.' \
+              '' \
+              "Upstream sha256: ${UP}" \
+              '' \
+              'Para atualizar (decisão explícita, nunca automática):' \
+              '1. Baixe o novo script e revise o diff contra o umami.js atual.' \
+              '2. Substitua umami.js, atualize third-party.lock.json e THIRD_PARTY.md.' \
+              '3. Confira o endpoint de coleta e mantenha as duas CSPs em paridade.' \
+              '4. Depois do deploy, confira o painel por alguns dias.'
+            gh issue create --title "umami.js vendored divergiu do upstream" \
+              --label umami-freshness --body "$issue_body"
+          fi

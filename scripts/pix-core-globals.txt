@@ -1,0 +1,29 @@
+# Globals top-level do pix-core.js — consumidos pelo app.js (como globals de
+# script) e pelo module.exports dos testes. A minificação de deploy NÃO pode
+# destruir nenhum destes nomes.
+#
+# Lista viva, nunca de memória: o CI valida ANTES do build que ela bate com o
+# que a fonte declara (check-artifact.mjs --pre) e DEPOIS do build que todos
+# sobrevivem no artefato minificado (--post). Declarou global novo? O --pre
+# fica vermelho até você adicionar aqui.
+normalizeText
+crc16
+hasUnsafeText
+isPixEmail
+pixLocationUrl
+isCanonicalPixKey
+inspectCopiaCola
+validaCopiaCola
+tlv
+parseTLVStrict
+parseTLV
+parseCopiaCola
+validaCPF
+validaCNPJ
+parseChave
+formatarTelefoneBR
+formatChave
+normalizeValorParaPayload
+formatarValorBR
+generatePayload
+withStaticAmount

@@ -1,0 +1,69 @@
+{
+  "$comment": "Inventário e integridade dos assets vendorizados. O sha256 prova os bytes locais; sourceCommit/sourceIntegrity registram a origem declarada, mas só uma receita de rebuild verificada prova reprodutibilidade completa.",
+  "files": {
+    "jsQR.min.js": {
+      "version": "jsqr 1.4.0",
+      "origin": "https://registry.npmjs.org/jsqr/-/jsqr-1.4.0.tgz",
+      "sourceCommit": "49a9633931fb8030ac2fc9cecc121d6e5a19f9a3",
+      "sourceIntegrity": "sha512-dxLob7q65Xg2DvstYkRpkYtmKm2sPJ9oFhrhmudT1dZvNFFTlroai3AWSpLey/w5vMcLBXRgOJsbXpdN9HzU/A==",
+      "license": "Apache-2.0",
+      "licenseFile": "licenses/jsQR-Apache-2.0.txt",
+      "sha256": "6f139698c4ccab1764764600cc6d1baf12fa00f00ee4b8781e36ed337e0fda07"
+    },
+    "qrcode.min.js": {
+      "version": "qrcode 1.5.4",
+      "origin": "https://registry.npmjs.org/qrcode/-/qrcode-1.5.4.tgz",
+      "sourceCommit": "3848ed2c17de5bcdead487417dbf14c5dd017f8d",
+      "sourceIntegrity": "sha512-1ca71Zgiu6ORjHqFBDpnSMTR2ReToX4l1Au1VFLyVeBTFavzQnv5JxMFr3ukHVKpSrSA2MCk0lNJSykjUfz7Zg==",
+      "license": "MIT",
+      "licenseFile": "licenses/node-qrcode-MIT.txt",
+      "bundled": ["dijkstrajs@1.0.3"],
+      "sha256": "07d092a7bc6fd894bf0dc4a29b15bc4d8a52d40dcd447ff75070c11fb99476bb"
+    },
+    "umami.js": {
+      "version": "cloud snapshot 2026-07-06",
+      "origin": "https://cloud.umami.is/script.js",
+      "upstream": "https://github.com/umami-software/umami",
+      "license": "MIT",
+      "licenseFile": "licenses/umami-MIT.txt",
+      "sha256": "c8af63dd9b16d83401a4418af43d47b2b91f014b527dd26912c5a20be0e7db71"
+    },
+    "fonts/outfit-latin.woff2": {
+      "version": "Outfit variable latin v15",
+      "origin": "https://fonts.gstatic.com/s/outfit/v15/QGYvz_MVcBeNP4NJtEtqUYLknw.woff2",
+      "license": "OFL-1.1",
+      "licenseFile": "licenses/Outfit-OFL-1.1.txt",
+      "sha256": "92684e4acde79ef07758cd09380b7e01e9824d8b061eddeda046f78c166d7b12"
+    },
+    "licenses/jsQR-Apache-2.0.txt": {
+      "version": "jsqr 1.4.0 license",
+      "origin": "https://github.com/cozmo/jsQR/blob/49a9633931fb8030ac2fc9cecc121d6e5a19f9a3/LICENSE",
+      "license": "Apache-2.0",
+      "sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08"
+    },
+    "licenses/node-qrcode-MIT.txt": {
+      "version": "qrcode 1.5.4 license",
+      "origin": "https://github.com/soldair/node-qrcode/blob/v1.5.4/license",
+      "license": "MIT",
+      "sha256": "8df47c6ad9ac2c41eb9b2a72def9908959da0ede8dadd56c7b249c1bdb0c5ce6"
+    },
+    "licenses/dijkstrajs-MIT.txt": {
+      "version": "dijkstrajs 1.0.3 license",
+      "origin": "https://github.com/tcort/dijkstrajs/blob/49ad1ecd5c519281ee3c4711bb78db4d96e19c83/LICENSE.md",
+      "license": "MIT",
+      "sha256": "c46324e45a005413535a6fb7a97e9eacd3cc6bf30335b7d5c10b8ee3af9e60c2"
+    },
+    "licenses/umami-MIT.txt": {
+      "version": "umami license snapshot",
+      "origin": "https://github.com/umami-software/umami/blob/af1b6c6efcadd65136a9ec3db6b8ec20962a8a69/LICENSE",
+      "license": "MIT",
+      "sha256": "9942cb0f60bb19fab84e73f55264ee208da333183adf69c52c47064336291609"
+    },
+    "licenses/Outfit-OFL-1.1.txt": {
+      "version": "Outfit OFL license",
+      "origin": "https://github.com/google/fonts/blob/ec0464b978de222073645d6d3366f3fdf03376d8/ofl/outfit/OFL.txt",
+      "license": "OFL-1.1",
+      "sha256": "c676351bf8576b9aba743cd5eaa8c0e7ee0d51f805d720447b4df4ddb6a2e416"
+    }
+  }
+}

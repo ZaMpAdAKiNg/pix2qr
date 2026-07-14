@@ -1,0 +1,173 @@
+name: guardrails
+
+# Roda em todo push consolidado para main e em pull requests.
+# workflow_dispatch permite trigger manual via UI.
+# Contexto github.* só entra nos run: via env: com aspas (BASE/PR_TITLE),
+# nunca interpolado direto no script — sem risco de injection.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: guardrails-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sanity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0   # histórico completo: o check de CHANGELOG faz diff vs a base do PR
+          persist-credentials: false
+
+      # Marcadores de conflito sempre começam a linha (convenção git merge).
+      # Ancorar em ^ evita self-match com o próprio regex-pattern em strings.
+      - name: Fail on conflict markers
+        run: |
+          if grep -RIn --exclude-dir=.git -E '^(<<<<<<<|=======|>>>>>>>)' .; then
+            echo "Found conflict markers"; exit 1;
+          fi
+
+      - name: Fail if token-like strings are committed
+        run: |
+          if grep -RIn --exclude-dir=.git -E "ghp_[A-Za-z0-9]{20,}" .; then
+            echo "Possible GitHub PAT found in repo"; exit 1;
+          fi
+
+      - name: Smoke ensure HTML exists
+        run: |
+          test -f index.html
+
+      # Testes do núcleo puro de PIX (pix-core.js): CRC16, normalização de valor
+      # (o bug "1.234,56"→1,23 passou por falta de teste), roundtrip de geração.
+      # Sem dependências: usa o test runner nativo do Node.
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '20'
+
+      - name: npm ci
+        run: npm ci
+
+      # Integridade dos assets vendorizados e licenças: cada sha256 precisa
+      # bater com third-party.lock.json; troca silenciosa fica vermelha aqui.
+      - name: Assets vendorizados batem com o inventário (third-party.lock.json)
+        run: node scripts/check-vendored.mjs
+
+      - name: Unit tests (núcleo PIX)
+        run: node --test test/*.test.js
+
+      # Disciplina de CHANGELOG: toda mudança de COMPORTAMENTO (código, HTML, SW,
+      # manifest, vercel.json) precisa de uma entrada no CHANGELOG.md. Só roda em
+      # PR (no push direto pra main não há base pra comparar). Escape pra exceções
+      # genuínas: "[skip changelog]" no título do PR. github.* entra via env: com
+      # aspas (BASE/PR_TITLE) — nunca interpolado no script, sem risco de injection.
+      - name: Require CHANGELOG entry for behavioral changes
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          case "$PR_TITLE" in
+            *"[skip changelog]"*) echo "skip changelog pedido no título — ok"; exit 0 ;;
+          esac
+          # checkout com fetch-depth:0 já autenticou e trouxe o histórico antes
+          # de remover a credencial. Não tenta novo fetch anônimo em repo privado.
+          git cat-file -e "${BASE_SHA}^{commit}"
+          CHANGED="$(git diff --name-only "${BASE_SHA}...HEAD")"
+          printf 'Arquivos no PR:\n%s\n---\n' "$CHANGED"
+          SRC='^(app\.js|pix-core\.js|index\.html|sw\.js|manifest\.webmanifest|vercel\.json)$'
+          if printf '%s\n' "$CHANGED" | grep -qE "$SRC"; then
+            if printf '%s\n' "$CHANGED" | grep -qxF 'CHANGELOG.md'; then
+              echo "OK: mudança de comportamento acompanhada de entrada no CHANGELOG."
+            else
+              echo "FALHA: o PR muda comportamento (código/HTML/SW) mas não toca CHANGELOG.md."
+              echo "→ Adicione uma entrada em '## [Não lançado]' no CHANGELOG.md."
+              echo "  (Se for irrelevante pro usuário, ponha '[skip changelog]' no título do PR.)"
+              exit 1
+            fi
+          else
+            echo "OK: nenhuma mudança de comportamento — CHANGELOG não exigido."
+          fi
+
+  # Gates do artefato: o deploy copia uma allowlist para dist/ e minifica essa
+  # cópia. Este job constrói exatamente o que os clientes recebem e
+  # artefato real e prova os invariantes que uma minificação errada quebraria
+  # (cada um cobre uma regressão real): JSON-LD byte-idêntico (hash fixado
+  # na CSP), CACHE_NAME injetado ANTES do minify, globals do pix-core.js
+  # preservados. Os unit tests re-rodam contra o pix-core minificado.
+  build-gates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '20'
+
+      - name: Lista canônica de globals em dia (pré-build)
+        run: node scripts/check-artifact.mjs --pre
+
+      # esbuild local com versão exata + integridade do lockfile (o minify
+      # não usa mais npx). npm ci falha se lock e package.json divergirem.
+      - name: npm ci (esbuild pinado)
+        run: npm ci
+
+      - name: Build real (sed CACHE_NAME + minify)
+        run: bash scripts/build.sh
+
+      - name: Gates do artefato (JSON-LD, CACHE_NAME, globals)
+        run: node scripts/check-artifact.mjs --post
+
+      - name: Unit tests contra o pix-core minificado
+        run: PIX_CORE_PATH=dist/pix-core.js node --test test/*.test.js
+
+  # E2E contra o artefato: serve o output do build, gera um QR na página real,
+  # decodifica com o jsQR da própria página e confere payload + CRC via
+  # pix-core. Pega o que unit test não pega: integração com as libs vendored
+  # (qrcode/jsQR) e o app.js minificado consumindo os globals do pix-core.
+  e2e-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '20'
+
+      # playwright-core e esbuild pinados via lockfile (usa o Chrome do runner)
+      - name: npm ci
+        run: npm ci
+
+      - name: Build real (o e2e roda contra o minificado)
+        run: bash scripts/build.sh
+
+      # Antes de virar required check, rodou como probe de flakiness:
+      # 2 runs de CI × 10 execuções cada = 20/20 verde (inclusive após o
+      # endurecimento do wait pra não depender de eval bloqueado pela CSP).
+      - name: E2E smoke
+        run: node test/e2e-smoke.mjs
+
+      - name: E2E privacy network (Umami)
+        run: node test/privacy-e2e.mjs
+
+      - name: E2E PWA offline
+        run: node test/pwa-e2e.mjs
+
+      - name: E2E adversarial
+        run: node test/e2e-adversarial.mjs

@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- SEO core -->
+  <title>Gerador de QR Code PIX — Grátis e com processamento local</title>
+  <meta name="description" content="Gere QR Code PIX e Copia e Cola com os dados de pagamento processados no navegador, sem cadastro nem backend de pagamentos. Funciona offline." />
+  <meta name="keywords" content="qr code pix, gerador pix, gerar qr code pix, pix copia e cola, qr pix online, qr code pix grátis, criar qr code pix, pix offline" />
+  <meta name="author" content="pix2qr" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <meta name="google-site-verification" content="for3v0TqpC2WJJay98wMdNAqINN5IaMq_ejBS8vpK6c" />
+
+  <!-- Open Graph (Facebook, LinkedIn, WhatsApp) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="PIX QR Code" />
+  <meta property="og:locale" content="pt_BR" />
+  <meta property="og:title" content="Gerador de QR Code PIX — Grátis e com processamento local" />
+  <meta property="og:description" content="Gere e leia QR Code PIX com o conteúdo de pagamento processado no navegador, sem cadastro nem backend de pagamentos." />
+  <meta property="og:url" content="https://pix2qr.xyz/" />
+  <meta property="og:image" content="https://pix2qr.xyz/icons/icon-512.png" />
+  <meta property="og:image:width" content="512" />
+  <meta property="og:image:height" content="512" />
+  <meta property="og:image:alt" content="Logo do PIX QR Code: gerador local de QR Code PIX" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Gerador de QR Code PIX — processamento local" />
+  <meta name="twitter:description" content="Gere e leia QR Code PIX com o conteúdo de pagamento processado no navegador." />
+  <meta name="twitter:image" content="https://pix2qr.xyz/icons/icon-512.png" />
+
+  <!-- PWA / iOS -->
+  <meta name="theme-color" content="#0c0c12" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="PIX QR Code" />
+
+  <!-- CSP: restrict script/style origins. SHA pra JSON-LD inline (data, não código).
+       Fonte canônica é o header HTTP em vercel.json (mais robusto, suporta frame-ancestors);
+       este <meta> é fallback p/ quando não há header (ex.: abrir o arquivo via file://).
+       NÃO remover hosts umami do connect-src num "cleanup": o Umami migra o endpoint de
+       ingestão sem aviso (já passou por api-gateway.umami.dev → gateway.umami.is); manter
+       os três cobre o histórico e evita re-zerar o painel. Mudou aqui? Mude também no vercel.json. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-GGHH/1agz1XbHI/BeCsV5JfDijWlDCdCq2LoBJoGZEo='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://cloud.umami.is https://gateway.umami.is https://api-gateway.umami.dev; object-src 'none'; base-uri 'self'; form-action 'none';" />
+
+  <!-- Discovery / metadata: canonical, manifest, ícones, llms.txt -->
+  <link rel="canonical" href="https://pix2qr.xyz/" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+  <link rel="alternate" type="application/json" title="LLM-friendly summary" href="/llms.txt" />
+  <!-- Umami SELF-HOSTED (/umami.js, vendored de cloud.umami.is/script.js): nenhum script
+       de terceiro executa na página — script-src fica só 'self' + hash do JSON-LD. O script
+       posta pra gateway.umami.is/api/send (default hardcoded; ver connect-src acima).
+       Frescor vigiado pelo workflow umami-freshness (alerta em issue quando o upstream
+       muda); integridade local pinada em third-party.lock.json. SRI fixo no script REMOTO foi
+       descartado de propósito: o upstream muda in-place e o hash quebrava o tracking. -->
+  <script src="/analytics-privacy.js"></script>
+  <script defer src="/umami.js"
+          data-website-id="6d397cad-3f3c-4311-aabd-cf3010f33803"
+          data-exclude-search="true"
+          data-exclude-hash="true"
+          data-do-not-track="true"
+          data-before-send="pix2qrBeforeSend"></script>
+
+  <style>
+    @font-face {
+      font-family: 'Outfit';
+      font-style: normal;
+      font-weight: 100 900;
+      font-display: swap;
+      src: url('/fonts/outfit-latin.woff2') format('woff2');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+    :root {
+      --font-sans: 'Outfit', system-ui, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+      --bg-base:   #0c0c12;
+      --bg-topbar: #111118;
+      --bg-card:   #14141c;
+      --bg-card-2: #1c1c26;
+      --bg-input:  #1c1c26;
+
+      --border:       rgba(255,255,255,.09);
+      --border-focus: rgba(115,100,240,.6);
+
+      --primary:            #7364f0;
+      --primary-hover:      #8576f5;
+      --primary-active:     #6255d6;
+      --primary-foreground: #fff;
+      --primary-subtle:     rgba(115,100,240,.15);
+      --primary-border:     rgba(115,100,240,.45);
+
+      --fg:        #f0f0f8;
+      --fg-muted:  rgba(240,240,248,.5);
+      --fg-subtle: rgba(240,240,248,.3);
+
+      --destructive: #f87171;
+
+      --radius-sm:   0.375rem;
+      --radius-md:   0.625rem;
+      --radius-lg:   0.875rem;
+      --radius-xl:   1.125rem;
+      --radius-2xl:  1.375rem;
+      --radius-full: 9999px;
+
+      --shadow-card: 0 2px 16px rgba(0,0,0,.35);
+      --shadow-btn:  0 2px 12px rgba(115,100,240,.35);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-base);
+      color: var(--fg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 0 5rem;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .topbar {
+      width: 100%;
+      background: var(--bg-topbar);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 1rem;
+      height: 54px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .topbar-inner {
+      width: 100%;
+      max-width: 390px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    .topbar-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--fg);
+    }
+
+    .topbar-logo svg { color: var(--primary); flex-shrink: 0; }
+
+    .topbar-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid rgba(248,113,113,.35);
+      color: #fda4af;
+      background: rgba(248,113,113,.12);
+      border-radius: var(--radius-full);
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 0.22rem 0.55rem;
+      white-space: nowrap;
+    }
+    /* O atributo [hidden] (display:none da UA stylesheet) perde em especificidade
+       pra .status-chip{display:inline-flex} — sem esta regra o chip "Offline"
+       fica visível mesmo online (app.js seta .hidden mas o CSS vence). */
+    .status-chip[hidden] { display: none; }
+
+    .install-btn {
+      padding: 0.48rem 0.72rem;
+      font-size: 0.68rem;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 390px;
+      padding: 1.25rem 1rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.875rem;
+    }
+
+    @media (min-width: 600px) {
+      .page { padding: 1.5rem 0 2rem; }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-2xl);
+      box-shadow: var(--shadow-card);
+      padding: 1.5rem;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--fg);
+      margin-bottom: 0.25rem;
+    }
+
+    .card-subtitle {
+      font-size: 0.8rem;
+      color: var(--fg-muted);
+      margin-bottom: 1.25rem;
+      line-height: 1.5;
+    }
+
+    .field { margin-bottom: 0.875rem; }
+    .field:last-child { margin-bottom: 0; }
+
+    label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--fg-muted);
+      margin-bottom: 0.35rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 0.7rem 0.875rem;
+      background: var(--bg-input);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px var(--primary-subtle);
+    }
+
+    input::placeholder { color: var(--fg-subtle); }
+
+    .field-hint {
+      font-size: 0.7rem;
+      /* fg-muted (não fg-subtle): texto informativo precisa de contraste AA (4.5:1) */
+      color: var(--fg-muted);
+      margin-top: 0.3rem;
+    }
+
+    /* Aviso soft (não bloqueia): usado em Nome/Cidade quando detecta
+       coisa estranha (ex: dígitos). Tom amber pra diferenciar de erro. */
+    .field-warn {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.72rem;
+      color: #fbbf24;
+      margin-top: 0.3rem;
+      line-height: 1.35;
+    }
+    .field-warn[hidden] { display: none; }
+    .field-warn svg { flex-shrink: 0; opacity: 0.9; }
+
+    .safety-notice,
+    .result-check {
+      font-size: 0.76rem;
+      line-height: 1.5;
+      color: rgba(240,240,248,.78);
+      background: rgba(251, 191, 36, 0.07);
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      border-radius: var(--radius-xl);
+      padding: 0.7rem 0.8rem;
+    }
+    .safety-notice { margin: 0.75rem 0; }
+    .safety-notice strong,
+    .result-check strong { color: #fbbf24; }
+    .result-check { margin: 0 0 0.85rem; }
+
+    /* Botão "Escanear QR": ghost style, fica logo abaixo da hint do input.
+       Em mobile, abre direto a câmera traseira via capture="environment". */
+    .scan-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.42rem;
+      margin-top: 0.5rem;
+      padding: 0.45rem 0.78rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      color: var(--fg-muted);
+      font-family: var(--font-sans);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s, background 0.15s, transform 0.08s;
+    }
+    .scan-btn:hover {
+      border-color: var(--primary-border);
+      color: var(--primary-hover);
+      background: var(--primary-subtle);
+    }
+    .scan-btn:active { transform: scale(0.97); }
+    .scan-btn:focus-visible {
+      outline: none;
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px var(--primary-subtle);
+    }
+    .scan-btn svg { flex-shrink: 0; }
+    .scan-btn[disabled] {
+      opacity: 0.6;
+      cursor: progress;
+      pointer-events: none;
+    }
+
+    .mode-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.75rem;
+      border-radius: var(--radius-full);
+      background: var(--primary-subtle);
+      border: 1px solid var(--primary-border);
+      color: var(--primary-hover);
+      margin-bottom: 0.875rem;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .mode-pill.visible { opacity: 1; }
+    .mode-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+    #extra-fields {
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transition: max-height 0.35s ease, opacity 0.25s ease;
+    }
+
+    #extra-fields.visible { max-height: 400px; opacity: 1; }
+
+    .row-two {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      font-family: var(--font-sans);
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: var(--radius-md);
+      transition: background 0.15s, opacity 0.15s, transform 0.1s;
+      border: none;
+      letter-spacing: 0.01em;
+    }
+
+    .btn:active { transform: scale(0.985); }
+    .btn:disabled { opacity: 0.45; pointer-events: none; }
+
+    .btn-primary {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      font-size: 0.95rem;
+      background: var(--primary);
+      color: var(--primary-foreground);
+      box-shadow: var(--shadow-btn);
+      border-radius: var(--radius-lg);
+      margin-top: 0.25rem;
+    }
+
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-primary:active { background: var(--primary-active); }
+
+    .btn-outline {
+      padding: 0.6rem 1rem;
+      font-size: 0.8rem;
+      background: transparent;
+      /* primary-hover (#8576f5, 5.3:1) em vez de primary (#7364f0, 4.3:1):
+         o texto pequeno (0.68rem) do install-btn precisa de 4.5:1 AA */
+      color: var(--primary-hover);
+      border: 1px solid var(--primary-border);
+      border-radius: var(--radius-full);
+    }
+
+    .btn-outline:hover { background: var(--primary-subtle); }
+
+    .btn-ghost {
+      padding: 0.55rem 0.875rem;
+      font-size: 0.8rem;
+      background: var(--bg-card-2);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+    }
+
+    .btn-ghost:hover { border-color: var(--primary-border); color: var(--primary-hover); }
+
+    .btn-ghost.success {
+      background: var(--primary-subtle);
+      color: var(--primary-hover);
+      border-color: var(--primary-border);
+    }
+
+    .error-msg {
+      font-size: 0.78rem;
+      color: var(--destructive);
+      min-height: 1.1em;
+      margin-top: 0.35rem;
+    }
+
+    /* Result card escondido até QR ser gerado — antes só mudava opacity,
+       o que mantinha 956px de gap fantasma no layout (resultcard + tip-jar
+       dentro). display:none remove do flow; .visible recoloca + anima. */
+    #result {
+      display: none;
+    }
+
+    #result.visible {
+      display: block;
+      animation: result-fade-in 0.35s ease-out;
+    }
+
+    @keyframes result-fade-in {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .qr-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1.25rem;
+      background: #fff;
+      border-radius: var(--radius-xl);
+      margin-bottom: 1.25rem;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    .qr-container:hover { transform: scale(1.015); }
+    .qr-container:active { transform: scale(0.99); }
+
+    /* Canvas preserva pelo menos 4 pixels inteiros por módulo e cresce nos QRs
+       densos: alta resolução pra câmeras ruins + PNG baixado de qualidade
+       pra impressão, mas display visual fica capped em 280px pra caber bem em
+       mobile/desktop sem ficar gigante. image-rendering: pixelated mantém
+       bordas afiadas mesmo escalando — crítico pra leitura por câmera. */
+    #qr-wrap canvas {
+      display: block;
+      pointer-events: none;
+      width: 100%;
+      max-width: 280px;
+      height: auto;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+    }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    /* Foco programático (movido pra cá após gerar o QR, pro leitor de tela
+       anunciar "QR Code gerado"). Sem anel visível: não é tabbável (tabindex=-1),
+       então o foco aqui é só pra anúncio/navegação por teclado a partir do resultado. */
+    .result-header:focus { outline: none; }
+
+    .check-badge {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--primary-subtle);
+      border: 1px solid var(--primary-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary-hover);
+      flex-shrink: 0;
+    }
+
+    .result-header-text { font-size: 0.9rem; font-weight: 700; }
+
+    .payload-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      /* fg-muted (não fg-subtle): label significativo precisa de contraste AA */
+      color: var(--fg-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    /* Aviso de chave-cadastrada: a chave PIX precisa estar registrada no PSP do
+       recebedor pra receber. Só aparece quando o QR vem de uma CHAVE (não de
+       Copia-e-Cola, que já vem de um PSP). Âmbar sutil para manter o aviso visível.
+       Previne a confusão "não escaneia" que costuma ser chave não-registrada. */
+    .key-hint {
+      font-size: 0.78rem;
+      line-height: 1.45;
+      color: rgba(240,240,248,.72);
+      background: rgba(251, 191, 36, 0.07);
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      border-radius: var(--radius-xl);
+      padding: 0.65rem 0.8rem;
+      margin: 0 0 0.85rem;
+    }
+    .key-hint[hidden] { display: none; }
+
+    .payload-box {
+      background: var(--bg-base);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 0.75rem;
+      font-family: var(--font-mono);
+      font-size: 0.67rem;
+      word-break: break-all;
+      color: var(--primary-hover);
+      line-height: 1.6;
+      margin-bottom: 0.875rem;
+      max-height: 68px;
+      overflow-y: auto;
+      cursor: text;
+      user-select: all;
+    }
+
+    .action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    footer {
+      font-size: 0.7rem;
+      /* fg-muted (não fg-subtle): texto do rodapé precisa de contraste AA */
+      color: var(--fg-muted);
+      text-align: center;
+      padding: 0 1rem;
+      max-width: 390px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    footer a { color: var(--primary); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    .footer-meta { line-height: 1.6; }
+
+    .legal-notice {
+      font-size: 0.76rem;
+      line-height: 1.6;
+      color: var(--fg-muted);
+    }
+    .legal-notice h2 {
+      font-size: 0.9rem;
+      color: var(--fg);
+      margin-bottom: 0.65rem;
+    }
+    .legal-notice p + p { margin-top: 0.65rem; }
+    .legal-notice strong { color: var(--fg); }
+
+    .donate-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.55rem 1rem;
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--primary);
+      background: transparent;
+      border: 1px solid var(--primary-border);
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .donate-btn:hover  { background: var(--primary-subtle); }
+    .donate-btn:active { transform: scale(0.95); }
+
+    .donate-panel {
+      width: 100%;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transition: max-height 0.35s ease, opacity 0.25s ease;
+    }
+
+    .donate-panel.open {
+      max-height: 300px;
+      opacity: 1;
+    }
+
+    .donate-panel-inner { padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
+
+    .donate-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .donate-row-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      /* fg-muted (não fg-subtle): label significativo precisa de contraste AA */
+      color: var(--fg-muted);
+    }
+
+    .donate-row-addr-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--bg-card-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 0.55rem 0.75rem;
+    }
+
+    .donate-addr {
+      flex: 1;
+      font-family: var(--font-mono);
+      font-size: 0.67rem;
+      color: var(--fg-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      user-select: all;
+    }
+
+    .donate-copy {
+      flex-shrink: 0;
+      padding: 0.3rem 0.6rem;
+      font-family: var(--font-sans);
+      font-size: 0.7rem;
+      font-weight: 600;
+      background: transparent;
+      color: var(--primary);
+      border: 1px solid var(--primary-border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+
+    .donate-copy:hover { background: var(--primary-subtle); }
+    .donate-copy.copied { color: #4ade80; border-color: rgba(74,222,128,.4); }
+
+    /* telas pequenas: row-two vira coluna única */
+    @media (max-width: 360px) {
+      .row-two { grid-template-columns: 1fr; }
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.7);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      z-index: 50;
+    }
+    .modal-backdrop.open { display: flex; }
+
+    .modal {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-2xl);
+      padding: 1.5rem;
+      max-width: 360px;
+      width: 100%;
+      box-shadow: 0 12px 48px rgba(0,0,0,.6);
+    }
+
+
+    /* Resumo do Copia-e-Cola colado: mostra valor, chave, nome, cidade
+       em tempo real, antes mesmo de clicar "Gerar". Usuário confirma
+       que tá pagando o valor certo / pessoa certa. */
+    .cc-summary {
+      background: var(--bg-card-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 0.85rem 0.95rem;
+      margin-bottom: 1rem;
+      animation: cc-summary-in 0.22s ease-out;
+    }
+    .cc-summary[hidden] { display: none; }
+
+    @keyframes cc-summary-in {
+      from { opacity: 0; transform: translateY(-4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .cc-summary-title {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--primary-hover);
+      margin-bottom: 0.6rem;
+    }
+    .cc-summary-title svg { flex-shrink: 0; }
+
+    .cc-row {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 0.5rem;
+      align-items: baseline;
+      font-size: 0.78rem;
+      padding: 0.18rem 0;
+    }
+    .cc-row[hidden] { display: none; }
+    .cc-label {
+      color: var(--fg-muted);
+      font-weight: 500;
+    }
+    .cc-value {
+      color: var(--fg);
+      font-weight: 600;
+      word-break: break-word;
+    }
+    .cc-value-money {
+      color: #4ade80;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+    .cc-value-muted {
+      color: var(--fg-muted);
+      font-weight: 500;
+      font-style: italic;
+    }
+
+
+    /* Adicionar valor (opcional) — só pra QR Estático sem valor embutido.
+       Permite usuário transformar QR sem valor em QR com valor antes do Gerar. */
+    .cc-add-valor {
+      margin-top: 0.85rem;
+      padding-top: 0.85rem;
+      border-top: 1px solid var(--border);
+    }
+    .cc-add-valor[hidden] { display: none; }
+
+    .cc-add-valor-hint {
+      font-size: 0.72rem;
+      color: var(--fg-muted);
+      line-height: 1.45;
+      margin-bottom: 0.55rem;
+    }
+
+    .cc-add-valor-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .cc-add-valor-prefix {
+      color: var(--fg-muted);
+      font-weight: 600;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    .cc-add-valor input {
+      flex: 1;
+      padding: 0.55rem 0.7rem;
+      background: var(--bg-input);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-family: var(--font-sans);
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .cc-add-valor input:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px var(--primary-subtle);
+    }
+
+    .modal h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--fg);
+      margin-bottom: 0.75rem;
+    }
+
+    .modal p {
+      font-size: 0.82rem;
+      color: var(--fg-muted);
+      line-height: 1.55;
+      margin-bottom: 0.9rem;
+    }
+
+    .modal ol {
+      padding-left: 1.2rem;
+      color: var(--fg);
+      font-size: 0.85rem;
+      line-height: 1.7;
+      margin-bottom: 1rem;
+    }
+
+    .modal ol li { margin-bottom: 0.15rem; }
+    .modal strong { color: var(--primary-hover); font-weight: 600; }
+    .modal .close-btn { width: 100%; margin-top: 0.25rem; }
+
+    /* FAQ section: <details> nativo + styling sutil. Bom pra SEO + LLMs. */
+    .faq {
+      margin-top: 0.5rem;
+    }
+    .faq-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--fg);
+      margin-bottom: 0.85rem;
+    }
+    .faq details {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 0;
+      margin-bottom: 0.5rem;
+      overflow: hidden;
+    }
+    .faq summary {
+      cursor: pointer;
+      padding: 0.75rem 0.95rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--fg);
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+    .faq summary::-webkit-details-marker { display: none; }
+    .faq summary::after {
+      content: "+";
+      font-size: 1.1rem;
+      color: var(--fg-muted);
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+    .faq details[open] summary::after { transform: rotate(45deg); }
+    .faq summary:hover { color: var(--primary-hover); }
+    .faq details[open] summary { border-bottom: 1px solid var(--border); }
+    .faq-answer {
+      padding: 0.75rem 0.95rem;
+      font-size: 0.78rem;
+      line-height: 1.55;
+      color: var(--fg-muted);
+    }
+    .faq-answer a {
+      color: var(--primary-hover);
+      text-decoration: none;
+    }
+    .faq-answer a:hover { text-decoration: underline; }
+
+    /* Tip jar pattern: bloco de doação dentro do card de resultado.
+       Aparece junto com o QR gerado — momento de "just-in-time gratitude"
+       quando o usuário acabou de receber valor. UX research mostra
+       conversão 3-5x maior que pedidos passivos no rodapé. */
+    .tip-jar {
+      margin-top: 1.25rem;
+      animation: tip-jar-fade 0.4s ease-out 0.2s backwards;
+    }
+    @keyframes tip-jar-fade {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .tip-jar-divider {
+      height: 1px;
+      background: var(--border);
+      margin-bottom: 1rem;
+    }
+    .tip-jar-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--fg);
+      margin-bottom: 0.3rem;
+      text-align: center;
+    }
+    .tip-jar-sub {
+      font-size: 0.74rem;
+      color: var(--fg-muted);
+      line-height: 1.5;
+      text-align: center;
+      margin-bottom: 0.85rem;
+    }
+    /* No contexto do tip-jar, o donate-btn é o foco — mais largo e centralizado. */
+    .tip-jar .donate-btn {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      padding: 0.65rem 1rem;
+      font-size: 0.78rem;
+    }
+
+  </style>
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://pix2qr.xyz/#website",
+      "url": "https://pix2qr.xyz/",
+      "name": "PIX QR Code",
+      "description": "Gerador de QR Code PIX gratuito com processamento local dos dados de pagamento",
+      "inLanguage": "pt-BR",
+      "sameAs": "https://github.com/ZaMpAdAKiNg/pix2qr"
+    },
+    {
+      "@type": "WebApplication",
+      "@id": "https://pix2qr.xyz/#app",
+      "name": "PIX QR Code",
+      "url": "https://pix2qr.xyz/",
+      "description": "Gerador e leitor de QR Code PIX com conteúdo de pagamento processado no navegador, sem cadastro nem backend de pagamentos. Funciona offline e usa telemetria técnica sem o conteúdo digitado.",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Any",
+      "browserRequirements": "Requires JavaScript. Requires HTML5.",
+      "inLanguage": "pt-BR",
+      "isAccessibleForFree": true,
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "BRL"
+      },
+      "featureList": [
+        "Gerar QR Code PIX",
+        "Decodificar QR Code PIX existente",
+        "Suporte a CPF, CNPJ, e-mail, telefone e chave aleatória",
+        "Validação de CRC do Copia-e-Cola",
+        "Funciona offline (PWA)",
+        "Instalável em iOS, Android e desktop"
+      ]
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "@id": "https://pix2qr.xyz/#source",
+      "name": "Código-fonte do pix2qr",
+      "codeRepository": "https://github.com/ZaMpAdAKiNg/pix2qr",
+      "programmingLanguage": ["HTML", "CSS", "JavaScript"],
+      "license": "https://github.com/ZaMpAdAKiNg/pix2qr/blob/main/LICENSE"
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://pix2qr.xyz/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Os meus dados ficam salvos em algum servidor?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "O conteúdo PIX digitado e as imagens selecionadas são processados no navegador e não são enviados pelo pix2qr. O site usa telemetria técnica de acesso e eventos de uso, sem incluir chave, valor, nome, cidade, payload ou imagem."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "É grátis? Tem cadastro?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sim, totalmente grátis e sem cadastro. O conteúdo de pagamento é processado localmente; existe telemetria técnica de acesso e uso."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Funciona offline?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sim. Após a primeira carga, o app funciona sem internet. Instalável como PWA em iOS, Android e desktop."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Que tipos de chave PIX são aceitos?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Os 5 tipos do DICT: CPF, CNPJ numérico ou alfanumérico, e-mail ASCII, telefone E.164 e EVP em UUID hexadecimal canônico. CPF e CNPJ usam dígitos verificadores oficiais."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Como ler ou decodificar um QR Code PIX existente?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Clique em 'Escanear QR Code' no campo da chave, selecione uma imagem ou tire foto. O conteúdo Copia-e-Cola aparece automaticamente."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Posso usar para cobrança comercial?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sim. Inclua nome do beneficiário, cidade e valor. Use uma chave PIX cadastrada no seu PSP (banco) com permissão de recebimento."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Qual a diferença entre chave PIX e PIX Copia e Cola?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A chave identifica a conta do recebedor (CPF/CNPJ/e-mail/telefone/aleatória). O Copia e Cola é o payload EMV completo gerado a partir da chave + nome + cidade + valor opcional, que vira QR Code escaneável."
+          }
+        }
+      ]
+    }
+  ]
+}
+  </script>
+</head>
+<body>
+
+<noscript>
+  <div style="max-width:640px;margin:1rem auto;padding:1rem 1.25rem;border:1px solid #b91c1c;border-radius:12px;background:#1a0d0d;color:#fca5a5;font-family:system-ui,sans-serif;line-height:1.5;text-align:center">
+    <strong>Este gerador de QR Code PIX precisa de JavaScript.</strong><br>
+    O conteúdo PIX é processado no seu navegador, por isso o JavaScript é
+    necessário. Ative-o e recarregue a página.
+  </div>
+</noscript>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="topbar-logo">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+        <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+        <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+        <path d="M14 14h3v3M17 17h3M14 20h3"/>
+      </svg>
+      PIX QR Code
+    </div>
+    <div class="topbar-actions">
+      <span id="offline-chip" class="status-chip" hidden>Offline</span>
+      <button id="install-btn" class="btn btn-outline install-btn" type="button" hidden>Instalar app</button>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <div class="card">
+    <h1 class="card-title">Gerador de QR Code PIX</h1>
+    <p class="card-subtitle">Cole uma chave PIX ou um código Copia e Cola — gera o QR Code direto no seu navegador. <strong>Conteúdo PIX processado localmente, sem cadastro nem backend de pagamentos.</strong></p>
+
+    <div class="field">
+      <label for="chave-input">Chave PIX ou Copia e Cola</label>
+      <input
+        id="chave-input"
+        type="text"
+        placeholder="Cole chave PIX ou PIX Copia e Cola"
+        autocomplete="off"
+        spellcheck="false"
+        maxlength="1024"
+      />
+      <p class="field-hint">Detecta CPF, CNPJ alfanumérico, e-mail, telefone E.164 (+), EVP e Pix Copia e Cola.</p>
+      <input id="qr-file-input" type="file" accept="image/png,image/jpeg,image/gif,image/webp" capture="environment" hidden />
+      <button id="scan-qr-btn" type="button" class="scan-btn" aria-label="Escanear QR Code de uma imagem ou foto">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="3" width="6" height="6" rx="1"/>
+          <rect x="15" y="3" width="6" height="6" rx="1"/>
+          <rect x="3" y="15" width="6" height="6" rx="1"/>
+          <path d="M15 15h2v2M19 19h2M15 19h2M19 15h2"/>
+        </svg>
+        Escanear QR Code
+      </button>
+    </div>
+
+    <div id="mode-tag" class="mode-pill">
+      <span class="dot"></span>
+      <span id="mode-label">—</span>
+    </div>
+
+
+    <div id="cc-summary" class="cc-summary" hidden aria-live="polite">
+      <div class="cc-summary-title">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+          <polyline points="10 9 9 9 8 9"/>
+        </svg>
+        Resumo do pagamento
+      </div>
+      <div class="cc-row" id="cc-row-kind" hidden>
+        <span class="cc-label">Tipo</span>
+        <span class="cc-value cc-value-muted" id="cc-kind"></span>
+      </div>
+      <div class="cc-row" id="cc-row-valor" hidden>
+        <span class="cc-label">Valor</span>
+        <span class="cc-value cc-value-money" id="cc-valor"></span>
+      </div>
+      <div class="cc-row" id="cc-row-psp" hidden>
+        <span class="cc-label">Resolvido por</span>
+        <span class="cc-value cc-value-muted" id="cc-psp"></span>
+      </div>
+      <div class="cc-row" id="cc-row-recurrence" hidden>
+        <span class="cc-label">Recorrência</span>
+        <span class="cc-value cc-value-muted" id="cc-recurrence"></span>
+      </div>
+      <div class="cc-row" id="cc-row-chave" hidden>
+        <span class="cc-label">Chave PIX</span>
+        <span class="cc-value" id="cc-chave"></span>
+      </div>
+      <div class="cc-row" id="cc-row-nome" hidden>
+        <span class="cc-label">Para</span>
+        <span class="cc-value" id="cc-nome"></span>
+      </div>
+      <div class="cc-row" id="cc-row-cidade" hidden>
+        <span class="cc-label">Cidade</span>
+        <span class="cc-value" id="cc-cidade"></span>
+      </div>
+
+      <div id="cc-add-valor" class="cc-add-valor" hidden>
+        <p class="cc-add-valor-hint">
+          Esse QR não tem valor embutido. Você pode adicionar um valor antes de gerar:
+        </p>
+        <div class="cc-add-valor-row">
+          <span class="cc-add-valor-prefix">R$</span>
+          <input type="text" id="cc-add-valor-input" inputmode="decimal"
+                 pattern="[0-9]*[.,]?[0-9]{0,2}" placeholder="0,00"
+                 maxlength="24" aria-label="Adicionar valor opcional ao QR Code" />
+        </div>
+      </div>
+    </div>
+
+    <div id="extra-fields">
+      <div class="row-two">
+        <div class="field">
+          <label for="nome-input">Nome</label>
+          <input id="nome-input" type="text" placeholder="João Silva" maxlength="50" aria-describedby="nome-warn" />
+          <p class="field-warn" id="nome-warn" hidden>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 8v4M12 16h.01"/>
+            </svg>
+            Nome geralmente não tem números.
+          </p>
+        </div>
+        <div class="field">
+          <label for="cidade-input">Cidade</label>
+          <input id="cidade-input" type="text" placeholder="São Paulo" maxlength="30" aria-describedby="cidade-warn" />
+          <p class="field-warn" id="cidade-warn" hidden>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 8v4M12 16h.01"/>
+            </svg>
+            Cidade geralmente não tem números.
+          </p>
+        </div>
+      </div>
+      <div class="field">
+        <label for="valor-input">Valor (R$)</label>
+        <input id="valor-input" type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]{0,2}" maxlength="24" placeholder="Deixe vazio para valor aberto" />
+      </div>
+    </div>
+
+    <p class="error-msg" id="error-msg" role="alert" aria-live="polite"></p>
+
+    <aside class="safety-notice" role="note">
+      <strong>Antes de pagar:</strong> confira no app do banco o nome do recebedor,
+      a chave PIX e o valor. O pix2qr é independente, não é banco, PSP ou serviço
+      do Banco Central e não inicia, autoriza nem garante pagamentos.
+    </aside>
+
+    <button class="btn btn-primary" id="gerar-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+      Gerar QR Code
+    </button>
+  </div>
+
+  <!-- Result card -->
+  <div id="result">
+    <div class="card">
+      <div class="result-header" tabindex="-1">
+        <div class="check-badge">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M20 6L9 17l-5-5"/>
+          </svg>
+        </div>
+        <span class="result-header-text">QR Code gerado</span>
+      </div>
+
+      <p class="key-hint" id="key-hint" hidden></p>
+
+      <p class="result-check"><strong>Confira antes de confirmar:</strong> o app do banco é a fonte final para nome do recebedor, chave e valor.</p>
+
+      <div class="qr-container" id="qr-container" role="button" tabindex="0" aria-label="Clique para baixar o QR Code">
+        <div id="qr-wrap"></div>
+      </div>
+
+      <p class="payload-label">Pix Copia e Cola</p>
+      <div class="payload-box" id="payload-display"></div>
+
+      <div class="action-row">
+        <button class="btn btn-ghost" id="copy-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+          Copiar texto
+        </button>
+        <button class="btn btn-ghost" id="download-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Baixar PNG
+        </button>
+        <button class="btn btn-ghost" id="download-svg-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Baixar SVG
+        </button>
+        <button class="btn btn-ghost" id="copy-img-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <circle cx="9" cy="9" r="2"/>
+            <path d="M21 15l-5-5L5 21"/>
+          </svg>
+          Copiar imagem
+        </button>
+      </div>
+
+      <div class="tip-jar">
+        <div class="tip-jar-divider"></div>
+        <p class="tip-jar-title">Te ajudei? Paga um café ☕</p>
+        <p class="tip-jar-sub">Processamento PIX local e sem cadastro — manter o domínio + tempo custa. Qualquer valor ajuda.</p>
+      <button id="donate-toggle" class="donate-btn" aria-expanded="false" aria-controls="donate-panel">
+        Mostrar endereços para doação
+      </button>
+
+      <div id="donate-panel" class="donate-panel" inert>
+        <div class="donate-panel-inner">
+
+          <div class="donate-row">
+            <span class="donate-row-label">EVM (ETH / Polygon / Base…)</span>
+            <div class="donate-addr-wrap donate-row-addr-wrap">
+              <span id="evm-addr" class="donate-addr">0xf3D016932Aed9033406745fF5F5be357A495e8B0</span>
+              <button class="donate-copy" data-target="evm-addr">Copiar</button>
+            </div>
+          </div>
+
+          <div class="donate-row">
+            <span class="donate-row-label">⚡ Lightning (LNURL)</span>
+            <div class="donate-addr-wrap donate-row-addr-wrap">
+              <span id="ln-addr" class="donate-addr">dazedmexican849@walletofsatoshi.com</span>
+              <button class="donate-copy" data-target="ln-addr">Copiar</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      </div><!-- /.tip-jar -->
+    </div><!-- /.card -->
+  </div><!-- /#result -->
+
+  <section class="card faq" aria-labelledby="faq-title">
+    <h2 class="faq-title" id="faq-title">Perguntas frequentes</h2>
+
+    <details>
+      <summary>Os meus dados ficam salvos em algum servidor?</summary>
+      <div class="faq-answer">
+        O conteúdo PIX digitado e as imagens selecionadas são processados no navegador e não são enviados pelo pix2qr. O site usa Umami para telemetria técnica de acesso e eventos de uso, sem incluir chave, valor, nome, cidade, payload ou imagem. Query e fragmento são excluídos; URL e referência ficam reduzidas a origem + caminho antes do envio.
+      </div>
+    </details>
+
+    <details>
+      <summary>É grátis? Tem cadastro?</summary>
+      <div class="faq-answer">
+        Sim, totalmente grátis e sem cadastro. O conteúdo de pagamento é processado localmente; existe telemetria técnica de acesso e uso.
+      </div>
+    </details>
+
+    <details>
+      <summary>Funciona offline?</summary>
+      <div class="faq-answer">
+        Sim. Após a primeira carga, o app funciona sem internet — pode gerar e ler QR Codes mesmo no avião ou em rede instável. Instalável como PWA em iOS, Android e desktop.
+      </div>
+    </details>
+
+    <details>
+      <summary>Que tipos de chave PIX são aceitos?</summary>
+      <div class="faq-answer">
+        Todos os 5 tipos do DICT: <strong>CPF</strong>, <strong>CNPJ</strong> numérico ou alfanumérico, <strong>e-mail</strong> ASCII, <strong>telefone</strong> E.164 (com + e código do país) e <strong>EVP</strong> em UUID hexadecimal canônico. CPF e CNPJ usam dígitos verificadores oficiais.
+      </div>
+    </details>
+
+    <details>
+      <summary>Como ler ou decodificar um QR Code PIX existente?</summary>
+      <div class="faq-answer">
+        Clique em "Escanear QR Code" no campo da chave. Selecione uma imagem ou tire foto direto da câmera. O conteúdo Copia-e-Cola aparece automaticamente, com validação de CRC.
+      </div>
+    </details>
+
+    <details>
+      <summary>Posso usar para cobrança comercial?</summary>
+      <div class="faq-answer">
+        Sim. Inclua nome do beneficiário, cidade e valor. Use uma chave PIX cadastrada no seu PSP (banco) com permissão de recebimento.
+      </div>
+    </details>
+
+    <details>
+      <summary>Qual a diferença entre chave PIX e PIX Copia e Cola?</summary>
+      <div class="faq-answer">
+        A <strong>chave</strong> identifica a conta do recebedor (CPF/CNPJ/e-mail/telefone/aleatória). O <strong>Copia e Cola</strong> é o payload EMV completo gerado a partir da chave + nome + cidade + valor opcional, que vira QR Code escaneável. Esta ferramenta gera os dois.
+      </div>
+    </details>
+  </section>
+
+  <section class="card legal-notice" aria-labelledby="legal-title">
+    <h2 id="legal-title">Aviso e responsabilidade</h2>
+    <p><strong>O pix2qr é uma ferramenta independente:</strong> não é banco, PSP nem serviço do Banco Central do Brasil, não é oficial, afiliado ou endossado por essas instituições e não oferece orientação financeira ou jurídica. Ele apenas gera e exibe dados localmente; não inicia, intermedeia, autoriza, garante nem estorna pagamentos PIX. Antes de confirmar no app do banco, confira o nome do recebedor, a chave PIX e o valor.</p>
+    <p>Este site e seu código são fornecidos <strong>como estão</strong>, sem garantias. Na máxima medida permitida pela legislação aplicável, o projeto e seu desenvolvedor não se responsabilizam por uso indevido, dados incorretos informados pelo usuário, pagamentos enviados ao destinatário errado, falhos ou duplicados, perdas financeiras nem consequências diretas ou indiretas decorrentes do uso. Nada neste aviso exclui direitos ou responsabilidades que a lei brasileira não permita excluir.</p>
+    <p><strong>Privacidade:</strong> chaves, valores, nomes, cidades, payloads e imagens permanecem no navegador. O Umami recebe telemetria técnica de acesso e uso; os eventos definidos pelo pix2qr não incluem o conteúdo PIX digitado ou lido.</p>
+  </section>
+
+<footer>
+    <span class="footer-meta">Conteúdo PIX processado localmente no navegador</span>
+    <span class="footer-meta"><a href="https://github.com/ZaMpAdAKiNg/pix2qr" rel="noopener">Código-fonte no GitHub</a> · <a href="/PRIVACY.md">Privacidade</a> · <a href="/THIRD_PARTY.md">Licenças de terceiros</a></span>
+  </footer>
+
+</div>
+
+
+<script src="/qrcode.min.js" defer></script>
+<script src="/jsQR.min.js" defer></script>
+<!-- pix-core.js (funções puras de PIX) ANTES de app.js: app.js consome suas globals -->
+<script src="/pix-core.js" defer></script>
+<script src="/image-metadata.js" defer></script>
+<script src="/app.js" defer></script>
+
+<!-- Modal de instruções de instalação (iOS / Safari Mac / Firefox / genérico) -->
+<div id="install-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="install-modal-title">
+  <div class="modal">
+    <h3 id="install-modal-title"></h3>
+    <p id="install-modal-desc"></p>
+    <ol id="install-modal-steps"></ol>
+    <button id="install-modal-close" class="btn btn-primary close-btn" type="button">Entendi</button>
+  </div>
+</div>
+
+</body>
+</html>

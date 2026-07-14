@@ -10,6 +10,9 @@ entradas são agrupadas por data.
 ## [Não lançado]
 
 ### Security
+- **Minificador falha fechado em comentários HTML truncados**: remoção por
+  scanner determinístico evita marcadores residuais em sequências aninhadas e
+  aborta o build quando um comentário não tem fechamento.
 - **Gramática DICT 2.12.0 e CNPJ alfanumérico**: CPF, CNPJ, PHONE, EMAIL e EVP
   seguem as expressões atuais do BCB; e-mail Unicode deixa de ser aceito, PHONE
   usa E.164, EVP aceita UUID hexadecimal de qualquer versão e CNPJ alfanumérico

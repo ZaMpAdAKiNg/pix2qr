@@ -967,19 +967,23 @@ if (!isStandalone) {
 if ('serviceWorker' in navigator && window.isSecureContext) {
   window.addEventListener('load', async () => {
     const hadController = Boolean(navigator.serviceWorker.controller);
+    let controllerSeen = navigator.serviceWorker.controller;
     let reloadStarted = false;
 
     // Um controller novo só assume após baixar e validar o shell inteiro. A aba
-    // já controlada recarrega exatamente uma vez para não manter HTML/JS v1
-    // rodando sobre cache v2. Na primeira instalação não havia controller, então
-    // clients.claim() não causa reload nem apaga estado recém-preenchido.
-    if (hadController) {
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (reloadStarted) return;
-        reloadStarted = true;
-        window.location.reload();
-      }, { once: true });
-    }
+    // recarrega exatamente uma vez para não manter HTML/JS v1 rodando sobre
+    // cache v2. Na primeira instalação não havia controller: o primeiro
+    // clients.claim() apenas arma esta aba para mudanças futuras, sem apagar
+    // estado recém-preenchido. O listener permanece vivo depois desse claim.
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!controllerSeen) {
+        controllerSeen = navigator.serviceWorker.controller;
+        return;
+      }
+      if (reloadStarted) return;
+      reloadStarted = true;
+      window.location.reload();
+    });
 
     try {
       const registration = await navigator.serviceWorker.register('/sw.js', {

@@ -34,6 +34,9 @@ entradas são agrupadas por data.
   PR e timeouts adicionados.
 
 ### Fixed
+- **Primeira aba da PWA acompanha updates futuros**: o `clients.claim()` da
+  instalação inicial continua sem recarregar, mas deixa a aba armada para que a
+  próxima versão atômica faça exatamente um reload e não mantenha JS antigo.
 - **QRs densos preservam módulos inteiros**: o canvas cresce de acordo com a
   versão do QR, mantendo pelo menos 4 pixels por módulo; PNG e clipboard usam
   quiet zone exata de 4 módulos sem deformar payloads no limite de 1024 bytes.

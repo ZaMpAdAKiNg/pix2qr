@@ -55,12 +55,14 @@ test('navegação e todos os scripts críticos são cache-only no CACHE_NAME ati
   assert.doesNotMatch(fetchHandler, /event\.waitUntil\s*\(/);
 });
 
-test('registro força update sem cache e só recarrega abas que já tinham controller', () => {
+test('registro força update sem cache e mantém a primeira aba armada para updates futuros', () => {
   assert.match(appSource, /const hadController = Boolean\(navigator\.serviceWorker\.controller\)/);
-  assert.match(appSource, /if \(hadController\) \{[\s\S]*controllerchange[\s\S]*window\.location\.reload\(\)/);
+  assert.match(appSource, /let controllerSeen = navigator\.serviceWorker\.controller/);
+  assert.match(appSource, /controllerchange[\s\S]*if \(!controllerSeen\)[\s\S]*controllerSeen = navigator\.serviceWorker\.controller[\s\S]*return/);
+  assert.match(appSource, /controllerchange[\s\S]*window\.location\.reload\(\)/);
   assert.match(appSource, /let reloadStarted = false/);
   assert.match(appSource, /if \(reloadStarted\) return/);
-  assert.match(appSource, /\{ once: true \}/);
+  assert.doesNotMatch(appSource, /controllerchange[\s\S]*\{ once: true \}/);
   assert.match(
     appSource,
     /serviceWorker\.register\('\/sw\.js', \{\s*updateViaCache: 'none',?\s*\}\)/,

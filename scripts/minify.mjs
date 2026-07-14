@@ -13,6 +13,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
+import { stripHtmlComments } from './minify-helpers.mjs';
 
 // esbuild LOCAL, instalado via npm ci (versão exata + integridade verificada
 // pelo package-lock.json) — nada de npx buscar binário na hora do build.
@@ -47,7 +48,7 @@ html = html.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/g, 
 });
 html = html.replace(/(<style>)([\s\S]*?)(<\/style>)/g,
   (m, a, css, b) => a + esbuild(['--minify', '--loader=css'], css).trim() + b);
-html = html.replace(/<!--[\s\S]*?-->/g, '');
+html = stripHtmlComments(html);
 html = html.replace(/^[ \t]+/gm, '');
 html = html.replace(/\n{2,}/g, '\n');
 html = html.replace(/\x00LD(\d+)\x00/g, (m, i) => ldBlocks[Number(i)]);

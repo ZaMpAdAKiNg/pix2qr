@@ -1,5 +1,3 @@
-<!-- Codex-authored public project document. -->
-
 # Contribuindo
 
 Contribuições pequenas e focadas são bem-vindas. O pix2qr manipula instruções de

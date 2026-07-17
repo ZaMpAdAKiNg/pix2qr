@@ -1,5 +1,3 @@
-<!-- Codex-authored public project document. -->
-
 # Software e assets de terceiros
 
 O pix2qr serve localmente os componentes abaixo. Os textos integrais de licença

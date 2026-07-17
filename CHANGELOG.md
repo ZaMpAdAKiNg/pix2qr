@@ -58,6 +58,11 @@ entradas são agrupadas por data.
   issue é montado dentro do bloco shell corretamente.
 
 ### Changed
+- **Repositório público visível no primeiro viewport**: o header agora exibe um
+  link acessível para o GitHub com o logo da plataforma e o rótulo "Repo
+  público", preservando o layout responsivo e a CSP sem assets externos.
+- **Sitemap sincronizado com a atualização pública**: o `lastmod` da URL
+  canônica agora reflete a mudança significativa de links do header.
 - **Analytics simplificada para Umami somente**: o Vercel Web Analytics foi
   removido do HTML, da CSP, da documentação e dos testes de rede.
 - **Endereço Lightning de doação atualizado** a pedido do mantenedor, sem

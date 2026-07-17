@@ -39,4 +39,6 @@ test('runtime usa somente Umami e mantém os filtros de privacidade', () => {
   assert.doesNotMatch(vercel, /vitals\.vercel-insights\.com/i);
   assert.match(html, /"codeRepository": "https:\/\/github\.com\/ZaMpAdAKiNg\/pix2qr"/);
   assert.match(html, />Código-fonte no GitHub<\/a>/);
+  assert.match(html, /class="github-repo-link" href="https:\/\/github\.com\/ZaMpAdAKiNg\/pix2qr"/);
+  assert.match(html, /<span>Repo público<\/span>/);
 });

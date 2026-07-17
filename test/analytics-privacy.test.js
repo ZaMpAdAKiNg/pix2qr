@@ -1,6 +1,11 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { readFileSync } = require('node:fs');
+const path = require('node:path');
+
+const indexHtmlPath = process.env.PIX_INDEX_PATH
+  ? path.resolve(process.env.PIX_INDEX_PATH)
+  : path.resolve(__dirname, '../index.html');
 
 globalThis.location = { origin: 'https://pix2qr.xyz' };
 const A = require('../analytics-privacy.js');
@@ -29,12 +34,12 @@ test('analytics preserva payload/eventos e falha fechado em URL malformada', () 
 });
 
 test('[hidden] override — .btn não fica visível quando [hidden] (F301 regressão)', () => {
-  const html = readFileSync(require.resolve('../index.html'), 'utf8');
+  const html = readFileSync(indexHtmlPath, 'utf8');
   assert.match(html, /\.btn\[hidden\]\s*\{\s*display:\s*none/);
 });
 
 test('runtime usa somente Umami e mantém os filtros de privacidade', () => {
-  const html = readFileSync(require.resolve('../index.html'), 'utf8');
+  const html = readFileSync(indexHtmlPath, 'utf8');
   const vercel = readFileSync(require.resolve('../vercel.json'), 'utf8');
   assert.match(html, /data-exclude-search="true"/);
   assert.match(html, /data-exclude-hash="true"/);

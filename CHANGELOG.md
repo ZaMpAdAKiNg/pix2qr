@@ -97,6 +97,9 @@ entradas são agrupadas por data.
   público", preservando o layout responsivo e a CSP sem assets externos.
 - **Sitemap sincronizado com a atualização pública**: o `lastmod` da URL
   canônica agora reflete a mudança significativa de links do header.
+- **Sitemap lista as páginas novas**: `/privacidade` e `/licencas` entram no
+  `sitemap.xml` como URLs próprias (`priority` 0.3), tornando-as descobríveis
+  por crawlers junto da home.
 - **Analytics simplificada para Umami somente**: o Vercel Web Analytics foi
   removido do HTML, da CSP, da documentação e dos testes de rede.
 - **Endereço Lightning de doação atualizado** a pedido do mantenedor, sem

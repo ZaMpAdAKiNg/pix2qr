@@ -14,7 +14,6 @@ const APP_SHELL = [
   "/sitemap.xml",
   "/llms.txt",
   "/PRIVACY.md",
-  "/SECURITY.md",
   "/THIRD_PARTY.md",
   "/icons/icon-192.png",
   "/icons/icon-192-maskable.png",

@@ -45,6 +45,21 @@
       ],
       "destination": "https://pix2qr.xyz/$1",
       "permanent": true
+    },
+    {
+      "source": "/PRIVACY.md",
+      "destination": "/privacidade",
+      "permanent": true
+    },
+    {
+      "source": "/THIRD_PARTY.md",
+      "destination": "/licencas",
+      "permanent": true
+    },
+    {
+      "source": "/SECURITY.md",
+      "destination": "https://github.com/ZaMpAdAKiNg/pix2qr/blob/main/SECURITY.md",
+      "permanent": true
     }
   ]
 }

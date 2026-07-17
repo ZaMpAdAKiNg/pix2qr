@@ -63,6 +63,17 @@ entradas são agrupadas por data.
   issue é montado dentro do bloco shell corretamente.
 
 ### Changed
+- **Privacidade e Licenças viram páginas de verdade**: `/privacidade` e
+  `/licencas` substituem o markdown cru que `/PRIVACY.md` e `/THIRD_PARTY.md`
+  serviam em produção — HTML com o mesmo shell do app (header, rodapé, CSS
+  inline, `lang="pt-BR"`), cada uma com title, description e canonical próprios.
+  O texto dos documentos foi preservado; só a apresentação mudou. As URLs
+  antigas passam a redirecionar (308) para as novas, e o rodapé aponta direto
+  para elas. Nenhum script inline ou JSON-LD novo: a CSP segue intocada.
+- **`SECURITY.md` e `LICENSE` saem do deploy**: passam a viver só no GitHub, de
+  onde já eram lidos. Deixam a allowlist do build e o precache do Service
+  Worker (que baixava `SECURITY.md` em toda instalação sem um único link no
+  site para ele); `/SECURITY.md` redireciona para o blob do repositório.
 - **Repositório público visível no primeiro viewport**: o header agora exibe um
   link acessível para o GitHub com o logo da plataforma e o rótulo "Repo
   público", preservando o layout responsivo e a CSP sem assets externos.

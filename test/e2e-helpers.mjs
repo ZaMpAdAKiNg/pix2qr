@@ -75,8 +75,19 @@ export function createStaticRequestHandler(rootDirectory) {
         assetStat = await stat(assetPath);
       }
     } catch {
-      sendText(response, 404, 'Not Found\n', headOnly);
-      return;
+      // Clean URLs, espelhando o default da Vercel: /privacidade serve
+      // privacidade.html. Sem isto o E2E não consegue exercer as URLs que o
+      // site publica de verdade (rodapé, canonical, sitemap e o precache do SW
+      // apontam todos para a forma sem extensão).
+      const cleanUrlPath = `${assetPath}.html`;
+      try {
+        if (path.extname(assetPath)) throw new Error('não é candidato a clean URL');
+        assetStat = await stat(cleanUrlPath);
+        assetPath = cleanUrlPath;
+      } catch {
+        sendText(response, 404, 'Not Found\n', headOnly);
+        return;
+      }
     }
 
     if (!assetStat.isFile()) {

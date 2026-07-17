@@ -37,6 +37,12 @@ entradas são agrupadas por data.
   PR e timeouts adicionados.
 
 ### Fixed
+- **Páginas de documento deixam de servir o gerador de QR**: o Service Worker
+  mapeava *toda* navegação para `/index.html`, então quem tinha o app instalado
+  (ou já havia visitado o site) clicava em "Privacidade" no rodapé e recebia o
+  gerador renderizado na URL `/privacidade`. `/privacidade` e `/licencas` agora
+  respondem à própria navegação e entram no precache — funcionam offline como o
+  resto do shell. Qualquer outra navegação continua caindo no app shell.
 - **Botão "Instalar app" respeita o atributo `[hidden]`**: a regra autoral
   `.btn { display: inline-flex }` vencia em especificidade a UA stylesheet
   (`[hidden] { display: none }`), mantendo o botão visível quando a PWA não
@@ -70,10 +76,11 @@ entradas são agrupadas por data.
   O texto dos documentos foi preservado; só a apresentação mudou. As URLs
   antigas passam a redirecionar (308) para as novas, e o rodapé aponta direto
   para elas. Nenhum script inline ou JSON-LD novo: a CSP segue intocada.
-- **`SECURITY.md` e `LICENSE` saem do deploy**: passam a viver só no GitHub, de
-  onde já eram lidos. Deixam a allowlist do build e o precache do Service
-  Worker (que baixava `SECURITY.md` em toda instalação sem um único link no
-  site para ele); `/SECURITY.md` redireciona para o blob do repositório.
+- **Nenhum markdown é mais servido pelo site**: `SECURITY.md`, `LICENSE`,
+  `PRIVACY.md` e `THIRD_PARTY.md` saem da allowlist do build e do precache do
+  Service Worker — passam a viver só no GitHub, de onde já eram lidos. As URLs
+  antigas redirecionam para as páginas novas (`/SECURITY.md` vai para o blob do
+  repositório); se um redirect falhar, a resposta é 404 em vez de markdown cru.
 - **Repositório público visível no primeiro viewport**: o header agora exibe um
   link acessível para o GitHub com o logo da plataforma e o rótulo "Repo
   público", preservando o layout responsivo e a CSP sem assets externos.

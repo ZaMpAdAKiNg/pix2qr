@@ -1,7 +1,17 @@
 const CACHE_NAME = "pix2qr-pwa-dev"; // substituído por scripts/build.sh no deploy
+// Páginas de documento: navegáveis por URL limpa (a Vercel resolve
+// /privacidade → privacidade.html). Diferente do resto do shell, cada uma
+// responde à PRÓPRIA navegação — sem isto o app shell do gerador seria
+// servido no lugar delas, e o link do rodapé cairia de volta no gerador.
+const DOCUMENT_PAGES = [
+  "/privacidade",
+  "/licencas",
+];
+
 const APP_SHELL = [
   "/",
   "/index.html",
+  ...DOCUMENT_PAGES,
   "/app.js",
   "/pix-core.js",
   "/analytics-privacy.js",
@@ -13,8 +23,6 @@ const APP_SHELL = [
   "/robots.txt",
   "/sitemap.xml",
   "/llms.txt",
-  "/PRIVACY.md",
-  "/THIRD_PARTY.md",
   "/icons/icon-192.png",
   "/icons/icon-192-maskable.png",
   "/icons/icon-512.png",
@@ -26,12 +34,14 @@ const APP_SHELL = [
 // HTML, código crítico e dependências locais formam uma unidade indivisível.
 // Cada deploy usa outro CACHE_NAME; nenhum item do shell recebe refresh isolado.
 const VERSIONED_SHELL_PATHS = new Set(APP_SHELL);
+const DOCUMENT_PAGE_PATHS = new Set(DOCUMENT_PAGES);
 
 // O instalador também valida o tipo dos bytes executáveis. cache.addAll()
 // rejeita HTTP não-2xx, mas aceitaria HTML de erro servido como status 200 no
 // lugar de JavaScript; isso ativaria um cache completo porém inutilizável.
 function expectedShellKind(pathname) {
   if (pathname === "/" || pathname === "/index.html") return "html";
+  if (DOCUMENT_PAGE_PATHS.has(pathname)) return "html";
   if (pathname.endsWith(".js")) return "javascript";
   return "asset";
 }
@@ -138,7 +148,11 @@ self.addEventListener("fetch", (event) => {
   const reqUrl = new URL(request.url);
   if (reqUrl.origin !== self.location.origin) return;
 
-  const shellPath = request.mode === "navigate" ? "/index.html" : reqUrl.pathname;
+  // Navegar para uma página de documento serve a PRÓPRIA página; qualquer outra
+  // navegação continua caindo no app shell do gerador.
+  const shellPath = request.mode === "navigate"
+    ? (DOCUMENT_PAGE_PATHS.has(reqUrl.pathname) ? reqUrl.pathname : "/index.html")
+    : reqUrl.pathname;
   if (request.mode === "navigate" || VERSIONED_SHELL_PATHS.has(shellPath)) {
     event.respondWith(
       caches.open(CACHE_NAME).then((cache) =>

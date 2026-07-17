@@ -100,7 +100,6 @@ const publicRoot = [
   'app.js', 'pix-core.js', 'analytics-privacy.js', 'image-metadata.js',
   'qrcode.min.js', 'jsQR.min.js',
   'umami.js', 'manifest.webmanifest', 'robots.txt', 'sitemap.xml', 'llms.txt', 'sw.js',
-  'THIRD_PARTY.md', 'PRIVACY.md',
 ];
 const expectedFiles = [
   ...publicRoot,

@@ -44,7 +44,15 @@ test('instala o app shell inteiro antes de ativar a nova versão', () => {
 
 test('navegação e todos os scripts críticos são cache-only no CACHE_NAME ativo', () => {
   const fetchHandler = swSource.slice(swSource.indexOf('self.addEventListener("fetch"'));
-  assert.match(fetchHandler, /request\.mode === "navigate" \? "\/index\.html" : reqUrl\.pathname/);
+  // Navegação para página de documento serve a própria página; toda outra
+  // navegação continua caindo no app shell do gerador. A prova de que isso
+  // funciona de verdade (SW ativo, offline) está em pwa-e2e.mjs.
+  assert.match(fetchHandler, /request\.mode === "navigate"/);
+  assert.match(fetchHandler, /DOCUMENT_PAGE_PATHS\.has\(reqUrl\.pathname\)\s*\?\s*reqUrl\.pathname\s*:\s*"\/index\.html"/);
+  assert.match(swSource, /const DOCUMENT_PAGE_PATHS = new Set\(DOCUMENT_PAGES\)/);
+  assert.match(swSource, /"\/privacidade"/);
+  assert.match(swSource, /"\/licencas"/);
+  assert.match(swSource, /DOCUMENT_PAGE_PATHS\.has\(pathname\)\) return "html"/);
   assert.match(fetchHandler, /VERSIONED_SHELL_PATHS\.has\(shellPath\)/);
   assert.match(fetchHandler, /caches\.open\(CACHE_NAME\)/);
   assert.match(fetchHandler, /cache\.match\(shellPath\)/);

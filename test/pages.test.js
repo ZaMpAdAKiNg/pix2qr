@@ -65,9 +65,15 @@ test('as páginas entram no deploy pela allowlist e pelo gate do artefato', () =
     assert.match(build, new RegExp(`\\b${page.file.replace('.', '\\.')}\\b`), page.file);
     assert.match(gate, new RegExp(`'${page.file.replace('.', '\\.')}'`), page.file);
   }
-  // SECURITY.md e LICENSE saem do site: passam a viver só no GitHub.
-  assert.doesNotMatch(build, /SECURITY\.md/);
-  assert.doesNotMatch(gate, /'SECURITY\.md'/);
+  // Nenhum .md é servido pelo site: os documentos viram página HTML e o
+  // markdown fica só no GitHub. Se um redirect falhar, o usuário recebe 404 —
+  // nunca markdown cru, que é justamente o que estas páginas eliminam.
+  const sw = read('sw.js');
+  for (const doc of ['PRIVACY.md', 'SECURITY.md', 'THIRD_PARTY.md']) {
+    const pattern = doc.replace('.', '\\.');
+    assert.doesNotMatch(build, new RegExp(`\\b${pattern}\\b`), doc);
+    assert.doesNotMatch(gate, new RegExp(`'${pattern}'`), doc);
+    assert.doesNotMatch(sw, new RegExp(`"/${pattern}"`), doc);
+  }
   assert.doesNotMatch(gate, /'LICENSE'/);
-  assert.doesNotMatch(read('sw.js'), /"\/SECURITY\.md"/);
 });

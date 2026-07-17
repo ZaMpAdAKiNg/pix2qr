@@ -10,6 +10,12 @@ entradas são agrupadas por data.
 ## [Não lançado]
 
 ### Security
+- **Precache atômico não depende mais de roteamento da plataforma**:
+  `/privacidade` e `/licencas` saíram do `APP_SHELL`. A instalação do Service
+  Worker é um `Promise.all` que aborta inteira em qualquer resposta não-200, e
+  essas URLs só resolvem via rewrite — um erro de configuração na plataforma
+  derrubaria o offline de *todos* os usuários. Agora o pior caso de um rewrite
+  ausente é 404 nas duas páginas: visível e reversível, sem brick de offline.
 - **Minificador falha fechado em comentários HTML truncados**: remoção por
   scanner determinístico evita marcadores residuais em sequências aninhadas e
   aborta o build quando um comentário não tem fechamento.
@@ -40,9 +46,14 @@ entradas são agrupadas por data.
 - **Páginas de documento deixam de servir o gerador de QR**: o Service Worker
   mapeava *toda* navegação para `/index.html`, então quem tinha o app instalado
   (ou já havia visitado o site) clicava em "Privacidade" no rodapé e recebia o
-  gerador renderizado na URL `/privacidade`. `/privacidade` e `/licencas` agora
-  respondem à própria navegação e entram no precache — funcionam offline como o
-  resto do shell. Qualquer outra navegação continua caindo no app shell.
+  gerador renderizado na URL `/privacidade`. Agora a navegação para
+  `/privacidade` e `/licencas` não é interceptada pelo SW: vai à rede e serve a
+  própria página. Qualquer outra navegação continua caindo no app shell.
+- **URLs limpas passam a ser declaradas, não presumidas**: `vercel.json` ganhou
+  `rewrites` de `/privacidade` e `/licencas` para os respectivos `.html`. O
+  `cleanUrls` da Vercel tem default `false` e o projeto não o declarava — as
+  URLs publicadas em canonical, sitemap e rodapé responderiam 404 em produção.
+  Um teste passa a exigir rewrite para toda URL limpa publicada.
 - **Botão "Instalar app" respeita o atributo `[hidden]`**: a regra autoral
   `.btn { display: inline-flex }` vencia em especificidade a UA stylesheet
   (`[hidden] { display: none }`), mantendo o botão visível quando a PWA não

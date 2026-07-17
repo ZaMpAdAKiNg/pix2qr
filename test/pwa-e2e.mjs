@@ -157,8 +157,9 @@ async function createSyntheticServer() {
         send(response, 400, 'text/plain; charset=utf-8', 'Bad Request\n');
         return;
       }
-      // Clean URLs, espelhando o default da Vercel: /privacidade serve
-      // privacidade.html. É a forma que o SW precacheia e que o rodapé linka.
+      // Espelha os rewrites declarados em vercel.json: /privacidade serve
+      // privacidade.html. NÃO é default da plataforma — cleanUrls tem default
+      // `false` na Vercel; a resolução só existe porque o rewrite a declara.
       const candidates = path.extname(resolved) ? [resolved] : [resolved, `${resolved}.html`];
       let served;
       for (const candidate of candidates) {
@@ -527,11 +528,20 @@ try {
   assert.equal(parsed?.chave, 'privacy-offline@example.invalid');
   assert.equal(parsed?.valor, '12.34');
 
-  // Navegação real para as páginas de documento com o SW ATIVO e a rede
-  // OFFLINE: só passa se elas estiverem no precache E o handler de navegação
-  // servir a própria página. É a jornada do clique no rodapé dentro do app.
-  // Antes do carve-out DOCUMENT_PAGE_PATHS, toda navegação era mapeada para
-  // "/index.html" e estas URLs devolviam o gerador de QR.
+  await context.setOffline(false);
+
+  // Navegação real para as páginas de documento com o SW ATIVO e a rede ONLINE:
+  // é a jornada do clique no rodapé dentro do app (usuário recorrente/PWA, já
+  // sob controle do SW). Elas NÃO estão no precache — nenhum requisito pede que
+  // funcionem offline —, então quem tem de acertar aqui é o bypass de navegação:
+  // sem ele o handler devolve o app shell do gerador, ou um 503 de shell
+  // indisponível quando o caminho não está no cache. O SW já está ativo neste
+  // ponto do teste (v2 instalado e reload feito acima), então o bypass é
+  // exercido de verdade — não é uma navegação sem controller.
+  assert.ok(
+    await page.evaluate(() => Boolean(navigator.serviceWorker.controller)),
+    'PWA E2E FAIL: SW não está controlando a aba — a navegação abaixo não provaria o bypass',
+  );
   for (const [pathname, heading] of [
     ['/privacidade', 'Privacidade'],
     ['/licencas', 'Software e assets de terceiros'],
@@ -540,23 +550,22 @@ try {
     assert.equal(
       new URL(page.url()).pathname,
       pathname,
-      `PWA E2E FAIL: navegação offline saiu de ${pathname}`,
+      `PWA E2E FAIL: navegação saiu de ${pathname}`,
     );
     assert.equal(
       (await page.textContent('h1'))?.trim(),
       heading,
-      `PWA E2E FAIL: ${pathname} offline não serviu a página do documento (app shell do gerador no lugar dela?)`,
+      `PWA E2E FAIL: ${pathname} não serviu a página do documento (app shell do gerador no lugar dela?)`,
     );
     assert.equal(
       await page.locator('#gerar-btn').count(),
       0,
-      `PWA E2E FAIL: ${pathname} offline serviu o gerador de QR`,
+      `PWA E2E FAIL: ${pathname} serviu o gerador de QR`,
     );
   }
 
-  await context.setOffline(false);
   console.log(
-    'PWA E2E PASS: shell HTML+6 scripts atômico, reload único, faults assimétricos, PIX offline e páginas de documento offline',
+    'PWA E2E PASS: shell HTML+6 scripts atômico, reload único, faults assimétricos, PIX offline e páginas de documento online sob SW ativo',
   );
 } catch (error) {
   console.error(error?.stack || error?.message || String(error));

@@ -34,6 +34,16 @@
       ]
     }
   ],
+  "rewrites": [
+    {
+      "source": "/privacidade",
+      "destination": "/privacidade.html"
+    },
+    {
+      "source": "/licencas",
+      "destination": "/licencas.html"
+    }
+  ],
   "redirects": [
     {
       "source": "/(.*)",

@@ -13,6 +13,22 @@ const PAGES = [
   { file: 'licencas.html', title: 'Licenças de terceiros — pix2qr', canonical: 'https://pix2qr.xyz/licencas' },
 ];
 
+// A URL publicada (canonical, sitemap, rodapé) é a forma sem extensão. Ela só
+// existe porque vercel.json declara um rewrite: cleanUrls tem default `false` na
+// Vercel e este projeto não o declara — sem o rewrite, /privacidade dá 404 em
+// produção e nenhum gate local percebe, porque a falha mora na plataforma.
+test('vercel.json declara um rewrite para toda URL limpa publicada', () => {
+  const { rewrites } = JSON.parse(read('vercel.json'));
+  assert.ok(Array.isArray(rewrites), 'vercel.json não declara rewrites');
+  for (const page of PAGES) {
+    const cleanUrl = new URL(page.canonical).pathname;
+    assert.notEqual(cleanUrl, `/${page.file}`, page.file);
+    const rewrite = rewrites.find((entry) => entry.source === cleanUrl);
+    assert.ok(rewrite, `sem rewrite para ${cleanUrl} — 404 em produção`);
+    assert.equal(rewrite.destination, `/${page.file}`, cleanUrl);
+  }
+});
+
 test('páginas auxiliares têm shell, lang e identidade de SEO próprios', () => {
   for (const page of PAGES) {
     const html = read(page.file);

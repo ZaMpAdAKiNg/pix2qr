@@ -1,8 +1,11 @@
 const CACHE_NAME = "pix2qr-pwa-dev"; // substituído por scripts/build.sh no deploy
-// Páginas de documento: navegáveis por URL limpa (a Vercel resolve
-// /privacidade → privacidade.html). Diferente do resto do shell, cada uma
-// responde à PRÓPRIA navegação — sem isto o app shell do gerador seria
-// servido no lugar delas, e o link do rodapé cairia de volta no gerador.
+// Páginas de documento: URLs limpas resolvidas por rewrite declarado em
+// vercel.json (/privacidade → privacidade.html). Elas NÃO entram no APP_SHELL:
+// o precache é atômico e um único item não-200 abortaria a instalação inteira,
+// derrubando o offline de todo mundo por causa de uma questão de roteamento.
+// Cada navegação para elas vai à rede; nenhum requisito pede que funcionem
+// offline. O handler de fetch precisa dispensá-las explicitamente — senão o
+// app shell do gerador (ou um 503) seria servido no lugar delas.
 const DOCUMENT_PAGES = [
   "/privacidade",
   "/licencas",
@@ -11,7 +14,6 @@ const DOCUMENT_PAGES = [
 const APP_SHELL = [
   "/",
   "/index.html",
-  ...DOCUMENT_PAGES,
   "/app.js",
   "/pix-core.js",
   "/analytics-privacy.js",
@@ -41,7 +43,6 @@ const DOCUMENT_PAGE_PATHS = new Set(DOCUMENT_PAGES);
 // lugar de JavaScript; isso ativaria um cache completo porém inutilizável.
 function expectedShellKind(pathname) {
   if (pathname === "/" || pathname === "/index.html") return "html";
-  if (DOCUMENT_PAGE_PATHS.has(pathname)) return "html";
   if (pathname.endsWith(".js")) return "javascript";
   return "asset";
 }
@@ -148,11 +149,15 @@ self.addEventListener("fetch", (event) => {
   const reqUrl = new URL(request.url);
   if (reqUrl.origin !== self.location.origin) return;
 
-  // Navegar para uma página de documento serve a PRÓPRIA página; qualquer outra
-  // navegação continua caindo no app shell do gerador.
-  const shellPath = request.mode === "navigate"
-    ? (DOCUMENT_PAGE_PATHS.has(reqUrl.pathname) ? reqUrl.pathname : "/index.html")
-    : reqUrl.pathname;
+  // Navegar para uma página de documento não é responsabilidade do SW: elas não
+  // estão no precache, então interceptar só produziria o app shell do gerador no
+  // lugar delas (ou o 503 de shell indisponível). Sem respondWith, o browser
+  // busca na rede e o rewrite da Vercel resolve a URL limpa. Os subrecursos
+  // delas (scripts, fontes) continuam vindo do shell versionado abaixo.
+  if (request.mode === "navigate" && DOCUMENT_PAGE_PATHS.has(reqUrl.pathname)) return;
+
+  // Qualquer outra navegação cai no app shell do gerador.
+  const shellPath = request.mode === "navigate" ? "/index.html" : reqUrl.pathname;
   if (request.mode === "navigate" || VERSIONED_SHELL_PATHS.has(shellPath)) {
     event.respondWith(
       caches.open(CACHE_NAME).then((cache) =>

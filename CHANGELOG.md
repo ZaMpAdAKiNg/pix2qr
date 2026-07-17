@@ -37,6 +37,11 @@ entradas são agrupadas por data.
   PR e timeouts adicionados.
 
 ### Fixed
+- **Botão "Instalar app" respeita o atributo `[hidden]`**: a regra autoral
+  `.btn { display: inline-flex }` vencia em especificidade a UA stylesheet
+  (`[hidden] { display: none }`), mantendo o botão visível quando a PWA não
+  estava disponível para instalação. Corrigido com `.btn[hidden] { display: none }`
+  seguindo o mesmo idioma do `.status-chip[hidden]` já presente.
 - **Primeira aba da PWA acompanha updates futuros**: o `clients.claim()` da
   instalação inicial continua sem recarregar, mas deixa a aba armada para que a
   próxima versão atômica faça exatamente um reload e não mantenha JS antigo.

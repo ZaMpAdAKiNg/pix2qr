@@ -4,6 +4,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
+const vm = require('node:vm');
 
 const swSource = fs.readFileSync(path.resolve(__dirname, '../sw.js'), 'utf8');
 const appSource = fs.readFileSync(path.resolve(__dirname, '../app.js'), 'utf8');
@@ -71,11 +72,11 @@ test('navegação e todos os scripts críticos são cache-only no CACHE_NAME ati
   assert.match(fetchHandler, /request\.mode === "navigate"/);
   assert.match(
     fetchHandler,
-    /if \(request\.mode === "navigate" && DOCUMENT_PAGE_PATHS\.has\(reqUrl\.pathname\)\) return;/,
+    /if \(request\.mode === "navigate" && DOCUMENT_PAGE_PATHS\.has\(documentPagePathname\(reqUrl\.pathname\)\)\) return;/,
   );
   assert.match(fetchHandler, /const shellPath = request\.mode === "navigate" \? "\/index\.html" : reqUrl\.pathname;/);
   assert.ok(
-    fetchHandler.indexOf('DOCUMENT_PAGE_PATHS.has(reqUrl.pathname)) return;')
+    fetchHandler.indexOf('DOCUMENT_PAGE_PATHS.has(documentPagePathname(reqUrl.pathname))) return;')
       < fetchHandler.indexOf('event.respondWith'),
     'o bypass das páginas de documento precisa preceder o respondWith de navegação',
   );
@@ -106,4 +107,104 @@ test('registro força update sem cache e mantém a primeira aba armada para upda
   );
   assert.match(appSource, /if \(hadController && !registration\.installing\)/);
   assert.match(appSource, /await registration\.update\(\)/);
+});
+
+// Os testes acima assertam sobre o TEXTO-FONTE do SW. Isso prova que o código
+// existe, não que ele decide certo — uma regressão de roteamento passaria por
+// acidente. O bloco abaixo EXECUTA o handler de fetch num contexto isolado com
+// stubs e observa a única decisão que importa: houve respondWith ou não.
+function loadFetchHandler(source) {
+  const listeners = {};
+  const noopCache = {
+    match: async () => undefined,
+    put: async () => {},
+  };
+  const sandbox = {
+    self: {
+      addEventListener: (type, handler) => { listeners[type] = handler; },
+      location: { origin: 'https://pix2qr.xyz' },
+      clients: { matchAll: async () => [], claim: async () => {} },
+      skipWaiting: async () => {},
+    },
+    caches: {
+      open: async () => noopCache,
+      delete: async () => {},
+      keys: async () => [],
+    },
+    fetch: async () => { throw new Error('o teste não deve tocar a rede'); },
+    URL, Request, Response, Promise, setTimeout, clearTimeout, console,
+  };
+  vm.runInNewContext(source, sandbox);
+  assert.ok(listeners.fetch, 'o SW não registrou listener de fetch');
+  return listeners.fetch;
+}
+
+// true = o SW interceptou (serviria do cache/shell); false = passou para a rede.
+function intercepts(fetchHandler, url, mode = 'navigate') {
+  let responded = false;
+  fetchHandler({
+    request: { method: 'GET', mode, url },
+    respondWith: (promise) => {
+      responded = true;
+      if (promise && typeof promise.catch === 'function') promise.catch(() => {});
+    },
+  });
+  return responded;
+}
+
+test('navegação para páginas de documento vai à rede em TODAS as variantes de caminho', () => {
+  const fetchHandler = loadFetchHandler(swSource);
+  const origin = 'https://pix2qr.xyz';
+
+  // O SW roda ANTES da rede: nenhum rewrite/redirect da plataforma corrige uma
+  // URL que ele mesmo curto-circuita. Se qualquer variante for interceptada, o
+  // fallback de shell serve o GERADOR no lugar da página pedida.
+  //   /privacidade.html → arquivo real do artefato (200 em produção)
+  //   /privacidade/     → 404 da plataforma; errado, mas honesto — muito melhor
+  //                       que 200 servindo a página errada
+  for (const variant of [
+    '/privacidade', '/privacidade/', '/privacidade.html',
+    '/licencas', '/licencas/', '/licencas.html',
+  ]) {
+    assert.equal(
+      intercepts(fetchHandler, `${origin}${variant}`),
+      false,
+      `SW interceptou ${variant} e serviria o gerador no lugar da página`,
+    );
+  }
+
+  // A normalização não pode vazar para o shell: a raiz e o index continuam
+  // sendo servidos pelo app shell versionado (offline do gerador depende disso).
+  for (const shellUrl of ['/', '/index.html', '/qualquer-rota-desconhecida']) {
+    assert.equal(
+      intercepts(fetchHandler, `${origin}${shellUrl}`),
+      true,
+      `navegação para ${shellUrl} deixou de ser servida pelo app shell`,
+    );
+  }
+
+  // Subrecursos do shell continuam cache-only; outra origem continua ignorada.
+  assert.equal(intercepts(fetchHandler, `${origin}/app.js`, 'no-cors'), true);
+  assert.equal(intercepts(fetchHandler, 'https://cloud.umami.is/script.js', 'no-cors'), false);
+});
+
+// A checagem sintática acima ("tem extensão, logo é arquivo") aceita qualquer
+// caminho inventado: /ghost.js passaria verde, entraria no precache atômico,
+// daria 404 e brickaria o offline de todo mundo — com o CI todo verde. O shell
+// só é confiável se cruzado contra os arquivos que existem DE VERDADE.
+test('todo item do APP_SHELL corresponde a um arquivo real no repositório', () => {
+  const repoRoot = path.resolve(__dirname, '..');
+  const start = swSource.indexOf('const APP_SHELL = [');
+  const appShell = swSource.slice(start, swSource.indexOf('];', start));
+  const paths = [...appShell.matchAll(/"([^"]+)"/g)].map((m) => m[1]);
+  assert.ok(paths.length > 10, 'APP_SHELL vazio ou não parseado — a checagem seria vácua');
+
+  const missing = paths
+    .map((pathname) => (pathname === '/' ? 'index.html' : pathname.replace(/^\//, '')))
+    .filter((relative) => !fs.existsSync(path.join(repoRoot, relative)));
+  assert.deepEqual(
+    missing,
+    [],
+    `APP_SHELL cita arquivos inexistentes (precache atômico falharia e derrubaria o offline): ${missing.join(', ')}`,
+  );
 });

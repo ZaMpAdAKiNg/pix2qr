@@ -38,6 +38,18 @@ const APP_SHELL = [
 const VERSIONED_SHELL_PATHS = new Set(APP_SHELL);
 const DOCUMENT_PAGE_PATHS = new Set(DOCUMENT_PAGES);
 
+// A mesma página de documento é alcançável por variantes de caminho:
+// /privacidade, /privacidade/ e /privacidade.html (o arquivo real do artefato).
+// O SW roda ANTES da rede, então nenhum rewrite ou redirect da plataforma
+// corrige uma URL que ele próprio curto-circuitou — a normalização tem de
+// acontecer aqui. Sem ela, as variantes caem no fallback de shell e o gerador é
+// servido no lugar da página pedida, com status 200.
+function documentPagePathname(pathname) {
+  let normalized = pathname.replace(/\/+$/, "");
+  if (normalized.endsWith(".html")) normalized = normalized.slice(0, -".html".length);
+  return normalized === "" ? "/" : normalized;
+}
+
 // O instalador também valida o tipo dos bytes executáveis. cache.addAll()
 // rejeita HTTP não-2xx, mas aceitaria HTML de erro servido como status 200 no
 // lugar de JavaScript; isso ativaria um cache completo porém inutilizável.
@@ -154,7 +166,7 @@ self.addEventListener("fetch", (event) => {
   // lugar delas (ou o 503 de shell indisponível). Sem respondWith, o browser
   // busca na rede e o rewrite da Vercel resolve a URL limpa. Os subrecursos
   // delas (scripts, fontes) continuam vindo do shell versionado abaixo.
-  if (request.mode === "navigate" && DOCUMENT_PAGE_PATHS.has(reqUrl.pathname)) return;
+  if (request.mode === "navigate" && DOCUMENT_PAGE_PATHS.has(documentPagePathname(reqUrl.pathname))) return;
 
   // Qualquer outra navegação cai no app shell do gerador.
   const shellPath = request.mode === "navigate" ? "/index.html" : reqUrl.pathname;

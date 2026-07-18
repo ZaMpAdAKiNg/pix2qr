@@ -43,6 +43,11 @@ entradas são agrupadas por data.
   PR e timeouts adicionados.
 
 ### Fixed
+- **Privacidade e Licenças abrem em qualquer forma do endereço**: as páginas já
+  eram servidas corretamente em `/privacidade` e `/licencas`, mas variações do
+  mesmo endereço — com barra no final ou terminando em `.html` — ainda caíam no
+  gerador de QR para quem tinha o app instalado. Agora todas as formas abrem a
+  página pedida.
 - **Páginas de documento deixam de servir o gerador de QR**: o Service Worker
   mapeava *toda* navegação para `/index.html`, então quem tinha o app instalado
   (ou já havia visitado o site) clicava em "Privacidade" no rodapé e recebia o
@@ -89,9 +94,11 @@ entradas são agrupadas por data.
   para elas. Nenhum script inline ou JSON-LD novo: a CSP segue intocada.
 - **Nenhum markdown é mais servido pelo site**: `SECURITY.md`, `LICENSE`,
   `PRIVACY.md` e `THIRD_PARTY.md` saem da allowlist do build e do precache do
-  Service Worker — passam a viver só no GitHub, de onde já eram lidos. As URLs
-  antigas redirecionam para as páginas novas (`/SECURITY.md` vai para o blob do
-  repositório); se um redirect falhar, a resposta é 404 em vez de markdown cru.
+  Service Worker — passam a viver só no GitHub, de onde já eram lidos. Três dos
+  endereços antigos redirecionam para o conteúdo novo (`/PRIVACY.md` e
+  `/THIRD_PARTY.md` para as páginas, `/SECURITY.md` para o blob do repositório);
+  `/LICENSE` não redireciona e responde 404 direto. Em qualquer caso, o pior
+  resultado possível é um 404 — nunca markdown cru.
 - **Repositório público visível no primeiro viewport**: o header agora exibe um
   link acessível para o GitHub com o logo da plataforma e o rótulo "Repo
   público", preservando o layout responsivo e a CSP sem assets externos.
@@ -142,6 +149,17 @@ entradas são agrupadas por data.
   recebeu `role="img"` + `aria-label` ("QR Code PIX gerado — escaneie no app do
   banco"). Antes o canvas não tinha descrição textual (o Copia-e-Cola em texto
   segue como a alternativa acessível ao conteúdo).
+- **Nome falado do link do repositório bate com o texto na tela**: o link "Repo
+  público" era anunciado por leitores de tela com uma descrição que não começava
+  pelo rótulo visível, então quem navega por comando de voz não conseguia
+  ativá-lo dizendo o que estava lendo. A descrição passa a começar pelo próprio
+  texto do botão.
+- **Contorno de foco do teclado bem mais visível**: botões e links passam a
+  receber um anel roxo claro de contraste alto quando alcançados pelo teclado,
+  no lugar do brilho sutil que quase desaparecia sobre os fundos mais claros.
+- **Link "Repo público" mais fácil de acertar no celular**: a área de toque do
+  link no topo das páginas cresceu, sem alterar a altura da barra nem o visual
+  do site.
 
 ### Changed
 - **Supply chain do build pinada**: `esbuild` e `playwright-core` agora vêm de

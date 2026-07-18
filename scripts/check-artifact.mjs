@@ -119,4 +119,22 @@ if (missingFiles.length) fail(`dist sem arquivos públicos obrigatórios: ${miss
 if (extraFiles.length) fail(`dist contém arquivos fora da allowlist: ${extraFiles.join(', ')}`);
 ok(`allowlist pública do dist confirmada (${actualFiles.length} arquivos; sem test/scripts/.github)`);
 
+// ---- (e) APP_SHELL cruzado contra os arquivos que o artefato realmente tem ----
+// A allowlist acima e o APP_SHELL do SW eram duas listas mantidas à mão que
+// nunca se olhavam. Um caminho no precache sem arquivo correspondente no dist
+// não quebra build nenhum: ele falha em runtime, no cache.addAll() atômico, e
+// derruba o offline de TODOS os clientes — com o CI inteiro verde. Aqui o
+// precache passa a ser validado contra o artefato de verdade.
+const swSource = readFileSync('sw.js', 'utf8');
+const shellStart = swSource.indexOf('const APP_SHELL = [');
+const shellBlock = swSource.slice(shellStart, swSource.indexOf('];', shellStart));
+const shellPaths = [...shellBlock.matchAll(/"([^"]+)"/g)].map((m) => m[1]);
+// Sem esta guarda a checagem seria vácua: lista vazia passa por definição.
+if (shellPaths.length < 10) fail('APP_SHELL do sw.js não parseado (menos de 10 caminhos) — a checagem de precache seria vácua');
+const shellMissing = shellPaths
+  .map((pathname) => (pathname === '/' ? 'index.html' : pathname.replace(/^\//, '')))
+  .filter((relative) => !actualFiles.includes(relative));
+if (shellMissing.length) fail(`APP_SHELL precacheia caminhos que não existem no artefato: ${shellMissing.join(', ')} — install do SW falharia e o offline morreria para todos`);
+ok(`APP_SHELL cruzado com o artefato (${shellPaths.length} caminhos, todos presentes no dist)`);
+
 console.log('[check-artifact] todos os gates passaram');

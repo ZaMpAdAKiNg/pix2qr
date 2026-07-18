@@ -70,7 +70,7 @@
       --bg-card-2: #1c1c26;
 
       --border:       rgba(255,255,255,.09);
-      --border-focus: rgba(115,100,240,.6);
+      --border-focus: #8576f5;
 
       --primary:        #7364f0;
       --primary-subtle: rgba(115,100,240,.15);
@@ -112,7 +112,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 0.35rem 1rem;
+      padding: 0.25rem 1rem;
       min-height: 54px;
       position: sticky;
       top: 0;
@@ -145,7 +145,7 @@
 
     .topbar-logo:focus-visible {
       outline: 2px solid var(--border-focus);
-      outline-offset: 3px;
+      outline-offset: 2px;
     }
 
     .topbar-actions {
@@ -156,7 +156,7 @@
     }
 
     .github-repo-link {
-      min-height: 34px;
+      min-height: 44px;
       display: inline-flex;
       align-items: center;
       gap: 0.35rem;
@@ -187,9 +187,10 @@
     }
 
     .github-repo-link:focus-visible {
-      outline: none;
-      border-color: var(--border-focus);
-      box-shadow: 0 0 0 3px var(--primary-subtle);
+      outline: 2px solid var(--border-focus);
+      outline-offset: 2px;
+      border-color: var(--primary-border);
+      background: var(--primary-subtle);
     }
 
     .github-repo-link:active {

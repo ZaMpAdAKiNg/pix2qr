@@ -42,9 +42,46 @@ test('instala o app shell inteiro antes de ativar a nova versão', () => {
   );
 });
 
+// O precache é atômico: um único item não-200 aborta a instalação e derruba o
+// offline de TODO usuário. Por isso ele só pode conter caminhos que resolvem
+// independentemente de configuração de roteamento da plataforma. As URLs limpas
+// das páginas de documento dependem de um rewrite declarado em vercel.json —
+// se um dia voltarem para cá, um erro de roteamento vira brick de offline.
+test('o precache atômico não contém nenhum caminho que dependa de rewrite', () => {
+  const start = swSource.indexOf('const APP_SHELL = [');
+  const appShell = swSource.slice(start, swSource.indexOf('];', start));
+  assert.doesNotMatch(appShell, /DOCUMENT_PAGES/);
+  for (const cleanUrl of ['/privacidade', '/licencas']) {
+    assert.doesNotMatch(appShell, new RegExp(`"${cleanUrl}"`), cleanUrl);
+  }
+  // Todo item do shell é servido por um arquivo real do artefato: "/" (index)
+  // ou um caminho com extensão. Nada de extensionless dependente de rewrite.
+  const paths = [...appShell.matchAll(/"([^"]+)"/g)].map((m) => m[1]);
+  assert.ok(paths.length > 10, 'APP_SHELL vazio ou não parseado');
+  for (const pathname of paths) {
+    assert.ok(pathname === '/' || /\.[a-z0-9]+$/i.test(pathname), `shell depende de rewrite: ${pathname}`);
+  }
+});
+
 test('navegação e todos os scripts críticos são cache-only no CACHE_NAME ativo', () => {
   const fetchHandler = swSource.slice(swSource.indexOf('self.addEventListener("fetch"'));
-  assert.match(fetchHandler, /request\.mode === "navigate" \? "\/index\.html" : reqUrl\.pathname/);
+  // Navegação para página de documento NÃO é interceptada: sem precache, servir
+  // do cache devolveria o gerador (ou 503). O bypass precisa vir ANTES do
+  // respondWith de navegação. A prova real (SW ativo, online) está em pwa-e2e.mjs.
+  assert.match(fetchHandler, /request\.mode === "navigate"/);
+  assert.match(
+    fetchHandler,
+    /if \(request\.mode === "navigate" && DOCUMENT_PAGE_PATHS\.has\(reqUrl\.pathname\)\) return;/,
+  );
+  assert.match(fetchHandler, /const shellPath = request\.mode === "navigate" \? "\/index\.html" : reqUrl\.pathname;/);
+  assert.ok(
+    fetchHandler.indexOf('DOCUMENT_PAGE_PATHS.has(reqUrl.pathname)) return;')
+      < fetchHandler.indexOf('event.respondWith'),
+    'o bypass das páginas de documento precisa preceder o respondWith de navegação',
+  );
+  assert.match(swSource, /const DOCUMENT_PAGE_PATHS = new Set\(DOCUMENT_PAGES\)/);
+  assert.match(swSource, /"\/privacidade"/);
+  assert.match(swSource, /"\/licencas"/);
   assert.match(fetchHandler, /VERSIONED_SHELL_PATHS\.has\(shellPath\)/);
   assert.match(fetchHandler, /caches\.open\(CACHE_NAME\)/);
   assert.match(fetchHandler, /cache\.match\(shellPath\)/);

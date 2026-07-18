@@ -131,7 +131,7 @@ jobs:
         run: node scripts/check-artifact.mjs --post
 
       - name: Unit tests contra o pix-core minificado
-        run: PIX_CORE_PATH=dist/pix-core.js node --test test/*.test.js
+        run: PIX_CORE_PATH=dist/pix-core.js PIX_INDEX_PATH=dist/index.html node --test test/*.test.js
 
   # E2E contra o artefato: serve o output do build, gera um QR na página real,
   # decodifica com o jsQR da própria página e confere payload + CRC via

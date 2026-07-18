@@ -1,5 +1,3 @@
-<!-- Codex-authored public project document. -->
-
 # Privacidade
 
 O pix2qr processa no navegador chaves PIX, valores, nomes, cidades, códigos

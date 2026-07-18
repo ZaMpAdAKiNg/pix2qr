@@ -24,10 +24,10 @@ CACHE_NAME="pix2qr-pwa-${VERSION}"
 rm -rf dist
 mkdir -p dist/icons dist/fonts dist/licenses
 ROOT_FILES=(
-  index.html app.js pix-core.js analytics-privacy.js image-metadata.js
+  index.html privacidade.html licencas.html
+  app.js pix-core.js analytics-privacy.js image-metadata.js
   qrcode.min.js jsQR.min.js umami.js
   manifest.webmanifest robots.txt sitemap.xml llms.txt sw.js
-  LICENSE SECURITY.md THIRD_PARTY.md PRIVACY.md
 )
 ICON_FILES=(
   icons/favicon-32.png icons/icon-1024.png icons/icon-192-maskable.png

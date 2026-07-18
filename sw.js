@@ -1,4 +1,16 @@
 const CACHE_NAME = "pix2qr-pwa-dev"; // substituído por scripts/build.sh no deploy
+// Páginas de documento: URLs limpas resolvidas por rewrite declarado em
+// vercel.json (/privacidade → privacidade.html). Elas NÃO entram no APP_SHELL:
+// o precache é atômico e um único item não-200 abortaria a instalação inteira,
+// derrubando o offline de todo mundo por causa de uma questão de roteamento.
+// Cada navegação para elas vai à rede; nenhum requisito pede que funcionem
+// offline. O handler de fetch precisa dispensá-las explicitamente — senão o
+// app shell do gerador (ou um 503) seria servido no lugar delas.
+const DOCUMENT_PAGES = [
+  "/privacidade",
+  "/licencas",
+];
+
 const APP_SHELL = [
   "/",
   "/index.html",
@@ -13,9 +25,6 @@ const APP_SHELL = [
   "/robots.txt",
   "/sitemap.xml",
   "/llms.txt",
-  "/PRIVACY.md",
-  "/SECURITY.md",
-  "/THIRD_PARTY.md",
   "/icons/icon-192.png",
   "/icons/icon-192-maskable.png",
   "/icons/icon-512.png",
@@ -27,6 +36,7 @@ const APP_SHELL = [
 // HTML, código crítico e dependências locais formam uma unidade indivisível.
 // Cada deploy usa outro CACHE_NAME; nenhum item do shell recebe refresh isolado.
 const VERSIONED_SHELL_PATHS = new Set(APP_SHELL);
+const DOCUMENT_PAGE_PATHS = new Set(DOCUMENT_PAGES);
 
 // O instalador também valida o tipo dos bytes executáveis. cache.addAll()
 // rejeita HTTP não-2xx, mas aceitaria HTML de erro servido como status 200 no
@@ -139,6 +149,14 @@ self.addEventListener("fetch", (event) => {
   const reqUrl = new URL(request.url);
   if (reqUrl.origin !== self.location.origin) return;
 
+  // Navegar para uma página de documento não é responsabilidade do SW: elas não
+  // estão no precache, então interceptar só produziria o app shell do gerador no
+  // lugar delas (ou o 503 de shell indisponível). Sem respondWith, o browser
+  // busca na rede e o rewrite da Vercel resolve a URL limpa. Os subrecursos
+  // delas (scripts, fontes) continuam vindo do shell versionado abaixo.
+  if (request.mode === "navigate" && DOCUMENT_PAGE_PATHS.has(reqUrl.pathname)) return;
+
+  // Qualquer outra navegação cai no app shell do gerador.
   const shellPath = request.mode === "navigate" ? "/index.html" : reqUrl.pathname;
   if (request.mode === "navigate" || VERSIONED_SHELL_PATHS.has(shellPath)) {
     event.respondWith(

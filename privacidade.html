@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- SEO core -->
+  <title>Privacidade — pix2qr</title>
+  <meta name="description" content="O que o pix2qr processa no navegador, qual telemetria técnica o site envia e o que fica armazenado localmente. Sem backend de pagamentos e sem cadastro." />
+  <meta name="author" content="pix2qr" />
+  <meta name="robots" content="index, follow" />
+
+  <!-- Open Graph (Facebook, LinkedIn, WhatsApp) -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="PIX QR Code" />
+  <meta property="og:locale" content="pt_BR" />
+  <meta property="og:title" content="Privacidade — pix2qr" />
+  <meta property="og:description" content="O que o pix2qr processa no navegador, qual telemetria técnica o site envia e o que fica armazenado localmente." />
+  <meta property="og:url" content="https://pix2qr.xyz/privacidade" />
+  <meta property="og:image" content="https://pix2qr.xyz/icons/icon-512.png" />
+  <meta property="og:image:width" content="512" />
+  <meta property="og:image:height" content="512" />
+  <meta property="og:image:alt" content="Logo do PIX QR Code: gerador local de QR Code PIX" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Privacidade — pix2qr" />
+  <meta name="twitter:description" content="O que o pix2qr processa no navegador e qual telemetria técnica o site envia." />
+  <meta name="twitter:image" content="https://pix2qr.xyz/icons/icon-512.png" />
+
+  <!-- PWA / iOS -->
+  <meta name="theme-color" content="#0c0c12" />
+
+  <!-- CSP: idêntica à do index.html (fonte canônica é o header HTTP em vercel.json;
+       este <meta> é fallback p/ file://). Esta página não tem script inline nem
+       JSON-LD: o hash sha256 aqui é o do JSON-LD do index.html e fica inerte —
+       mantido só para a meta não divergir da política servida. Mudou aqui? Mude
+       também no vercel.json e no index.html. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-GGHH/1agz1XbHI/BeCsV5JfDijWlDCdCq2LoBJoGZEo='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://cloud.umami.is https://gateway.umami.is https://api-gateway.umami.dev; object-src 'none'; base-uri 'self'; form-action 'none';" />
+
+  <!-- Discovery / metadata: canonical, manifest, ícones -->
+  <link rel="canonical" href="https://pix2qr.xyz/privacidade" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+  <script src="/analytics-privacy.js"></script>
+  <script defer src="/umami.js"
+          data-website-id="6d397cad-3f3c-4311-aabd-cf3010f33803"
+          data-exclude-search="true"
+          data-exclude-hash="true"
+          data-do-not-track="true"
+          data-before-send="pix2qrBeforeSend"></script>
+
+  <style>
+    @font-face {
+      font-family: 'Outfit';
+      font-style: normal;
+      font-weight: 100 900;
+      font-display: swap;
+      src: url('/fonts/outfit-latin.woff2') format('woff2');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+    :root {
+      --font-sans: 'Outfit', system-ui, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+      --bg-base:   #0c0c12;
+      --bg-topbar: #111118;
+      --bg-card:   #14141c;
+      --bg-card-2: #1c1c26;
+
+      --border:       rgba(255,255,255,.09);
+      --border-focus: rgba(115,100,240,.6);
+
+      --primary:        #7364f0;
+      --primary-subtle: rgba(115,100,240,.15);
+      --primary-border: rgba(115,100,240,.45);
+
+      --fg:        #f0f0f8;
+      --fg-muted:  rgba(240,240,248,.5);
+
+      --radius-sm:   0.375rem;
+      --radius-2xl:  1.375rem;
+      --radius-full: 9999px;
+
+      --shadow-card: 0 2px 16px rgba(0,0,0,.35);
+
+      /* Documento, não formulário: a coluna do app (390px) é estreita demais
+         para prosa. O shell inteiro (topbar, conteúdo, rodapé) usa a mesma
+         medida, então nada desalinha em relação ao index. */
+      --shell-max: 680px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-base);
+      color: var(--fg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 0 5rem;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .topbar {
+      width: 100%;
+      background: var(--bg-topbar);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.35rem 1rem;
+      min-height: 54px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .topbar-inner {
+      width: 100%;
+      max-width: var(--shell-max);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .topbar-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--fg);
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+    }
+
+    .topbar-logo svg { color: var(--primary); flex-shrink: 0; }
+
+    .topbar-logo:focus-visible {
+      outline: 2px solid var(--border-focus);
+      outline-offset: 3px;
+    }
+
+    .topbar-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-left: auto;
+    }
+
+    .github-repo-link {
+      min-height: 34px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.38rem 0.58rem;
+      color: var(--fg-muted);
+      background: rgba(255,255,255,.025);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-full);
+      font-size: 0.68rem;
+      font-weight: 700;
+      line-height: 1;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: color 0.15s, border-color 0.15s, background 0.15s, transform 0.1s;
+    }
+
+    .github-repo-link svg {
+      width: 16px;
+      height: 16px;
+      color: var(--fg);
+      flex-shrink: 0;
+    }
+
+    .github-repo-link:hover {
+      color: var(--fg);
+      border-color: var(--primary-border);
+      background: var(--primary-subtle);
+    }
+
+    .github-repo-link:focus-visible {
+      outline: none;
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px var(--primary-subtle);
+    }
+
+    .github-repo-link:active {
+      transform: scale(0.985);
+    }
+
+    .page {
+      width: 100%;
+      max-width: var(--shell-max);
+      padding: 1.25rem 1rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.875rem;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-2xl);
+      box-shadow: var(--shadow-card);
+      padding: 1.5rem;
+    }
+
+    @media (min-width: 600px) {
+      .page { padding: 1.5rem 1rem 2rem; }
+      .card { padding: 2rem; }
+    }
+
+    .doc-kicker {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--fg-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .doc h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 1.25rem;
+    }
+
+    .doc h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--fg);
+      margin: 2rem 0 0.75rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .doc p {
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: var(--fg-muted);
+    }
+
+    .doc p + p { margin-top: 0.9rem; }
+    .doc strong { color: var(--fg); font-weight: 600; }
+
+    .doc a {
+      color: var(--primary);
+      text-decoration: none;
+      border-bottom: 1px solid var(--primary-border);
+    }
+    .doc a:hover { border-bottom-color: var(--primary); }
+    .doc a:focus-visible {
+      outline: 2px solid var(--border-focus);
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
+
+    .doc code {
+      font-family: var(--font-mono);
+      font-size: 0.82em;
+      color: var(--fg);
+      background: var(--bg-card-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.08em 0.32em;
+      overflow-wrap: anywhere;
+    }
+
+    /* Ressalva final: mesma voz do .legal-notice do index — texto menor,
+       destacado do corpo do documento sem virar outro card. */
+    .doc-disclaimer {
+      margin-top: 2rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.76rem;
+      line-height: 1.6;
+      color: var(--fg-muted);
+    }
+
+    footer {
+      font-size: 0.7rem;
+      /* fg-muted (não fg-subtle): texto do rodapé precisa de contraste AA */
+      color: var(--fg-muted);
+      text-align: center;
+      padding: 0 1rem;
+      max-width: var(--shell-max);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    footer a { color: var(--primary); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    .footer-meta { line-height: 1.6; }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="topbar-logo" href="/">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+        <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+        <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+        <path d="M14 14h3v3M17 17h3M14 20h3"/>
+      </svg>
+      PIX QR Code
+    </a>
+    <div class="topbar-actions">
+      <a class="github-repo-link" href="https://github.com/ZaMpAdAKiNg/pix2qr" rel="noopener external" aria-label="Repo público — abrir o repositório do pix2qr no GitHub">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.1c-3.3.7-4-1.4-4-1.4-.5-1.4-1.3-1.8-1.3-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.6.1-3.2 0 0 1-.3 3.3 1.2a11.4 11.4 0 0 1 6 0C17.5 6 18.5 6.3 18.5 6.3c.6 1.6.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3Z"/>
+        </svg>
+        <span>Repo público</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <main class="card doc">
+    <p class="doc-kicker">Documento do projeto</p>
+    <h1>Privacidade</h1>
+
+    <p>O pix2qr processa no navegador chaves PIX, valores, nomes, cidades, códigos
+    Copia-e-Cola, conteúdo decodificado, dados da área de transferência e imagens
+    selecionadas. O código da aplicação não envia esse conteúdo para um backend do
+    pix2qr, não cria conta e não o grava em banco de dados.</p>
+
+    <h2>Telemetria técnica</h2>
+
+    <p>O site carrega o script vendorizado do Umami. A implementação atual pode
+    transmitir ao serviço de analytics metadados técnicos como URL visitada, origem
+    de referência, hostname, título da página, idioma, dimensão da tela e informações
+    usuais da requisição, além de eventos de uso com categorias fixas (por exemplo,
+    geração, cópia, download ou instalação).</p>
+
+    <p>Antes do tracker executar, <code>analytics-privacy.js</code> registra filtros
+    first-party. No Umami, <code>data-exclude-search</code>, <code>data-exclude-hash</code>
+    e <code>data-before-send</code> removem query/fragmento e reduzem URL/referrer a
+    origem + caminho; <code>data-do-not-track</code> respeita a preferência DNT do
+    navegador. Um teste de rede injeta probes sintéticos em query, hash, referrer e
+    formulário e falha se qualquer um aparecer nos requests do Umami.</p>
+
+    <p>Os eventos definidos em <code>app.js</code> não incluem chave PIX, valor, nome,
+    cidade, payload, conteúdo decodificado, texto copiado ou imagem. O repositório,
+    porém, não controla nem comprova sozinho as políticas, retenção e configuração dos
+    serviços de terceiros. Bloqueadores de conteúdo ou uso offline podem impedir a
+    telemetria.</p>
+
+    <h2>Armazenamento local e PWA</h2>
+
+    <p>O Service Worker armazena apenas os arquivos estáticos necessários ao
+    funcionamento offline. O pix2qr não usa <code>localStorage</code>,
+    <code>sessionStorage</code> ou IndexedDB para persistir dados de pagamento. O
+    navegador pode manter o conteúdo visível na aba, na área de transferência, no
+    histórico de downloads ou em caches sob controle do próprio usuário.</p>
+
+    <h2>Limites e reporte</h2>
+
+    <p>Não coloque chaves, payloads ou cobranças reais em issues, pull requests ou
+    fixtures. Para uma vulnerabilidade, use o canal privado indicado em
+    <a href="https://github.com/ZaMpAdAKiNg/pix2qr/blob/main/SECURITY.md" rel="noopener external">SECURITY.md</a>;
+    se o botão de reporte privado não estiver disponível, não publique o material
+    sensível numa issue.</p>
+
+    <p class="doc-disclaimer">Esta descrição documenta o comportamento observável do
+    código nesta versão e não constitui parecer jurídico nem certificação de
+    conformidade com a LGPD.</p>
+  </main>
+
+</div>
+
+<footer>
+  <span class="footer-meta">Conteúdo PIX processado localmente no navegador</span>
+  <span class="footer-meta"><a href="https://github.com/ZaMpAdAKiNg/pix2qr" rel="noopener">Código-fonte no GitHub</a> · <a href="/privacidade">Privacidade</a> · <a href="/licencas">Licenças de terceiros</a></span>
+</footer>
+
+</body>
+</html>

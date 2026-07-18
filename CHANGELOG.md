@@ -10,6 +10,12 @@ entradas são agrupadas por data.
 ## [Não lançado]
 
 ### Security
+- **Precache atômico não depende mais de roteamento da plataforma**:
+  `/privacidade` e `/licencas` saíram do `APP_SHELL`. A instalação do Service
+  Worker é um `Promise.all` que aborta inteira em qualquer resposta não-200, e
+  essas URLs só resolvem via rewrite — um erro de configuração na plataforma
+  derrubaria o offline de *todos* os usuários. Agora o pior caso de um rewrite
+  ausente é 404 nas duas páginas: visível e reversível, sem brick de offline.
 - **Minificador falha fechado em comentários HTML truncados**: remoção por
   scanner determinístico evita marcadores residuais em sequências aninhadas e
   aborta o build quando um comentário não tem fechamento.
@@ -37,6 +43,22 @@ entradas são agrupadas por data.
   PR e timeouts adicionados.
 
 ### Fixed
+- **Páginas de documento deixam de servir o gerador de QR**: o Service Worker
+  mapeava *toda* navegação para `/index.html`, então quem tinha o app instalado
+  (ou já havia visitado o site) clicava em "Privacidade" no rodapé e recebia o
+  gerador renderizado na URL `/privacidade`. Agora a navegação para
+  `/privacidade` e `/licencas` não é interceptada pelo SW: vai à rede e serve a
+  própria página. Qualquer outra navegação continua caindo no app shell.
+- **URLs limpas passam a ser declaradas, não presumidas**: `vercel.json` ganhou
+  `rewrites` de `/privacidade` e `/licencas` para os respectivos `.html`. O
+  `cleanUrls` da Vercel tem default `false` e o projeto não o declarava — as
+  URLs publicadas em canonical, sitemap e rodapé responderiam 404 em produção.
+  Um teste passa a exigir rewrite para toda URL limpa publicada.
+- **Botão "Instalar app" respeita o atributo `[hidden]`**: a regra autoral
+  `.btn { display: inline-flex }` vencia em especificidade a UA stylesheet
+  (`[hidden] { display: none }`), mantendo o botão visível quando a PWA não
+  estava disponível para instalação. Corrigido com `.btn[hidden] { display: none }`
+  seguindo o mesmo idioma do `.status-chip[hidden]` já presente.
 - **Primeira aba da PWA acompanha updates futuros**: o `clients.claim()` da
   instalação inicial continua sem recarregar, mas deixa a aba armada para que a
   próxima versão atômica faça exatamente um reload e não mantenha JS antigo.
@@ -58,6 +80,26 @@ entradas são agrupadas por data.
   issue é montado dentro do bloco shell corretamente.
 
 ### Changed
+- **Privacidade e Licenças viram páginas de verdade**: `/privacidade` e
+  `/licencas` substituem o markdown cru que `/PRIVACY.md` e `/THIRD_PARTY.md`
+  serviam em produção — HTML com o mesmo shell do app (header, rodapé, CSS
+  inline, `lang="pt-BR"`), cada uma com title, description e canonical próprios.
+  O texto dos documentos foi preservado; só a apresentação mudou. As URLs
+  antigas passam a redirecionar (308) para as novas, e o rodapé aponta direto
+  para elas. Nenhum script inline ou JSON-LD novo: a CSP segue intocada.
+- **Nenhum markdown é mais servido pelo site**: `SECURITY.md`, `LICENSE`,
+  `PRIVACY.md` e `THIRD_PARTY.md` saem da allowlist do build e do precache do
+  Service Worker — passam a viver só no GitHub, de onde já eram lidos. As URLs
+  antigas redirecionam para as páginas novas (`/SECURITY.md` vai para o blob do
+  repositório); se um redirect falhar, a resposta é 404 em vez de markdown cru.
+- **Repositório público visível no primeiro viewport**: o header agora exibe um
+  link acessível para o GitHub com o logo da plataforma e o rótulo "Repo
+  público", preservando o layout responsivo e a CSP sem assets externos.
+- **Sitemap sincronizado com a atualização pública**: o `lastmod` da URL
+  canônica agora reflete a mudança significativa de links do header.
+- **Sitemap lista as páginas novas**: `/privacidade` e `/licencas` entram no
+  `sitemap.xml` como URLs próprias (`priority` 0.3), tornando-as descobríveis
+  por crawlers junto da home.
 - **Analytics simplificada para Umami somente**: o Vercel Web Analytics foi
   removido do HTML, da CSP, da documentação e dos testes de rede.
 - **Endereço Lightning de doação atualizado** a pedido do mantenedor, sem

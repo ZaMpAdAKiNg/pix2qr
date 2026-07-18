@@ -28,8 +28,18 @@ test('static server uses an ephemeral port, serves HEAD/GET, and closes idempote
   assert.equal(head.headers.get('content-length'), String(Buffer.byteLength('synthetic-only')));
   assert.equal(await head.text(), '');
 
+  // Clean URLs: o servidor espelha o default da Vercel, senão o E2E não
+  // consegue exercer /privacidade — a URL que o site realmente publica.
+  await writeFile(path.join(root, 'documento.html'), '<!doctype html><title>Clean URL fixture</title>');
+  const cleanUrl = await fetch(`${staticServer.origin}/documento`);
+  assert.equal(cleanUrl.status, 200);
+  assert.match(cleanUrl.headers.get('content-type'), /^text\/html/);
+  assert.match(await cleanUrl.text(), /Clean URL fixture/);
+
   const missing = await fetch(`${staticServer.origin}/missing.txt`);
   assert.equal(missing.status, 404);
+  const missingCleanUrl = await fetch(`${staticServer.origin}/nao-existe`);
+  assert.equal(missingCleanUrl.status, 404);
   const rejectedMethod = await fetch(`${staticServer.origin}/fixture.txt`, { method: 'POST' });
   assert.equal(rejectedMethod.status, 405);
 

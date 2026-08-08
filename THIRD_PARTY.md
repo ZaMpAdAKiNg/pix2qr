@@ -8,7 +8,7 @@ ficam em [`licenses/`](licenses/) e também entram no artefato público `dist/`.
 | **jsQR** | npm `jsqr@1.4.0`, `gitHead 49a9633`, integridade npm registrada no lock | Decodificar QR de imagem | [`jsQR.min.js`](jsQR.min.js) | [Apache-2.0](licenses/jsQR-Apache-2.0.txt) |
 | **node-qrcode** | npm `qrcode@1.5.4`, commit `3848ed2`, integridade npm registrada no lock | Renderizar QR | [`qrcode.min.js`](qrcode.min.js) | [MIT](licenses/node-qrcode-MIT.txt) |
 | **dijkstrajs** | npm `dijkstrajs@1.0.3`, commit `49ad1ec` | Transitivo incluído no bundle browser do node-qrcode | dentro de `qrcode.min.js` | [MIT](licenses/dijkstrajs-MIT.txt) |
-| **Umami tracker** | snapshot do script cloud em 2026-07-06 | Telemetria técnica | [`umami.js`](umami.js) | [MIT](licenses/umami-MIT.txt) |
+| **Umami tracker** | snapshot do script cloud em 2026-08-08 | Telemetria técnica | [`umami.js`](umami.js) | [MIT](licenses/umami-MIT.txt) |
 | **Outfit** | Google Fonts `v15`, variante variável latin; URL e hash no lock | Fonte local | [`fonts/outfit-latin.woff2`](fonts/outfit-latin.woff2) | [OFL-1.1](licenses/Outfit-OFL-1.1.txt) |
 
 O `qrcode.min.js` usa o caminho browser do node-qrcode; dependências de CLI e

@@ -1013,6 +1013,11 @@
       "@id": "https://pix2qr.xyz/#app",
       "name": "PIX QR Code",
       "url": "https://pix2qr.xyz/",
+      "author": {
+        "@type": "Person",
+        "name": "ZaMpA",
+        "url": "https://github.com/ZaMpAdAKiNg"
+      },
       "description": "Gerador e leitor de QR Code PIX com conteúdo de pagamento processado no navegador, sem cadastro nem backend de pagamentos. Funciona offline e usa telemetria técnica sem o conteúdo digitado.",
       "applicationCategory": "FinanceApplication",
       "operatingSystem": "Any",
@@ -1424,10 +1429,12 @@
     <p><strong>O pix2qr é uma ferramenta independente:</strong> não é banco, PSP nem serviço do Banco Central do Brasil, não é oficial, afiliado ou endossado por essas instituições e não oferece orientação financeira ou jurídica. Ele apenas gera e exibe dados localmente; não inicia, intermedeia, autoriza, garante nem estorna pagamentos PIX. Antes de confirmar no app do banco, confira o nome do recebedor, a chave PIX e o valor.</p>
     <p>Este site e seu código são fornecidos <strong>como estão</strong>, sem garantias. Na máxima medida permitida pela legislação aplicável, o projeto e seu desenvolvedor não se responsabilizam por uso indevido, dados incorretos informados pelo usuário, pagamentos enviados ao destinatário errado, falhos ou duplicados, perdas financeiras nem consequências diretas ou indiretas decorrentes do uso. Nada neste aviso exclui direitos ou responsabilidades que a lei brasileira não permita excluir.</p>
     <p><strong>Privacidade:</strong> chaves, valores, nomes, cidades, payloads e imagens permanecem no navegador. O Umami recebe telemetria técnica de acesso e uso; os eventos definidos pelo pix2qr não incluem o conteúdo PIX digitado ou lido.</p>
+    <p><strong>Metodologia:</strong> a geração e a validação seguem o <a href="https://www.bcb.gov.br/estabilidadefinanceira/pix" rel="noopener">Manual de Padrões para Iniciação do Pix (BR Code)</a> do Banco Central e a especificação EMV® QRCPS; os tipos de chave usam as expressões do DICT. O código que implementa essas regras é <a href="https://github.com/ZaMpAdAKiNg/pix2qr" rel="noopener">aberto e auditável</a>, com testes públicos.</p>
   </section>
 
 <footer>
     <span class="footer-meta">Conteúdo PIX processado localmente no navegador</span>
+    <span class="footer-meta">Mantido por <a href="https://github.com/ZaMpAdAKiNg" rel="noopener">ZaMpA</a></span>
     <span class="footer-meta"><a href="https://github.com/ZaMpAdAKiNg/pix2qr" rel="noopener">Código-fonte no GitHub</a> · <a href="/privacidade">Privacidade</a> · <a href="/licencas">Licenças de terceiros</a></span>
   </footer>
 

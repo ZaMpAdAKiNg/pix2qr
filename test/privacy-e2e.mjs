@@ -62,6 +62,17 @@ try {
     if (payload.referrer && /[?#]/.test(payload.referrer)) fail(`${request.provider} referrer manteve search/hash`);
   }
 
+  // Funil SEO (P0): a primeira interação com a ferramenta emite tool-start —
+  // exatamente UM por carga de página, com data restrita ao modo enumerado.
+  // O loop de probes acima já prova que ele não carrega conteúdo PIX.
+  const toolStarts = requests
+    .map((request) => (request.body ? JSON.parse(request.body).payload : null))
+    .filter((payload) => payload && payload.name === 'tool-start');
+  if (toolStarts.length !== 1) fail(`esperado exatamente 1 tool-start, veio ${toolStarts.length}`);
+  const startData = toolStarts[0].data || {};
+  if (Object.keys(startData).join(',') !== 'mode') fail(`tool-start com data além de mode: ${JSON.stringify(startData)}`);
+  if (!['type', 'scan'].includes(startData.mode)) fail(`tool-start com mode fora do enum: ${startData.mode}`);
+
   console.log(`PRIVACY E2E PASS: ${requests.length} requests redigidos (Umami)`);
   server.kill();
   process.exit(0);

@@ -9,6 +9,18 @@ entradas são agrupadas por data.
 
 ## [Não lançado]
 
+### Added
+- **Autoria e metodologia visíveis na home**: a seção de aviso agora cita o
+  Manual de Padrões para Iniciação do Pix (BR Code) do Banco Central e a
+  especificação EMV® QRCPS como fontes da geração/validação, com link para o
+  código aberto; o rodapé declara o mantenedor e o JSON-LD ganhou `author`.
+  Invariantes cobertos por teste (`test/seo-eeat.test.js`).
+- **Evento `tool-start` no funil de uso**: a primeira interação com a
+  ferramenta em cada carga de página (digitar chave ou abrir o scanner) emite
+  um evento único com apenas o modo enumerado (`type`/`scan`) — nunca conteúdo
+  PIX. Permite medir taxa de início sem novos dados coletados; provado no E2E
+  de privacidade.
+
 ### Security
 - **Precache atômico não depende mais de roteamento da plataforma**:
   `/privacidade` e `/licencas` saíram do `APP_SHELL`. A instalação do Service

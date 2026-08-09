@@ -41,6 +41,23 @@ entradas são agrupadas por data.
 - **Actions imutáveis e permissões mínimas**: actions oficiais fixadas por SHA,
   token padrão explicitamente read-only, credenciais não persistidas nos jobs de
   PR e timeouts adicionados.
+- **HSTS fase 2 — `max-age` de 2 anos + `preload`**: `vercel.json` passa a
+  enviar `Strict-Transport-Security: max-age=63072000; includeSubDomains;
+  preload`, elevando o TTL de 1 para 2 anos e sinalizando o domínio para a
+  lista de preload dos navegadores (HTTPS obrigatório no domínio e subdomínios).
+- **umami.js vendorizado atualizado para o snapshot cloud 2026-08-08**: o ativo
+  local foi realinhado ao upstream `cloud.umami.is/script.js`; o novo sha256
+  está registrado em `third-party.lock.json` e `THIRD_PARTY.md`. Endpoint
+  inalterado (`gateway.umami.is/api/send`), sem novos domínios, sem
+  `eval`/`Function` e sem expansão de storage/cookies/fingerprinting.
+- **Dependências de build atualizadas**: `esbuild` 0.25.5 → 0.28.2 e
+  `playwright-core` 1.53.0 → 1.62.1 (devDeps), reduzindo a superfície de
+  vulnerabilidades conhecidas do tooling.
+
+### Added
+- **Dependabot habilitado para npm e GitHub Actions**: `.github/dependabot.yml`
+  passa a abrir PRs automáticos de atualização para os dois ecossistemas,
+  mantendo dependências e actions oficiais em dia sem intervenção manual.
 
 ### Fixed
 - **Privacidade e Licenças abrem em qualquer forma do endereço**: as páginas já

@@ -43,6 +43,10 @@
     {
       "source": "/licencas",
       "destination": "/licencas.html"
+    },
+    {
+      "source": "/qr-code-pix-para-imprimir",
+      "destination": "/qr-code-pix-para-imprimir.html"
     }
   ],
   "redirects": [

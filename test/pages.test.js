@@ -11,6 +11,7 @@ const read = (name) => readFileSync(require.resolve(`../${name}`), 'utf8');
 const PAGES = [
   { file: 'privacidade.html', title: 'Privacidade — pix2qr', canonical: 'https://pix2qr.xyz/privacidade' },
   { file: 'licencas.html', title: 'Licenças de terceiros — pix2qr', canonical: 'https://pix2qr.xyz/licencas' },
+  { file: 'qr-code-pix-para-imprimir.html', title: 'Placa PIX e QR Code para imprimir — grátis e local', canonical: 'https://pix2qr.xyz/qr-code-pix-para-imprimir' },
 ];
 
 // A URL publicada (canonical, sitemap, rodapé) é a forma sem extensão. Ela só

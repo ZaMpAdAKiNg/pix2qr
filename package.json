@@ -4,6 +4,6 @@
   "description": "Tooling de build/teste do pix2qr. Instale com npm ci; o build gera em dist/ somente a allowlist pública do site estático.",
   "devDependencies": {
     "esbuild": "0.28.2",
-    "playwright-core": "1.62.1"
+    "playwright-core": "1.63.0"
   }
 }

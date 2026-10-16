@@ -10,7 +10,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'sha256-GGHH/1agz1XbHI/BeCsV5JfDijWlDCdCq2LoBJoGZEo='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://cloud.umami.is https://gateway.umami.is https://api-gateway.umami.dev; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none';"
+          "value": "default-src 'self'; script-src 'self' 'sha256-Q+xsUuLeMTJCkWe8CE2hLDKrR03AuSgn2330SI5An04='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://cloud.umami.is https://gateway.umami.is https://api-gateway.umami.dev; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none';"
         },
         {
           "key": "Strict-Transport-Security",
@@ -43,6 +43,10 @@
     {
       "source": "/licencas",
       "destination": "/licencas.html"
+    },
+    {
+      "source": "/qr-code-pix-para-imprimir",
+      "destination": "/qr-code-pix-para-imprimir.html"
     }
   ],
   "redirects": [

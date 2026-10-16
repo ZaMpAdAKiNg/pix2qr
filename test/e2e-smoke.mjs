@@ -123,6 +123,32 @@ try {
       fail('Pix Automático somente recorrência ofereceu edição de valor');
     }
   }
+  // Página de impressão (P1 SEO): a placa é gerada pelo MESMO core, o preview
+  // fica visível e o PNG baixa de verdade. Sem rewrite local, o alvo é o .html.
+  const placaPage = await browser.newPage();
+  placaPage.setDefaultTimeout(8000);
+  await placaPage.goto(`http://localhost:${PORT}/qr-code-pix-para-imprimir.html`, { waitUntil: 'load' });
+  await placaPage.fill('#chave-input', CHAVE);
+  await placaPage.fill('#nome-input', NOME);
+  await placaPage.fill('#cidade-input', CIDADE);
+  await placaPage.click('#gerar-btn');
+  await placaPage.waitForSelector('#placa-preview canvas', { state: 'visible' });
+  // jsQR não faz parte da página de impressão; entra aqui só pra decodificar o preview.
+  await placaPage.addScriptTag({ url: '/jsQR.min.js' });
+  const placaDecoded = await placaPage.evaluate(() => {
+    const canvas = document.querySelector('#placa-preview canvas');
+    const context = canvas.getContext('2d');
+    const image = context.getImageData(0, 0, canvas.width, canvas.height);
+    return window.jsQR(image.data, canvas.width, canvas.height)?.data || null;
+  });
+  if (!placaDecoded || !C.validaCopiaCola(placaDecoded)) fail('QR da placa não decodifica em payload válido');
+  const download = await Promise.all([
+    placaPage.waitForEvent('download'),
+    placaPage.click('#download-btn'),
+  ]).then(([d]) => d);
+  if (!/\.png$/.test(download.suggestedFilename())) fail(`download da placa não é PNG: ${download.suggestedFilename()}`);
+  await placaPage.close();
+
   // Alguns Chrome locais demoram indefinidamente no shutdown mesmo após todas
   // as páginas fecharem. O processo do teste termina logo abaixo; não deixe a
   // limpeza do browser transformar um gate verde em hang.

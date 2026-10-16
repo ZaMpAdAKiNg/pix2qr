@@ -240,7 +240,19 @@ function hideCopiaColaSummary() {
   lastCopiaColaSource = '';
 }
 
+// Funil de uso: tool-start marca a PRIMEIRA interação com a ferramenta na
+// carga da página (digitar chave = 'type', abrir scanner = 'scan'). Uma vez
+// só — o funil mede sessões que começaram, não quantidade de teclas. O data
+// carrega apenas o modo enumerado; nunca conteúdo PIX.
+let toolStartTracked = false;
+function trackToolStart(mode) {
+  if (toolStartTracked) return;
+  toolStartTracked = true;
+  if (window.umami) umami.track('tool-start', { mode });
+}
+
 chaveInput.addEventListener('input', () => {
+  trackToolStart('type');
   const mode = detectMode(chaveInput.value);
   errorMsg.textContent = '';
   // O QR/payload exibido vira stale assim que a chave muda — invalida pra que
@@ -297,7 +309,10 @@ function loadImageFile(file) {
   });
 }
 
-scanQrBtn.addEventListener('click', () => qrFileInput.click());
+scanQrBtn.addEventListener('click', () => {
+  trackToolStart('scan');
+  qrFileInput.click();
+});
 
 qrFileInput.addEventListener('change', async (event) => {
   const file = event.target.files && event.target.files[0];

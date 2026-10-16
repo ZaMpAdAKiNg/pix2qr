@@ -9,6 +9,26 @@ entradas são agrupadas por data.
 
 ## [Não lançado]
 
+### Added
+- **Página `/qr-code-pix-para-imprimir`**: nova ferramenta de placa PIX
+  imprimível — preview em A4, A5 ou 10×15 cm desenhado em canvas local com o
+  mesmo core de payload da home, impressão isolada por `@media print` e
+  download em PNG. Fiação completa: rewrite na plataforma, sitemap, allowlist
+  de build/artefato, link interno da home e testes (estáticos + fluxo E2E de
+  geração, decodificação do preview e download). Telemetria da página segue o
+  contrato de privacidade: eventos `tool-start`/`placa-preview`/`print-action`/
+  `plate-downloaded` carregam apenas modo/preset enumerado.
+- **Autoria e metodologia visíveis na home**: a seção de aviso agora cita o
+  Manual de Padrões para Iniciação do Pix (BR Code) do Banco Central e a
+  especificação EMV® QRCPS como fontes da geração/validação, com link para o
+  código aberto; o rodapé declara o mantenedor e o JSON-LD ganhou `author`.
+  Invariantes cobertos por teste (`test/seo-eeat.test.js`).
+- **Evento `tool-start` no funil de uso**: a primeira interação com a
+  ferramenta em cada carga de página (digitar chave ou abrir o scanner) emite
+  um evento único com apenas o modo enumerado (`type`/`scan`) — nunca conteúdo
+  PIX. Permite medir taxa de início sem novos dados coletados; provado no E2E
+  de privacidade.
+
 ### Security
 - **Precache atômico não depende mais de roteamento da plataforma**:
   `/privacidade` e `/licencas` saíram do `APP_SHELL`. A instalação do Service

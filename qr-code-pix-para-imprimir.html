@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- SEO core -->
+  <title>Placa PIX e QR Code para imprimir — grátis e local</title>
+  <meta name="description" content="Gere um QR Code PIX pronto para imprimir: placa em A4, A5 ou balcão com a sua chave, direto no navegador e sem cadastro. Baixe em PNG ou imprima na hora." />
+  <meta name="author" content="pix2qr" />
+  <meta name="robots" content="index, follow" />
+
+  <!-- Open Graph (Facebook, LinkedIn, WhatsApp) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="PIX QR Code" />
+  <meta property="og:locale" content="pt_BR" />
+  <meta property="og:title" content="Placa PIX e QR Code para imprimir — grátis e local" />
+  <meta property="og:description" content="Placa PIX em A4, A5 ou balcão com a sua chave, gerada no navegador e sem cadastro. Baixe em PNG ou imprima na hora." />
+  <meta property="og:url" content="https://pix2qr.xyz/qr-code-pix-para-imprimir" />
+  <meta property="og:image" content="https://pix2qr.xyz/icons/icon-512.png" />
+  <meta property="og:image:width" content="512" />
+  <meta property="og:image:height" content="512" />
+  <meta property="og:image:alt" content="Logo do PIX QR Code: gerador local de QR Code PIX" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Placa PIX e QR Code para imprimir" />
+  <meta name="twitter:description" content="Placa PIX em A4, A5 ou balcão, gerada no navegador e sem cadastro." />
+  <meta name="twitter:image" content="https://pix2qr.xyz/icons/icon-512.png" />
+
+  <!-- PWA / iOS -->
+  <meta name="theme-color" content="#0c0c12" />
+
+  <!-- CSP: idêntica à do index.html (fonte canônica é o header HTTP em vercel.json;
+       este <meta> é fallback p/ file://). Esta página não tem script inline nem
+       JSON-LD: o hash sha256 aqui é o do JSON-LD do index.html e fica inerte —
+       mantido só para a meta não divergir da política servida. Mudou aqui? Mude
+       também no vercel.json e no index.html. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-Q+xsUuLeMTJCkWe8CE2hLDKrR03AuSgn2330SI5An04='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://cloud.umami.is https://gateway.umami.is https://api-gateway.umami.dev; object-src 'none'; base-uri 'self'; form-action 'none';" />
+
+  <!-- Discovery / metadata: canonical, manifest, ícones -->
+  <link rel="canonical" href="https://pix2qr.xyz/qr-code-pix-para-imprimir" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+  <script src="/analytics-privacy.js"></script>
+  <script defer src="/umami.js"
+          data-website-id="6d397cad-3f3c-4311-aabd-cf3010f33803"
+          data-exclude-search="true"
+          data-exclude-hash="true"
+          data-do-not-track="true"
+          data-before-send="pix2qrBeforeSend"></script>
+
+  <style>
+    @font-face {
+      font-family: 'Outfit';
+      font-style: normal;
+      font-weight: 100 900;
+      font-display: swap;
+      src: url('/fonts/outfit-latin.woff2') format('woff2');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+    :root {
+      --font-sans: 'Outfit', system-ui, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+      --bg-base:   #0c0c12;
+      --bg-topbar: #111118;
+      --bg-card:   #14141c;
+      --bg-card-2: #1c1c26;
+      --bg-input:  #1c1c26;
+
+      --border:       rgba(255,255,255,.09);
+      --border-focus: #8576f5;
+
+      --primary:            #7364f0;
+      --primary-hover:      #8576f5;
+      --primary-active:     #6255d6;
+      --primary-foreground: #fff;
+      --primary-subtle:     rgba(115,100,240,.15);
+      --primary-border:     rgba(115,100,240,.45);
+
+      --fg:        #f0f0f8;
+      --fg-muted:  rgba(240,240,248,.5);
+
+      --destructive: #f87171;
+
+      --radius-sm:   0.375rem;
+      --radius-md:   0.625rem;
+      --radius-2xl:  1.375rem;
+      --radius-full: 9999px;
+
+      --shadow-card: 0 2px 16px rgba(0,0,0,.35);
+      --shadow-btn:  0 2px 12px rgba(115,100,240,.35);
+
+      /* Ferramenta + prosa: mesma medida de shell das páginas de documento. */
+      --shell-max: 680px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-base);
+      color: var(--fg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 0 5rem;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .topbar {
+      width: 100%;
+      background: var(--bg-topbar);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.25rem 1rem;
+      min-height: 54px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .topbar-inner {
+      width: 100%;
+      max-width: var(--shell-max);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .topbar-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--fg);
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+    }
+
+    .topbar-logo svg { color: var(--primary); flex-shrink: 0; }
+
+    .topbar-logo:focus-visible {
+      outline: 2px solid var(--border-focus);
+      outline-offset: 2px;
+    }
+
+    .topbar-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-left: auto;
+    }
+
+    .github-repo-link {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.38rem 0.58rem;
+      color: var(--fg-muted);
+      background: rgba(255,255,255,.025);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-full);
+      font-size: 0.68rem;
+      font-weight: 700;
+      line-height: 1;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: color 0.15s, border-color 0.15s, background 0.15s, transform 0.1s;
+    }
+
+    .github-repo-link svg {
+      width: 16px;
+      height: 16px;
+      color: var(--fg);
+      flex-shrink: 0;
+    }
+
+    .github-repo-link:hover {
+      color: var(--fg);
+      border-color: var(--primary-border);
+      background: var(--primary-subtle);
+    }
+
+    .github-repo-link:focus-visible {
+      outline: 2px solid var(--border-focus);
+      outline-offset: 2px;
+      border-color: var(--primary-border);
+      background: var(--primary-subtle);
+    }
+
+    .github-repo-link:active { transform: scale(0.985); }
+
+    .page {
+      width: 100%;
+      max-width: var(--shell-max);
+      padding: 1.25rem 1rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.875rem;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-2xl);
+      box-shadow: var(--shadow-card);
+      padding: 1.5rem;
+    }
+
+    @media (min-width: 600px) {
+      .page { padding: 1.5rem 1rem 2rem; }
+      .card { padding: 2rem; }
+    }
+
+    .doc-kicker {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--fg-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 0.5rem;
+    }
+
+    .lead {
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: var(--fg-muted);
+      margin-bottom: 1.25rem;
+    }
+
+    .field { margin-bottom: 0.9rem; }
+
+    .field label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--fg-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .field input {
+      width: 100%;
+      min-height: 44px;
+      background: var(--bg-input);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 0.6rem 0.8rem;
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+    }
+
+    .field input:focus-visible {
+      outline: none;
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px var(--primary-subtle);
+    }
+
+    .field .hint {
+      font-size: 0.72rem;
+      color: var(--fg-muted);
+      margin-top: 0.3rem;
+      line-height: 1.5;
+    }
+
+    fieldset.presets {
+      border: 0;
+      margin-bottom: 1rem;
+    }
+
+    fieldset.presets legend {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--fg-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .preset-options { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+    .preset-options label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      min-height: 44px;
+      padding: 0.45rem 0.85rem;
+      background: var(--bg-card-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-full);
+      font-size: 0.82rem;
+      cursor: pointer;
+    }
+
+    .preset-options label:has(input:checked) {
+      border-color: var(--primary-border);
+      background: var(--primary-subtle);
+    }
+
+    .preset-options input { accent-color: var(--primary); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      min-height: 48px;
+      width: 100%;
+      padding: 0.7rem 1rem;
+      border: 0;
+      border-radius: var(--radius-md);
+      background: var(--primary);
+      color: var(--primary-foreground);
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: var(--shadow-btn);
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .btn:hover { background: var(--primary-hover); }
+    .btn:active { background: var(--primary-active); transform: scale(0.99); }
+    .btn:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
+
+    .btn-secondary {
+      background: var(--bg-card-2);
+      color: var(--fg);
+      border: 1px solid var(--border);
+      box-shadow: none;
+    }
+    .btn-secondary:hover { background: var(--primary-subtle); border-color: var(--primary-border); }
+
+    .error {
+      color: var(--destructive);
+      font-size: 0.82rem;
+      line-height: 1.5;
+      min-height: 1.2em;
+      margin: 0.5rem 0;
+    }
+
+    .preview-wrap[hidden] { display: none; }
+
+    .preview-wrap {
+      margin-top: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    #placa-preview {
+      background: #fff;
+      border-radius: var(--radius-md);
+      padding: 0.75rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    #placa-preview canvas {
+      width: 100%;
+      max-width: 340px;
+      height: auto;
+      display: block;
+    }
+
+    .preview-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+    .preview-actions .btn { width: auto; flex: 1 1 10rem; }
+
+    .doc h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--fg);
+      margin: 0 0 0.75rem;
+    }
+
+    .doc p, .doc li {
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: var(--fg-muted);
+    }
+
+    .doc ol, .doc ul { padding-left: 1.2rem; }
+    .doc li + li { margin-top: 0.5rem; }
+    .doc p + p { margin-top: 0.9rem; }
+    .doc strong { color: var(--fg); font-weight: 600; }
+
+    .doc a {
+      color: var(--primary);
+      text-decoration: none;
+      border-bottom: 1px solid var(--primary-border);
+    }
+    .doc a:hover { border-bottom-color: var(--primary); }
+    .doc a:focus-visible {
+      outline: 2px solid var(--border-focus);
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
+
+    .faq-item + .faq-item { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+    .faq-item h3 { font-size: 0.92rem; font-weight: 700; margin-bottom: 0.35rem; }
+
+    .doc-disclaimer {
+      margin-top: 1.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.76rem;
+      line-height: 1.6;
+      color: var(--fg-muted);
+    }
+
+    footer {
+      font-size: 0.7rem;
+      color: var(--fg-muted);
+      text-align: center;
+      padding: 0 1rem;
+      max-width: var(--shell-max);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    footer a { color: var(--primary); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+    .footer-meta { line-height: 1.6; }
+
+    /* Impressão: só a placa vai pro papel, em página inteira. O canvas foi
+       desenhado na proporção do preset escolhido; width 100% preserva a
+       margem de silêncio interna do desenho. */
+    @media print {
+      body > *:not(.print-area) { display: none !important; }
+      body { padding: 0; background: #fff; }
+      .print-area { display: block !important; width: 100%; }
+      .print-area canvas { width: 100%; height: auto; }
+    }
+    .print-area { display: none; }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="topbar-logo" href="/">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+        <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+        <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+        <path d="M14 14h3v3M17 17h3M14 20h3"/>
+      </svg>
+      PIX QR Code
+    </a>
+    <div class="topbar-actions">
+      <a class="github-repo-link" href="https://github.com/ZaMpAdAKiNg/pix2qr" rel="noopener external" aria-label="Repo público — abrir o repositório do pix2qr no GitHub">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.1c-3.3.7-4-1.4-4-1.4-.5-1.4-1.3-1.8-1.3-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.6.1-3.2 0 0 1-.3 3.3 1.2a11.4 11.4 0 0 1 6 0C17.5 6 18.5 6.3 18.5 6.3c.6 1.6.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3Z"/>
+        </svg>
+        <span>Repo público</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <main class="card" aria-labelledby="titulo">
+    <p class="doc-kicker">Ferramenta gratuita</p>
+    <h1 id="titulo">QR Code PIX para imprimir</h1>
+    <p class="lead">Monte uma <strong>placa PIX</strong> com a sua chave e imprima em A4, A5
+    ou formato de balcão — direto do navegador, sem cadastro. O conteúdo PIX é
+    <strong>processado localmente</strong> e não é enviado a servidor algum.</p>
+
+    <div class="field">
+      <label for="chave-input">Chave PIX</label>
+      <input id="chave-input" type="text" autocomplete="off" spellcheck="false"
+             placeholder="CPF, CNPJ, e-mail, telefone ou chave aleatória" />
+      <p class="hint">Use uma chave já cadastrada no seu banco. A validação segue o
+      padrão BR Code do Banco Central.</p>
+    </div>
+
+    <div class="field">
+      <label for="nome-input">Nome do recebedor</label>
+      <input id="nome-input" type="text" autocomplete="off" maxlength="25"
+             placeholder="Como aparece para quem paga" />
+    </div>
+
+    <div class="field">
+      <label for="cidade-input">Cidade</label>
+      <input id="cidade-input" type="text" autocomplete="off" maxlength="15"
+             placeholder="Cidade do recebedor" />
+    </div>
+
+    <div class="field">
+      <label for="valor-input">Valor fixo — opcional</label>
+      <input id="valor-input" type="text" inputmode="decimal" autocomplete="off"
+             placeholder="Deixe vazio para o pagador digitar" />
+      <p class="hint">Placa de balcão costuma ficar <strong>sem valor</strong>: cada
+      cliente digita o quanto vai pagar.</p>
+    </div>
+
+    <fieldset class="presets">
+      <legend>Tamanho da placa</legend>
+      <div class="preset-options">
+        <label><input type="radio" name="preset" value="a4" checked /> A4 — parede ou vitrine</label>
+        <label><input type="radio" name="preset" value="a5" /> A5 — balcão</label>
+        <label><input type="radio" name="preset" value="balcao" /> 10×15 cm — display</label>
+      </div>
+    </fieldset>
+
+    <p class="error" id="error-msg" role="alert" aria-live="polite"></p>
+
+    <button class="btn" id="gerar-btn" type="button">Gerar placa PIX</button>
+
+    <div class="preview-wrap" id="preview-wrap" hidden>
+      <div id="placa-preview" aria-label="Pré-visualização da placa PIX"></div>
+      <div class="preview-actions">
+        <button class="btn" id="print-btn" type="button">Imprimir</button>
+        <button class="btn btn-secondary" id="download-btn" type="button">Baixar PNG</button>
+      </div>
+      <p class="hint">Antes de expor a placa, <strong>escaneie o QR com o app do seu
+      banco</strong> e confira nome e chave. O QR PIX estático não vence e funciona
+      para qualquer banco.</p>
+    </div>
+  </main>
+
+  <section class="card doc" aria-labelledby="como-title">
+    <h2 id="como-title">Como gerar o QR Code PIX para imprimir</h2>
+    <ol>
+      <li><strong>Cole a sua chave PIX</strong> (CPF, CNPJ, e-mail, telefone ou chave
+      aleatória) e o nome do recebedor. A chave é validada localmente pelo padrão
+      BR Code — dígitos verificadores incluídos.</li>
+      <li><strong>Escolha o tamanho</strong>: A4 para parede/vitrine, A5 para balcão ou
+      10×15 cm para display de acrílico.</li>
+      <li><strong>Imprima ou baixe o PNG</strong> em alta resolução. A margem branca ao
+      redor do QR (zona de silêncio) já vem correta para leitura.</li>
+    </ol>
+    <p>Não precisa de app do banco, cadastro ou design: o mesmo motor que gera o
+    <a href="/">QR Code PIX na página inicial</a> desenha a placa — e nada do que você
+    digita sai do seu dispositivo.</p>
+  </section>
+
+  <section class="card doc" aria-labelledby="faq-title">
+    <h2 id="faq-title">Perguntas frequentes</h2>
+
+    <div class="faq-item">
+      <h3>Posso usar meu CPF como chave na placa?</h3>
+      <p>Pode, mas lembre que o CPF fica visível no payload para qualquer pessoa que
+      escanear. Para expor em público, uma <strong>chave aleatória</strong> preserva
+      melhor o seu dado pessoal — cadastre uma no app do banco.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>O QR Code impresso vence ou expira?</h3>
+      <p>Não. O QR PIX <strong>estático</strong> codifica a chave e os dados do
+      recebedor; ele vale enquanto a chave estiver cadastrada no seu banco.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Serve para qualquer banco?</h3>
+      <p>Sim. O BR Code é um padrão do Banco Central: qualquer app de banco ou
+      carteira que pague PIX lê o mesmo QR, independente de onde a chave foi
+      cadastrada.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Posso deixar a placa sem valor?</h3>
+      <p>Pode — e para balcão é o mais comum. Sem valor fixo, quem paga digita o
+      montante na hora. Com valor fixo, o app do pagador já abre preenchido.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Qual o tamanho mínimo para o QR ser lido?</h3>
+      <p>A partir de <strong>5×5 cm</strong> a leitura é confortável de perto. Atrás
+      de balcão ou vidro, prefira A5 ou A4. Evite plastificação com reflexo forte e
+      mantenha a margem branca ao redor do código.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Por que não fazemos QR Code PIX dinâmico?</h3>
+      <p>QR dinâmico exige um servidor de cobrança (PSP) que gere um código por
+      venda. O pix2qr roda 100% no seu navegador, sem backend — por isso gera apenas
+      QR <strong>estático</strong>, que cobre placa, balcão e cobrança simples.</p>
+    </div>
+
+    <p class="doc-disclaimer">O pix2qr é uma ferramenta independente: não é banco,
+    PSP nem serviço do Banco Central, e não inicia, autoriza ou garante pagamentos.
+    A geração e a validação seguem o Manual de Padrões para Iniciação do Pix
+    (BR Code) e a especificação EMV® QRCPS —
+    <a href="/privacidade">detalhes de privacidade</a> e
+    <a href="https://github.com/ZaMpAdAKiNg/pix2qr" rel="noopener external">código aberto auditável</a>.
+    Antes de expor a placa, confira o QR no app do seu banco.</p>
+  </section>
+
+</div>
+
+<div class="print-area" id="print-area" aria-hidden="true"></div>
+
+<footer>
+  <span class="footer-meta">Conteúdo PIX processado localmente no navegador</span>
+  <span class="footer-meta"><a href="https://github.com/ZaMpAdAKiNg/pix2qr" rel="noopener">Código-fonte no GitHub</a> · <a href="/privacidade">Privacidade</a> · <a href="/licencas">Licenças de terceiros</a></span>
+</footer>
+
+<script src="/pix-core.js" defer></script>
+<script src="/qrcode.min.js" defer></script>
+<script src="/placa.js" defer></script>
+
+</body>
+</html>

@@ -96,8 +96,8 @@ const walk = (dir, prefix = '') => readdirSync(dir).flatMap((name) => {
   return [rel];
 });
 const publicRoot = [
-  'index.html', 'privacidade.html', 'licencas.html',
-  'app.js', 'pix-core.js', 'analytics-privacy.js', 'image-metadata.js',
+  'index.html', 'privacidade.html', 'licencas.html', 'qr-code-pix-para-imprimir.html',
+  'app.js', 'placa.js', 'pix-core.js', 'analytics-privacy.js', 'image-metadata.js',
   'qrcode.min.js', 'jsQR.min.js',
   'umami.js', 'manifest.webmanifest', 'robots.txt', 'sitemap.xml', 'llms.txt', 'sw.js',
 ];

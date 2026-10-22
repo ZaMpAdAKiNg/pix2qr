@@ -30,3 +30,8 @@ atualização deve partir do pacote/commit fixado, revisar o diff, preservar os
 textos de licença e atualizar conscientemente o lock.
 
 Todo o código original do pix2qr permanece sob a [licença MIT](LICENSE).
+
+## Home — IBM Plex Mono e Lucide (PIX-7)
+
+- IBM Plex Mono latin, pesos 400 e 500, self-hosted em `fonts/ibm-plex-mono-{400,500}-latin.woff2`; SIL OFL 1.1, texto completo em `licenses/IBM-Plex-Mono-OFL-1.1.txt`. Origem pública: https://github.com/google/fonts/tree/main/ofl/ibmplexmono. Bytes conferidos com os hashes congelados da spec de design; hashes dos arquivos e licença em `third-party.lock.json`. Outfit variável 100–900 existente preservado.
+- Lucide Static **0.468.0**, ISC (inclui aviso Feather/MIT), licença completa em `licenses/lucide-ISC.txt`. Origem: https://registry.npmjs.org/lucide-static/-/lucide-static-0.468.0.tgz; integridade npm `sha512-JvpWui2umxRyEVMoETfMzb+qKqibV/sdoqJbKmW1JLdkuhXluJKoO6NqCbvCK/vAbUuH5bTEFD4T6uECsrNcnA==`. Traços de `scan-line`, `arrow-right`, `copy`, `download`, `image` e `circle-alert` incorporados como SVG inline na home, com tamanho 20, aria-hidden e focusable=false. Sem pacote em runtime.

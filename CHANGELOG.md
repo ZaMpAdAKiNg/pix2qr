@@ -9,6 +9,8 @@ entradas são agrupadas por data.
 
 ## [Não lançado]
 
+- [PIX-7] Home com tokens verde-grafite/brasa, títulos Outfit 900, Plex Mono local e ícones Lucide. Campos e ações acessíveis, foco visível, layout responsivo e manifest atualizado; conteúdo, hooks e QR preservados.
+
 ### Added
 - **Ambiente de stage em `stage.pix2qr.xyz`** (branch `stage`): `vercel.json`
   envia `X-Robots-Tag: noindex, nofollow` só nesse host, e o Umami das quatro

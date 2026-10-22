@@ -108,6 +108,7 @@ const expectedFiles = [
   'icons/icon-512-maskable.png', 'icons/icon-512.png',
   'icons/screenshot-narrow.png', 'icons/screenshot-wide.png',
   'fonts/outfit-latin.woff2',
+  'fonts/ibm-plex-mono-400-latin.woff2', 'fonts/ibm-plex-mono-500-latin.woff2', 'licenses/IBM-Plex-Mono-OFL-1.1.txt', 'licenses/lucide-ISC.txt',
   'licenses/Outfit-OFL-1.1.txt', 'licenses/dijkstrajs-MIT.txt',
   'licenses/jsQR-Apache-2.0.txt', 'licenses/node-qrcode-MIT.txt',
   'licenses/umami-MIT.txt',

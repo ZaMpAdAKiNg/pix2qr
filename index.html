@@ -31,7 +31,7 @@
   <meta name="twitter:image" content="https://pix2qr.xyz/icons/icon-512.png" />
 
   <!-- PWA / iOS -->
-  <meta name="theme-color" content="#0c0c12" />
+  <meta name="theme-color" content="#161e1b" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="PIX QR Code" />
@@ -68,934 +68,192 @@
           data-before-send="pix2qrBeforeSend"></script>
 
   <style>
-    @font-face {
-      font-family: 'Outfit';
-      font-style: normal;
-      font-weight: 100 900;
-      font-display: swap;
-      src: url('/fonts/outfit-latin.woff2') format('woff2');
-      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-    }
-    :root {
-      --font-sans: 'Outfit', system-ui, sans-serif;
-      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-
-      --bg-base:   #0c0c12;
-      --bg-topbar: #111118;
-      --bg-card:   #14141c;
-      --bg-card-2: #1c1c26;
-      --bg-input:  #1c1c26;
-
-      --border:       rgba(255,255,255,.09);
-      --border-focus: #8576f5;
-
-      --primary:            #7364f0;
-      --primary-hover:      #8576f5;
-      --primary-active:     #6255d6;
-      --primary-foreground: #fff;
-      --primary-subtle:     rgba(115,100,240,.15);
-      --primary-border:     rgba(115,100,240,.45);
-
-      --fg:        #f0f0f8;
-      --fg-muted:  rgba(240,240,248,.5);
-      --fg-subtle: rgba(240,240,248,.3);
-
-      --destructive: #f87171;
-
-      --radius-sm:   0.375rem;
-      --radius-md:   0.625rem;
-      --radius-lg:   0.875rem;
-      --radius-xl:   1.125rem;
-      --radius-2xl:  1.375rem;
-      --radius-full: 9999px;
-
-      --shadow-card: 0 2px 16px rgba(0,0,0,.35);
-      --shadow-btn:  0 2px 12px rgba(115,100,240,.35);
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: var(--font-sans);
-      background: var(--bg-base);
-      color: var(--fg);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 0 0 5rem;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    .topbar {
-      width: 100%;
-      background: var(--bg-topbar);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.25rem 1rem;
-      min-height: 54px;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    .topbar-inner {
-      width: 100%;
-      max-width: 390px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-    }
-
-    .topbar-logo {
-      display: flex;
-      align-items: center;
-      gap: 0.45rem;
-      font-size: 0.95rem;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-      color: var(--fg);
-    }
-
-    .topbar-logo svg { color: var(--primary); flex-shrink: 0; }
-
-    .topbar-actions {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      margin-left: auto;
-    }
-
-    .github-repo-link {
-      min-height: 44px;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      padding: 0.38rem 0.58rem;
-      color: var(--fg-muted);
-      background: rgba(255,255,255,.025);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-full);
-      font-size: 0.68rem;
-      font-weight: 700;
-      line-height: 1;
-      text-decoration: none;
-      white-space: nowrap;
-      transition: color 0.15s, border-color 0.15s, background 0.15s, transform 0.1s;
-    }
-
-    .github-repo-link svg {
-      width: 16px;
-      height: 16px;
-      color: var(--fg);
-      flex-shrink: 0;
-    }
-
-    .github-repo-link:hover {
-      color: var(--fg);
-      border-color: var(--primary-border);
-      background: var(--primary-subtle);
-    }
-
-    .github-repo-link:focus-visible {
-      outline: 2px solid var(--border-focus);
-      outline-offset: 2px;
-      border-color: var(--primary-border);
-      background: var(--primary-subtle);
-    }
-
-    .github-repo-link:active {
-      transform: scale(0.985);
-    }
-
-    .status-chip {
-      display: inline-flex;
-      align-items: center;
-      border: 1px solid rgba(248,113,113,.35);
-      color: #fda4af;
-      background: rgba(248,113,113,.12);
-      border-radius: var(--radius-full);
-      font-size: 0.65rem;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      padding: 0.22rem 0.55rem;
-      white-space: nowrap;
-    }
-    /* O atributo [hidden] (display:none da UA stylesheet) perde em especificidade
-       pra .status-chip{display:inline-flex} — sem esta regra o chip "Offline"
-       fica visível mesmo online (app.js seta .hidden mas o CSS vence). */
-    .status-chip[hidden] { display: none; }
-    .btn[hidden] { display: none; }
-
-    .install-btn {
-      padding: 0.48rem 0.72rem;
-      font-size: 0.68rem;
-      line-height: 1;
-      white-space: nowrap;
-    }
-
-    .page {
-      width: 100%;
-      max-width: 390px;
-      padding: 1.25rem 1rem 2rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.875rem;
-    }
-
-    @media (min-width: 600px) {
-      .page { padding: 1.5rem 0 2rem; }
-    }
-
-    .card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-2xl);
-      box-shadow: var(--shadow-card);
-      padding: 1.5rem;
-    }
-
-    .card-title {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--fg);
-      margin-bottom: 0.25rem;
-    }
-
-    .card-subtitle {
-      font-size: 0.8rem;
-      color: var(--fg-muted);
-      margin-bottom: 1.25rem;
-      line-height: 1.5;
-    }
-
-    .field { margin-bottom: 0.875rem; }
-    .field:last-child { margin-bottom: 0; }
-
-    label {
-      display: block;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--fg-muted);
-      margin-bottom: 0.35rem;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-    }
-
-    input[type="text"],
-    input[type="number"] {
-      width: 100%;
-      padding: 0.7rem 0.875rem;
-      background: var(--bg-input);
-      color: var(--fg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      font-family: var(--font-sans);
-      font-size: 0.9rem;
-      outline: none;
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-
-    input[type="text"]:focus,
-    input[type="number"]:focus {
-      border-color: var(--border-focus);
-      box-shadow: 0 0 0 3px var(--primary-subtle);
-    }
-
-    input::placeholder { color: var(--fg-subtle); }
-
-    .field-hint {
-      font-size: 0.7rem;
-      /* fg-muted (não fg-subtle): texto informativo precisa de contraste AA (4.5:1) */
-      color: var(--fg-muted);
-      margin-top: 0.3rem;
-    }
-
-    /* Aviso soft (não bloqueia): usado em Nome/Cidade quando detecta
-       coisa estranha (ex: dígitos). Tom amber pra diferenciar de erro. */
-    .field-warn {
-      display: flex;
-      align-items: center;
-      gap: 0.35rem;
-      font-size: 0.72rem;
-      color: #fbbf24;
-      margin-top: 0.3rem;
-      line-height: 1.35;
-    }
-    .field-warn[hidden] { display: none; }
-    .field-warn svg { flex-shrink: 0; opacity: 0.9; }
-
-    .safety-notice,
-    .result-check {
-      font-size: 0.76rem;
-      line-height: 1.5;
-      color: rgba(240,240,248,.78);
-      background: rgba(251, 191, 36, 0.07);
-      border: 1px solid rgba(251, 191, 36, 0.3);
-      border-radius: var(--radius-xl);
-      padding: 0.7rem 0.8rem;
-    }
-    .safety-notice { margin: 0.75rem 0; }
-    .safety-notice strong,
-    .result-check strong { color: #fbbf24; }
-    .result-check { margin: 0 0 0.85rem; }
-
-    /* Botão "Escanear QR": ghost style, fica logo abaixo da hint do input.
-       Em mobile, abre direto a câmera traseira via capture="environment". */
-    .scan-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.42rem;
-      margin-top: 0.5rem;
-      padding: 0.45rem 0.78rem;
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      color: var(--fg-muted);
-      font-family: var(--font-sans);
-      font-size: 0.72rem;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-      cursor: pointer;
-      transition: border-color 0.15s, color 0.15s, background 0.15s, transform 0.08s;
-    }
-    .scan-btn:hover {
-      border-color: var(--primary-border);
-      color: var(--primary-hover);
-      background: var(--primary-subtle);
-    }
-    .scan-btn:active { transform: scale(0.97); }
-    .scan-btn:focus-visible {
-      outline: 2px solid var(--border-focus);
-      outline-offset: 2px;
-      border-color: var(--primary-border);
-      background: var(--primary-subtle);
-    }
-    .scan-btn svg { flex-shrink: 0; }
-    .scan-btn[disabled] {
-      opacity: 0.6;
-      cursor: progress;
-      pointer-events: none;
-    }
-
-    .mode-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.7rem;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      padding: 0.3rem 0.75rem;
-      border-radius: var(--radius-full);
-      background: var(--primary-subtle);
-      border: 1px solid var(--primary-border);
-      color: var(--primary-hover);
-      margin-bottom: 0.875rem;
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-
-    .mode-pill.visible { opacity: 1; }
-    .mode-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-
-    #extra-fields {
-      overflow: hidden;
-      max-height: 0;
-      opacity: 0;
-      transition: max-height 0.35s ease, opacity 0.25s ease;
-    }
-
-    #extra-fields.visible { max-height: 400px; opacity: 1; }
-
-    .row-two {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.75rem;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.45rem;
-      font-family: var(--font-sans);
-      font-weight: 600;
-      cursor: pointer;
-      border-radius: var(--radius-md);
-      transition: background 0.15s, opacity 0.15s, transform 0.1s;
-      border: none;
-      letter-spacing: 0.01em;
-    }
-
-    .btn:active { transform: scale(0.985); }
-    .btn:disabled { opacity: 0.45; pointer-events: none; }
-
-    .btn-primary {
-      width: 100%;
-      padding: 0.8rem 1rem;
-      font-size: 0.95rem;
-      background: var(--primary);
-      color: var(--primary-foreground);
-      box-shadow: var(--shadow-btn);
-      border-radius: var(--radius-lg);
-      margin-top: 0.25rem;
-    }
-
-    .btn-primary:hover { background: var(--primary-hover); }
-    .btn-primary:active { background: var(--primary-active); }
-
-    .btn-outline {
-      padding: 0.6rem 1rem;
-      font-size: 0.8rem;
-      background: transparent;
-      /* primary-hover (#8576f5, 5.3:1) em vez de primary (#7364f0, 4.3:1):
-         o texto pequeno (0.68rem) do install-btn precisa de 4.5:1 AA */
-      color: var(--primary-hover);
-      border: 1px solid var(--primary-border);
-      border-radius: var(--radius-full);
-    }
-
-    .btn-outline:hover { background: var(--primary-subtle); }
-
-    .btn-ghost {
-      padding: 0.55rem 0.875rem;
-      font-size: 0.8rem;
-      background: var(--bg-card-2);
-      color: var(--fg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-    }
-
-    .btn-ghost:hover { border-color: var(--primary-border); color: var(--primary-hover); }
-
-    .btn-ghost.success {
-      background: var(--primary-subtle);
-      color: var(--primary-hover);
-      border-color: var(--primary-border);
-    }
-
-    .error-msg {
-      font-size: 0.78rem;
-      color: var(--destructive);
-      min-height: 1.1em;
-      margin-top: 0.35rem;
-    }
-
-    /* Result card escondido até QR ser gerado — antes só mudava opacity,
-       o que mantinha 956px de gap fantasma no layout (resultcard + tip-jar
-       dentro). display:none remove do flow; .visible recoloca + anima. */
-    #result {
-      display: none;
-    }
-
-    #result.visible {
-      display: block;
-      animation: result-fade-in 0.35s ease-out;
-    }
-
-    @keyframes result-fade-in {
-      from { opacity: 0; transform: translateY(8px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .qr-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 1.25rem;
-      background: #fff;
-      border-radius: var(--radius-xl);
-      margin-bottom: 1.25rem;
-      cursor: pointer;
-      transition: transform 0.1s;
-    }
-
-    .qr-container:hover { transform: scale(1.015); }
-    .qr-container:active { transform: scale(0.99); }
-
-    /* Canvas preserva pelo menos 4 pixels inteiros por módulo e cresce nos QRs
-       densos: alta resolução pra câmeras ruins + PNG baixado de qualidade
-       pra impressão, mas display visual fica capped em 280px pra caber bem em
-       mobile/desktop sem ficar gigante. image-rendering: pixelated mantém
-       bordas afiadas mesmo escalando — crítico pra leitura por câmera. */
-    #qr-wrap canvas {
-      display: block;
-      pointer-events: none;
-      width: 100%;
-      max-width: 280px;
-      height: auto;
-      image-rendering: pixelated;
-      image-rendering: -moz-crisp-edges;
-      image-rendering: crisp-edges;
-    }
-
-    .result-header {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 1.25rem;
-    }
-
-    /* Foco programático (movido pra cá após gerar o QR, pro leitor de tela
-       anunciar "QR Code gerado"). Sem anel visível: não é tabbável (tabindex=-1),
-       então o foco aqui é só pra anúncio/navegação por teclado a partir do resultado. */
-    .result-header:focus { outline: none; }
-
-    .check-badge {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      background: var(--primary-subtle);
-      border: 1px solid var(--primary-border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--primary-hover);
-      flex-shrink: 0;
-    }
-
-    .result-header-text { font-size: 0.9rem; font-weight: 700; }
-
-    .payload-label {
-      font-size: 0.7rem;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      /* fg-muted (não fg-subtle): label significativo precisa de contraste AA */
-      color: var(--fg-muted);
-      margin-bottom: 0.35rem;
-    }
-
-    /* Aviso de chave-cadastrada: a chave PIX precisa estar registrada no PSP do
-       recebedor pra receber. Só aparece quando o QR vem de uma CHAVE (não de
-       Copia-e-Cola, que já vem de um PSP). Âmbar sutil para manter o aviso visível.
-       Previne a confusão "não escaneia" que costuma ser chave não-registrada. */
-    .key-hint {
-      font-size: 0.78rem;
-      line-height: 1.45;
-      color: rgba(240,240,248,.72);
-      background: rgba(251, 191, 36, 0.07);
-      border: 1px solid rgba(251, 191, 36, 0.3);
-      border-radius: var(--radius-xl);
-      padding: 0.65rem 0.8rem;
-      margin: 0 0 0.85rem;
-    }
-    .key-hint[hidden] { display: none; }
-
-    .payload-box {
-      background: var(--bg-base);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 0.75rem;
-      font-family: var(--font-mono);
-      font-size: 0.67rem;
-      word-break: break-all;
-      color: var(--primary-hover);
-      line-height: 1.6;
-      margin-bottom: 0.875rem;
-      max-height: 68px;
-      overflow-y: auto;
-      cursor: text;
-      user-select: all;
-    }
-
-    .action-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-
-    footer {
-      font-size: 0.7rem;
-      /* fg-muted (não fg-subtle): texto do rodapé precisa de contraste AA */
-      color: var(--fg-muted);
-      text-align: center;
-      padding: 0 1rem;
-      max-width: 390px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    footer a { color: var(--primary); text-decoration: none; }
-    footer a:hover { text-decoration: underline; }
-
-    .footer-meta { line-height: 1.6; }
-
-    .legal-notice {
-      font-size: 0.76rem;
-      line-height: 1.6;
-      color: var(--fg-muted);
-    }
-    .legal-notice h2 {
-      font-size: 0.9rem;
-      color: var(--fg);
-      margin-bottom: 0.65rem;
-    }
-    .legal-notice p + p { margin-top: 0.65rem; }
-    .legal-notice strong { color: var(--fg); }
-
-    .donate-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.55rem 1rem;
-      font-family: var(--font-sans);
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--primary);
-      background: transparent;
-      border: 1px solid var(--primary-border);
-      border-radius: var(--radius-full);
-      cursor: pointer;
-      transition: background 0.15s, border-color 0.15s;
-    }
-
-    .donate-btn:hover  { background: var(--primary-subtle); }
-    .donate-btn:active { transform: scale(0.95); }
-
-    .donate-panel {
-      width: 100%;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-xl);
-      overflow: hidden;
-      max-height: 0;
-      opacity: 0;
-      transition: max-height 0.35s ease, opacity 0.25s ease;
-    }
-
-    .donate-panel.open {
-      max-height: 300px;
-      opacity: 1;
-    }
-
-    .donate-panel-inner { padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
-
-    .donate-row {
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-    }
-
-    .donate-row-label {
-      font-size: 0.68rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      /* fg-muted (não fg-subtle): label significativo precisa de contraste AA */
-      color: var(--fg-muted);
-    }
-
-    .donate-row-addr-wrap {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: var(--bg-card-2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 0.55rem 0.75rem;
-    }
-
-    .donate-addr {
-      flex: 1;
-      font-family: var(--font-mono);
-      font-size: 0.67rem;
-      color: var(--fg-muted);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      user-select: all;
-    }
-
-    .donate-copy {
-      flex-shrink: 0;
-      padding: 0.3rem 0.6rem;
-      font-family: var(--font-sans);
-      font-size: 0.7rem;
-      font-weight: 600;
-      background: transparent;
-      color: var(--primary);
-      border: 1px solid var(--primary-border);
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      transition: background 0.15s;
-      white-space: nowrap;
-    }
-
-    .donate-copy:hover { background: var(--primary-subtle); }
-    .donate-copy.copied { color: #4ade80; border-color: rgba(74,222,128,.4); }
-
-    @media (max-width: 420px) {
-      .topbar { padding-inline: 0.75rem; }
-      .topbar-inner { gap: 0.45rem; }
-      .topbar-actions { gap: 0.25rem; }
-      .github-repo-link { padding-inline: 0.48rem; }
-    }
-
-    /* telas pequenas: row-two vira coluna única */
-    @media (max-width: 360px) {
-      .row-two { grid-template-columns: 1fr; }
-    }
-
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.7);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem;
-      z-index: 50;
-    }
-    .modal-backdrop.open { display: flex; }
-
-    .modal {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-2xl);
-      padding: 1.5rem;
-      max-width: 360px;
-      width: 100%;
-      box-shadow: 0 12px 48px rgba(0,0,0,.6);
-    }
-
-
-    /* Resumo do Copia-e-Cola colado: mostra valor, chave, nome, cidade
-       em tempo real, antes mesmo de clicar "Gerar". Usuário confirma
-       que tá pagando o valor certo / pessoa certa. */
-    .cc-summary {
-      background: var(--bg-card-2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-xl);
-      padding: 0.85rem 0.95rem;
-      margin-bottom: 1rem;
-      animation: cc-summary-in 0.22s ease-out;
-    }
-    .cc-summary[hidden] { display: none; }
-
-    @keyframes cc-summary-in {
-      from { opacity: 0; transform: translateY(-4px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .cc-summary-title {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      color: var(--primary-hover);
-      margin-bottom: 0.6rem;
-    }
-    .cc-summary-title svg { flex-shrink: 0; }
-
-    .cc-row {
-      display: grid;
-      grid-template-columns: 80px 1fr;
-      gap: 0.5rem;
-      align-items: baseline;
-      font-size: 0.78rem;
-      padding: 0.18rem 0;
-    }
-    .cc-row[hidden] { display: none; }
-    .cc-label {
-      color: var(--fg-muted);
-      font-weight: 500;
-    }
-    .cc-value {
-      color: var(--fg);
-      font-weight: 600;
-      word-break: break-word;
-    }
-    .cc-value-money {
-      color: #4ade80;
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-    }
-    .cc-value-muted {
-      color: var(--fg-muted);
-      font-weight: 500;
-      font-style: italic;
-    }
-
-
-    /* Adicionar valor (opcional) — só pra QR Estático sem valor embutido.
-       Permite usuário transformar QR sem valor em QR com valor antes do Gerar. */
-    .cc-add-valor {
-      margin-top: 0.85rem;
-      padding-top: 0.85rem;
-      border-top: 1px solid var(--border);
-    }
-    .cc-add-valor[hidden] { display: none; }
-
-    .cc-add-valor-hint {
-      font-size: 0.72rem;
-      color: var(--fg-muted);
-      line-height: 1.45;
-      margin-bottom: 0.55rem;
-    }
-
-    .cc-add-valor-row {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .cc-add-valor-prefix {
-      color: var(--fg-muted);
-      font-weight: 600;
-      font-size: 0.85rem;
-      flex-shrink: 0;
-    }
-
-    .cc-add-valor input {
-      flex: 1;
-      padding: 0.55rem 0.7rem;
-      background: var(--bg-input);
-      color: var(--fg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      font-family: var(--font-sans);
-      font-size: 0.88rem;
-      outline: none;
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-    .cc-add-valor input:focus {
-      border-color: var(--border-focus);
-      box-shadow: 0 0 0 3px var(--primary-subtle);
-    }
-
-    .modal h3 {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--fg);
-      margin-bottom: 0.75rem;
-    }
-
-    .modal p {
-      font-size: 0.82rem;
-      color: var(--fg-muted);
-      line-height: 1.55;
-      margin-bottom: 0.9rem;
-    }
-
-    .modal ol {
-      padding-left: 1.2rem;
-      color: var(--fg);
-      font-size: 0.85rem;
-      line-height: 1.7;
-      margin-bottom: 1rem;
-    }
-
-    .modal ol li { margin-bottom: 0.15rem; }
-    .modal strong { color: var(--primary-hover); font-weight: 600; }
-    .modal .close-btn { width: 100%; margin-top: 0.25rem; }
-
-    /* FAQ section: <details> nativo + styling sutil. Bom pra SEO + LLMs. */
-    .faq {
-      margin-top: 0.5rem;
-    }
-    .faq-title {
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: var(--fg);
-      margin-bottom: 0.85rem;
-    }
-    .faq details {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 0;
-      margin-bottom: 0.5rem;
-      overflow: hidden;
-    }
-    .faq summary {
-      cursor: pointer;
-      padding: 0.75rem 0.95rem;
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--fg);
-      list-style: none;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.5rem;
-    }
-    .faq summary::-webkit-details-marker { display: none; }
-    .faq summary::after {
-      content: "+";
-      font-size: 1.1rem;
-      color: var(--fg-muted);
-      transition: transform 0.2s;
-      flex-shrink: 0;
-    }
-    .faq details[open] summary::after { transform: rotate(45deg); }
-    .faq summary:hover { color: var(--primary-hover); }
-    .faq details[open] summary { border-bottom: 1px solid var(--border); }
-    .faq-answer {
-      padding: 0.75rem 0.95rem;
-      font-size: 0.78rem;
-      line-height: 1.55;
-      color: var(--fg-muted);
-    }
-    .faq-answer a {
-      color: var(--primary-hover);
-      text-decoration: none;
-    }
-    .faq-answer a:hover { text-decoration: underline; }
-
-    /* Tip jar pattern: bloco de doação dentro do card de resultado.
-       Aparece junto com o QR gerado — momento de "just-in-time gratitude"
-       quando o usuário acabou de receber valor. UX research mostra
-       conversão 3-5x maior que pedidos passivos no rodapé. */
-    .tip-jar {
-      margin-top: 1.25rem;
-      animation: tip-jar-fade 0.4s ease-out 0.2s backwards;
-    }
-    @keyframes tip-jar-fade {
-      from { opacity: 0; transform: translateY(6px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .tip-jar-divider {
-      height: 1px;
-      background: var(--border);
-      margin-bottom: 1rem;
-    }
-    .tip-jar-title {
-      font-size: 0.92rem;
-      font-weight: 700;
-      color: var(--fg);
-      margin-bottom: 0.3rem;
-      text-align: center;
-    }
-    .tip-jar-sub {
-      font-size: 0.74rem;
-      color: var(--fg-muted);
-      line-height: 1.5;
-      text-align: center;
-      margin-bottom: 0.85rem;
-    }
-    /* No contexto do tip-jar, o donate-btn é o foco — mais largo e centralizado. */
-    .tip-jar .donate-btn {
-      display: flex;
-      justify-content: center;
-      width: 100%;
-      padding: 0.65rem 1rem;
-      font-size: 0.78rem;
-    }
-
+@font-face { font-family: 'Outfit'; font-style: normal; font-weight: 100 900; font-display: swap; src: url('/fonts/outfit-latin.woff2') format('woff2'); }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 400; font-display: swap; src: url('/fonts/ibm-plex-mono-400-latin.woff2') format('woff2'); }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 500; font-display: swap; src: url('/fonts/ibm-plex-mono-500-latin.woff2') format('woff2'); }
+:root {
+  --color-bg: #161e1b;
+  --color-surface: #1f2a26;
+  --color-surface-2: #2a3531;
+  --color-surface-3: #26312d;
+  --color-campo: #121815;
+  --color-border: #333c38;
+  --color-border-strong: #a9b5b0;
+  --color-grid-line: #3a4642;
+  --color-fg: #f7f9f8;
+  --color-fg-muted: #d6ddd9;
+  --color-fg-subtle: #a1aca7;
+  --color-fg-faint: #6a7672;
+  --color-fg-placeholder: #a1aca7;
+  --color-fg-on-accent: #ffffff;
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-accent: #e64a2e;
+  --color-accent-strong: #cf4227;
+  --color-accent-deep: #b83a20;
+  --color-accent-soft: #ee7358;
+  --color-accent-glint: #f5a08e;
+  --color-sucesso: #a6d8bd;
+  --color-aviso: #f2c46b;
+  --color-erro: #f59aa6;
+  --color-polygon: #6c00f6;
+  --color-tron: #ff060a;
+  --color-tether: #26a17b;
+  --color-pix: #1fa9a0;
+  --radius-campo: 16px;
+  --radius-vidro: 16px;
+  --radius-cartao: 24px;
+  --shadow-cartao: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --shadow-lift: 0 16px 48px rgba(0, 0, 0, 0.55);
+  --shadow-dialogo: 0 32px 80px rgba(0, 0, 0, 0.4);
+  --shadow-cta: 0 8px 24px rgba(230, 74, 46, 0.32);
+  --tracking-display: -0.025em;
+  --tracking-titulo: -0.02em;
+  --tracking-mono: -0.005em;
+  --tracking-rotulo: 0.12em;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-padrao: cubic-bezier(0.4, 0, 0.2, 1);
+  --font-sans: var(--font-outfit), system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-display: var(--font-outfit), system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+:root {
+  --font-outfit: 'Outfit';
+  --font-plex-mono: 'IBM Plex Mono';
+  --pix-radius-pill: 9999px;
+  --pix-space-1: 4px;
+  --pix-space-2: 8px;
+  --pix-space-3: 12px;
+  --pix-space-4: 16px;
+  --pix-space-5: 20px;
+  --pix-space-6: 24px;
+  --pix-space-8: 32px;
+  --pix-space-10: 40px;
+  --pix-space-12: 48px;
+  --pix-space-16: 64px;
+  --pix-container-shell: 87.5rem;
+  --pix-container-tool: 44rem;
+  --pix-container-prose: 44rem;
+  --pix-gutter: clamp(1rem, 4vw, 1.5rem);
+  --pix-section-gap: clamp(1.5rem, 4vw, 2.5rem);
+  --pix-z-decoration: -1;
+  --pix-z-content: 0;
+  --pix-z-nav: 30;
+  --pix-z-backdrop: 40;
+  --pix-z-dialog: 41;
+  --pix-z-toast: 50;
+  --pix-duration-fast: 150ms;
+  --pix-duration-control: 200ms;
+  --pix-duration-surface: 300ms;
+  --pix-duration-dialog: 320ms;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { color-scheme: dark; background: var(--color-bg); scroll-padding-top: 6rem; }
+body { font-family: var(--font-sans); color: var(--color-fg); background: var(--color-bg); line-height: 1.6; -webkit-font-smoothing: antialiased; padding-bottom: 3rem; }
+::selection { background: var(--color-accent-deep); color: var(--color-white); }
+a { color: var(--color-fg-muted); text-decoration: underline; text-underline-offset: 4px; }
+a:hover { color: var(--color-fg); }
+button, input { font: inherit; }
+button, a, summary { -webkit-tap-highlight-color: transparent; }
+button { cursor: pointer; }
+svg { flex-shrink: 0; vertical-align: middle; }
+:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+[hidden], .btn[hidden] { display: none !important; }
+.topbar { position: sticky; top: 0; z-index: var(--pix-z-nav); background: var(--color-bg); border-bottom: 1px solid var(--color-border); padding: .5rem var(--pix-gutter); }
+.topbar-inner { max-width: var(--pix-container-tool); min-height: 48px; margin: auto; display: flex; align-items: center; justify-content: space-between; gap: .75rem; flex-wrap: wrap; }
+.topbar-logo { display: flex; align-items: center; gap: .5rem; font-size: 1.125rem; font-weight: 800; letter-spacing: var(--tracking-titulo); }
+.topbar-logo svg { color: var(--color-accent); }
+.topbar-actions { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; }
+.github-repo-link { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 44px; padding: .5rem .75rem; border: 1px solid var(--color-border-strong); border-radius: var(--pix-radius-pill); font-size: .875rem; text-decoration: none; }
+.github-repo-link svg { width: 18px; height: 18px; }
+.page { width: 100%; max-width: calc(var(--pix-container-tool) + 2 * var(--pix-gutter)); padding: var(--pix-section-gap) var(--pix-gutter); margin: auto; display: flex; flex-direction: column; gap: var(--pix-section-gap); }
+.card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-cartao); padding: 24px; box-shadow: var(--shadow-cartao); }
+.card-title { font-size: clamp(2.5rem, 5vw, 3.5rem); font-weight: 900; line-height: 1.02; letter-spacing: var(--tracking-display); text-wrap: balance; margin-bottom: 1rem; max-width: 14ch; }
+.card-subtitle { font-size: 1.125rem; line-height: 1.6; color: var(--color-fg-muted); margin-bottom: 2rem; }
+.card-subtitle strong { font-weight: 500; }
+.field { margin-bottom: 1rem; min-width: 0; }
+label { display: block; font-size: .875rem; font-weight: 500; margin-bottom: .5rem; color: var(--color-fg-muted); }
+input[type=text], input[type=number] { width: 100%; min-width: 0; min-height: 52px; padding: .75rem 1rem; border: 1px solid var(--color-border-strong); border-radius: var(--radius-campo); background: var(--color-campo); color: var(--color-fg); font-size: 1rem; line-height: 1.5; }
+input::placeholder { color: var(--color-fg-placeholder); opacity: 1; }
+input[aria-invalid=true] { border-color: var(--color-erro); }
+.field-hint, .field-warn, .cc-add-valor-hint { font-size: .875rem; color: var(--color-fg-subtle); margin-top: .5rem; line-height: 1.5; }
+.field-warn { display: flex; align-items: center; gap: .5rem; color: var(--color-aviso); }
+.field-warn svg { width: 18px; height: 18px; }
+#extra-fields { display: none; }
+#extra-fields.visible { display: block; }
+.row-two { display: grid; grid-template-columns: 1fr; gap: 0 1rem; }
+.mode-pill, .status-chip { align-items: center; gap: .5rem; font: 500 11px/1.5 var(--font-mono); letter-spacing: var(--tracking-rotulo); text-transform: uppercase; border: 1px solid var(--color-border-strong); border-radius: var(--pix-radius-pill); color: var(--color-fg-muted); padding: .4rem .75rem; }
+.status-chip { display: inline-flex; color: var(--color-aviso); }
+.mode-pill { display: none; margin-bottom: 1rem; }
+.mode-pill.visible { display: inline-flex; }
+.mode-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-sucesso); }
+.btn, .scan-btn, .donate-btn, .donate-copy { display: inline-flex; justify-content: center; align-items: center; gap: .625rem; min-height: 44px; min-width: 44px; border: 1px solid var(--color-border-strong); border-radius: var(--pix-radius-pill); padding: .625rem 1rem; font-size: 1rem; line-height: 1.5; font-weight: 600; color: var(--color-fg-muted); background: transparent; transition: background 200ms var(--ease-padrao), color 200ms var(--ease-padrao), border-color 200ms var(--ease-padrao); }
+.btn svg, .scan-btn svg { width: 20px; height: 20px; }
+.btn:hover, .scan-btn:hover, .donate-btn:hover, .donate-copy:hover { color: var(--color-fg); background: var(--color-surface-2); }
+.btn:active, .scan-btn:active, .donate-btn:active, .donate-copy:active { transform: scale(.97); }
+.btn:disabled, .scan-btn:disabled { color: var(--color-fg-subtle); background: var(--color-surface-2); box-shadow: none; cursor: default; transform: none; }
+.btn-primary { min-height: 52px; width: 100%; padding: .75rem 1.5rem; border-color: transparent; color: var(--color-fg-on-accent); background: var(--color-accent-strong); box-shadow: var(--shadow-cta); }
+.btn-primary:hover, .btn-primary:active { color: var(--color-fg-on-accent); background: var(--color-accent-deep); }
+.install-btn, .scan-btn, .donate-copy { font-size: .875rem; }
+.scan-btn { margin-top: .75rem; }
+.btn-ghost.success, .donate-copy.copied { color: var(--color-sucesso); }
+.safety-notice, .result-check, .key-hint { font-size: .875rem; line-height: 1.6; color: var(--color-fg-muted); background: var(--color-campo); border: 1px solid var(--color-border-strong); border-left: 3px solid var(--color-aviso); border-radius: var(--radius-campo); padding: .75rem 1rem; margin: 1rem 0; }
+.safety-notice strong, .result-check strong { color: var(--color-aviso); }
+.error-msg { color: var(--color-erro); font-size: .875rem; }
+.error-msg:not(:empty) { margin: .75rem 0; }
+#result { display: none; }
+#result.visible { display: block; }
+.result-header { display: flex; align-items: center; gap: .75rem; margin-bottom: 1rem; }
+.result-header:focus { outline: none; }
+.result-header-text, .faq-title, .legal-notice h2 { font-size: clamp(1.75rem, 3vw, 2rem); font-weight: 800; line-height: 1.2; letter-spacing: var(--tracking-titulo); }
+.check-badge { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; color: var(--color-sucesso); }
+.qr-container { display: flex; justify-content: center; align-items: center; padding: 56px; background: #fff; border-radius: var(--radius-campo); margin: 1.25rem 0; cursor: pointer; }
+#qr-wrap { max-width: 100%; }
+#qr-wrap canvas { display: block; pointer-events: none; width: 100%; max-width: 280px; height: auto; image-rendering: pixelated; }
+.payload-label, .donate-row-label { font-size: .875rem; color: var(--color-fg-subtle); margin-bottom: .5rem; }
+.payload-box { background: var(--color-campo); border: 1px solid var(--color-border); border-radius: var(--radius-campo); padding: 1rem; font: 400 .875rem/1.5 var(--font-mono); color: var(--color-fg-muted); overflow-wrap: anywhere; user-select: all; margin-bottom: 1rem; }
+#chave-input, #valor-input, #cc-add-valor-input, #cc-chave, .cc-value-money, .cc-add-valor-prefix, .donate-addr { font-family: var(--font-mono); font-weight: 400; font-synthesis: none; font-variant-numeric: tabular-nums; letter-spacing: var(--tracking-mono); }
+.action-row { display: flex; flex-wrap: wrap; gap: .75rem; }
+.cc-summary { background: var(--color-campo); border: 1px solid var(--color-border); border-radius: var(--radius-campo); padding: 1rem; margin-bottom: 1rem; }
+.cc-summary-title { display: flex; align-items: center; gap: .5rem; color: var(--color-fg-muted); font-weight: 600; margin-bottom: .75rem; }
+.cc-row { display: grid; grid-template-columns: minmax(80px, 1fr) 3fr; gap: .75rem; padding: .35rem 0; font-size: .875rem; }
+.cc-label { color: var(--color-fg-subtle); }
+.cc-value { overflow-wrap: anywhere; min-width: 0; }
+.cc-value-money { color: var(--color-sucesso); font-size: clamp(1.375rem, 3vw, 2rem); font-weight: 500; }
+.cc-value-muted { color: var(--color-fg-muted); }
+.cc-add-valor { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--color-border); }
+.cc-add-valor-row { display: flex; align-items: center; gap: .75rem; margin-top: .5rem; }
+.tip-jar { margin-top: 2rem; }
+.tip-jar-divider { border-top: 1px solid var(--color-border); margin-bottom: 1.5rem; }
+.tip-jar-title { font-size: 1.25rem; font-weight: 800; }
+.tip-jar-sub { color: var(--color-fg-subtle); font-size: .875rem; margin: .5rem 0 1rem; }
+.donate-panel { display: none; }
+.donate-panel.open { display: block; margin-top: 1rem; }
+.donate-panel-inner { display: flex; flex-direction: column; gap: 1rem; }
+.donate-row-addr-wrap { display: flex; align-items: center; gap: .5rem; }
+.donate-addr { min-width: 0; flex: 1; overflow-wrap: anywhere; font-size: .875rem; color: var(--color-fg-muted); user-select: all; }
+.faq-title, .legal-notice h2 { margin-bottom: 1rem; }
+.faq details { border-bottom: 1px solid var(--color-border-strong); }
+.faq summary { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 56px; padding: 1rem .25rem; font-weight: 600; list-style: none; cursor: pointer; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: '+'; font-size: 1.5rem; color: var(--color-fg-subtle); }
+.faq details[open] summary::after { content: '−'; }
+.faq-answer { color: var(--color-fg-muted); padding: 0 .25rem 1.25rem; }
+.faq-answer a, .legal-notice a, footer a { display: inline-block; min-height: 44px; padding-block: 10px; }
+.legal-notice { color: var(--color-fg-muted); font-size: 1rem; }
+.legal-notice p + p { margin-top: 1rem; }
+.legal-notice strong { color: var(--color-fg); }
+footer { display: flex; flex-direction: column; gap: .75rem; font-size: .875rem; color: var(--color-fg-subtle); padding-top: 1rem; border-top: 1px solid var(--color-border); }
+.modal-backdrop { position: fixed; inset: 0; background: rgb(0 0 0 / .7); display: none; align-items: center; justify-content: center; padding: 1rem; z-index: var(--pix-z-dialog); }
+.modal-backdrop.open { display: flex; }
+.modal { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-cartao); padding: 24px; max-width: 28rem; width: 100%; max-height: calc(100dvh - 2rem); overflow-y: auto; box-shadow: var(--shadow-dialogo); }
+.modal h3 { font-size: 1.5rem; font-weight: 800; line-height: 1.25; margin-bottom: 1rem; }
+.modal p, .modal ol { margin-bottom: 1rem; color: var(--color-fg-muted); }
+.modal ol { padding-left: 1.25rem; }
+@media (min-width: 640px) { .row-two { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 639px) { .card { padding: 16px; } .topbar-actions { gap: .375rem; } .github-repo-link { font-size: .75rem; } .topbar-logo { font-size: 1rem; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } button:active { transform: none !important; } }
   </style>
 
   <script type="application/ld+json">
@@ -1125,7 +383,7 @@
   </div>
 </noscript>
 
-<div class="topbar">
+<div class="topbar" role="banner">
   <div class="topbar-inner">
     <div class="topbar-logo">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -1149,7 +407,7 @@
   </div>
 </div>
 
-<div class="page">
+<main class="page">
 
   <div class="card">
     <h1 class="card-title">Gerador de QR Code PIX</h1>
@@ -1168,12 +426,24 @@
       <p class="field-hint">Detecta CPF, CNPJ alfanumérico, e-mail, telefone E.164 (+), EVP e Pix Copia e Cola.</p>
       <input id="qr-file-input" type="file" accept="image/png,image/jpeg,image/gif,image/webp" capture="environment" hidden />
       <button id="scan-qr-btn" type="button" class="scan-btn" aria-label="Escanear QR Code de uma imagem ou foto">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect x="3" y="3" width="6" height="6" rx="1"/>
-          <rect x="15" y="3" width="6" height="6" rx="1"/>
-          <rect x="3" y="15" width="6" height="6" rx="1"/>
-          <path d="M15 15h2v2M19 19h2M15 19h2M19 15h2"/>
-        </svg>
+        <svg aria-hidden="true" focusable="false"
+  class="lucide lucide-scan-line"
+  xmlns="http://www.w3.org/2000/svg"
+  width="20"
+  height="20"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M3 7V5a2 2 0 0 1 2-2h2" />
+  <path d="M17 3h2a2 2 0 0 1 2 2v2" />
+  <path d="M21 17v2a2 2 0 0 1-2 2h-2" />
+  <path d="M7 21H5a2 2 0 0 1-2-2v-2" />
+  <path d="M7 12h10" />
+</svg>
         Escanear QR Code
       </button>
     </div>
@@ -1243,10 +513,22 @@
           <label for="nome-input">Nome</label>
           <input id="nome-input" type="text" placeholder="João Silva" maxlength="50" aria-describedby="nome-warn" />
           <p class="field-warn" id="nome-warn" hidden>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M12 8v4M12 16h.01"/>
-            </svg>
+            <svg aria-hidden="true" focusable="false"
+  class="lucide lucide-circle-alert"
+  xmlns="http://www.w3.org/2000/svg"
+  width="20"
+  height="20"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <line x1="12" x2="12" y1="8" y2="12" />
+  <line x1="12" x2="12.01" y1="16" y2="16" />
+</svg>
             Nome geralmente não tem números.
           </p>
         </div>
@@ -1254,10 +536,22 @@
           <label for="cidade-input">Cidade</label>
           <input id="cidade-input" type="text" placeholder="São Paulo" maxlength="30" aria-describedby="cidade-warn" />
           <p class="field-warn" id="cidade-warn" hidden>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M12 8v4M12 16h.01"/>
-            </svg>
+            <svg aria-hidden="true" focusable="false"
+  class="lucide lucide-circle-alert"
+  xmlns="http://www.w3.org/2000/svg"
+  width="20"
+  height="20"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <line x1="12" x2="12" y1="8" y2="12" />
+  <line x1="12" x2="12.01" y1="16" y2="16" />
+</svg>
             Cidade geralmente não tem números.
           </p>
         </div>
@@ -1277,9 +571,21 @@
     </aside>
 
     <button class="btn btn-primary" id="gerar-btn">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M5 12h14M12 5l7 7-7 7"/>
-      </svg>
+      <svg aria-hidden="true" focusable="false"
+  class="lucide lucide-arrow-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="20"
+  height="20"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M5 12h14" />
+  <path d="m12 5 7 7-7 7" />
+</svg>
       Gerar QR Code
     </button>
   </div>
@@ -1309,34 +615,78 @@
 
       <div class="action-row">
         <button class="btn btn-ghost" id="copy-btn">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="9" y="9" width="13" height="13" rx="2"/>
-            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-          </svg>
+          <svg aria-hidden="true" focusable="false"
+  class="lucide lucide-copy"
+  xmlns="http://www.w3.org/2000/svg"
+  width="20"
+  height="20"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+</svg>
           Copiar texto
         </button>
         <button class="btn btn-ghost" id="download-btn">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="7 10 12 15 17 10"/>
-            <line x1="12" y1="15" x2="12" y2="3"/>
-          </svg>
+          <svg aria-hidden="true" focusable="false"
+  class="lucide lucide-download"
+  xmlns="http://www.w3.org/2000/svg"
+  width="20"
+  height="20"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+  <polyline points="7 10 12 15 17 10" />
+  <line x1="12" x2="12" y1="15" y2="3" />
+</svg>
           Baixar PNG
         </button>
         <button class="btn btn-ghost" id="download-svg-btn">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="7 10 12 15 17 10"/>
-            <line x1="12" y1="15" x2="12" y2="3"/>
-          </svg>
+          <svg aria-hidden="true" focusable="false"
+  class="lucide lucide-download"
+  xmlns="http://www.w3.org/2000/svg"
+  width="20"
+  height="20"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+  <polyline points="7 10 12 15 17 10" />
+  <line x1="12" x2="12" y1="15" y2="3" />
+</svg>
           Baixar SVG
         </button>
         <button class="btn btn-ghost" id="copy-img-btn">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="2"/>
-            <circle cx="9" cy="9" r="2"/>
-            <path d="M21 15l-5-5L5 21"/>
-          </svg>
+          <svg aria-hidden="true" focusable="false"
+  class="lucide lucide-image"
+  xmlns="http://www.w3.org/2000/svg"
+  width="20"
+  height="20"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+  <circle cx="9" cy="9" r="2" />
+  <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+</svg>
           Copiar imagem
         </button>
       </div>
@@ -1442,7 +792,7 @@
     <span class="footer-meta"><a href="https://github.com/ZaMpAdAKiNg/pix2qr" rel="noopener">Código-fonte no GitHub</a> · <a href="/privacidade">Privacidade</a> · <a href="/licencas">Licenças de terceiros</a></span>
   </footer>
 
-</div>
+</main>
 
 
 <script src="/qrcode.min.js" defer></script>

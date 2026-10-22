@@ -1,11 +1,12 @@
 /* Secondary documents share tokens, navigation, controls and footer with home. */
 .document-page .topbar-logo { min-height: 44px; text-decoration: none; color: var(--color-fg); }
 .document-page > footer { max-width: var(--pix-container-prose); margin: 0 auto; padding: 1rem var(--pix-gutter) 0; }
-.doc-kicker { font: 500 11px/1.6 var(--font-mono); letter-spacing: var(--tracking-rotulo); text-transform: uppercase; color: var(--color-fg-subtle); margin-bottom: .75rem; }
+/* `.document-page` vence `.doc p`, que antes sobrescrevia o kicker dentro de main.doc. */
+.document-page .doc-kicker { font: 500 11px/1.6 var(--font-mono); letter-spacing: var(--tracking-rotulo); text-transform: uppercase; color: var(--color-fg-subtle); margin-bottom: .75rem; }
 .document-page h1 { font-size: clamp(2.25rem, 5vw, 3.5rem); font-weight: 900; line-height: 1.08; letter-spacing: var(--tracking-display); text-wrap: balance; margin-bottom: 1.5rem; }
 .lead, .doc p, .doc li { color: var(--color-fg-muted); font-size: 1rem; line-height: 1.75; }
 .lead { margin-bottom: 2rem; }
-.doc h2 { font-size: 1.5rem; line-height: 1.25; letter-spacing: var(--tracking-titulo); margin: 2rem 0 1rem; padding-top: 1.5rem; border-top: 1px solid var(--color-border); }
+.doc h2 { font-size: clamp(1.75rem, 3vw, 2rem); font-weight: 800; line-height: 1.2; letter-spacing: var(--tracking-titulo); margin: 2rem 0 1rem; padding-top: 1.5rem; border-top: 1px solid var(--color-border); }
 .doc > h2:first-child { margin-top: 0; padding-top: 0; border: 0; }
 .doc p + p { margin-top: 1rem; }
 .doc strong { color: var(--color-fg); font-weight: 600; }

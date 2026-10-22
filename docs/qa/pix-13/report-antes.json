@@ -1,0 +1,350 @@
+[
+  {
+    "page": "qr-code-pix-para-imprimir",
+    "viewport": 390,
+    "ok": false,
+    "subtle": "#a1aca7",
+    "tracking": "-.02em",
+    "h2": [
+      {
+        "text": "Como gerar o QR Code PIX para imprimir",
+        "fontFamily": "Outfit",
+        "fontSize": "24px",
+        "fontWeight": "700",
+        "letterSpacing": "-0.48px",
+        "lineHeight": "30px",
+        "color": "rgb(247, 249, 248)"
+      },
+      {
+        "text": "Perguntas frequentes",
+        "fontFamily": "Outfit",
+        "fontSize": "24px",
+        "fontWeight": "700",
+        "letterSpacing": "-0.48px",
+        "lineHeight": "30px",
+        "color": "rgb(247, 249, 248)"
+      }
+    ],
+    "kicker": [
+      {
+        "text": "Ferramenta gratuita",
+        "fontFamily": "\"IBM Plex Mono\"",
+        "fontSize": "11px",
+        "fontWeight": "500",
+        "letterSpacing": "1.32px",
+        "lineHeight": "17.6px",
+        "color": "rgb(161, 172, 167)"
+      }
+    ],
+    "overflow": false,
+    "axe": []
+  },
+  {
+    "page": "privacidade",
+    "viewport": 390,
+    "ok": false,
+    "subtle": "#a1aca7",
+    "tracking": "-.02em",
+    "h2": [
+      {
+        "text": "Telemetria técnica",
+        "fontFamily": "Outfit",
+        "fontSize": "24px",
+        "fontWeight": "700",
+        "letterSpacing": "-0.48px",
+        "lineHeight": "30px",
+        "color": "rgb(247, 249, 248)"
+      },
+      {
+        "text": "Armazenamento local e PWA",
+        "fontFamily": "Outfit",
+        "fontSize": "24px",
+        "fontWeight": "700",
+        "letterSpacing": "-0.48px",
+        "lineHeight": "30px",
+        "color": "rgb(247, 249, 248)"
+      },
+      {
+        "text": "Limites e reporte",
+        "fontFamily": "Outfit",
+        "fontSize": "24px",
+        "fontWeight": "700",
+        "letterSpacing": "-0.48px",
+        "lineHeight": "30px",
+        "color": "rgb(247, 249, 248)"
+      }
+    ],
+    "kicker": [
+      {
+        "text": "Documento do projeto",
+        "fontFamily": "\"IBM Plex Mono\"",
+        "fontSize": "16px",
+        "fontWeight": "500",
+        "letterSpacing": "1.92px",
+        "lineHeight": "28px",
+        "color": "rgb(214, 221, 217)"
+      }
+    ],
+    "overflow": false,
+    "axe": []
+  },
+  {
+    "page": "licencas",
+    "viewport": 390,
+    "ok": false,
+    "subtle": "#a1aca7",
+    "tracking": "-.02em",
+    "h2": [
+      {
+        "text": "jsQR",
+        "fontFamily": "Outfit",
+        "fontSize": "24px",
+        "fontWeight": "700",
+        "letterSpacing": "-0.48px",
+        "lineHeight": "30px",
+        "color": "rgb(247, 249, 248)"
+      },
+      {
+        "text": "node-qrcode",
+        "fontFamily": "Outfit",
+        "fontSize": "24px",
+        "fontWeight": "700",
+        "letterSpacing": "-0.48px",
+        "lineHeight": "30px",
+        "color": "rgb(247, 249, 248)"
+      },
+      {
+        "text": "dijkstrajs",
+        "fontFamily": "Outfit",
+        "fontSize": "24px",
+        "fontWeight": "700",
+        "letterSpacing": "-0.48px",
+        "lineHeight": "30px",
+        "color": "rgb(247, 249, 248)"
+      },
+      {
+        "text": "Umami tracker",
+        "fontFamily": "Outfit",
+        "fontSize": "24px",
+        "fontWeight": "700",
+        "letterSpacing": "-0.48px",
+        "lineHeight": "30px",
+        "color": "rgb(247, 249, 248)"
+      },
+      {
+        "text": "Outfit",
+        "fontFamily": "Outfit",
+        "fontSize": "24px",
+        "fontWeight": "700",
+        "letterSpacing": "-0.48px",
+        "lineHeight": "30px",
+        "color": "rgb(247, 249, 248)"
+      },
+      {
+        "text": "Fontes e ícones da home",
+        "fontFamily": "Outfit",
+        "fontSize": "24px",
+        "fontWeight": "700",
+        "letterSpacing": "-0.48px",
+        "lineHeight": "30px",
+        "color": "rgb(247, 249, 248)"
+      },
+      {
+        "text": "O que o gate comprova",
+        "fontFamily": "Outfit",
+        "fontSize": "24px",
+        "fontWeight": "700",
+        "letterSpacing": "-0.48px",
+        "lineHeight": "30px",
+        "color": "rgb(247, 249, 248)"
+      }
+    ],
+    "kicker": [
+      {
+        "text": "Documento do projeto",
+        "fontFamily": "\"IBM Plex Mono\"",
+        "fontSize": "16px",
+        "fontWeight": "500",
+        "letterSpacing": "1.92px",
+        "lineHeight": "28px",
+        "color": "rgb(214, 221, 217)"
+      }
+    ],
+    "overflow": false,
+    "axe": []
+  },
+  {
+    "page": "qr-code-pix-para-imprimir",
+    "viewport": 1280,
+    "ok": false,
+    "subtle": "#a1aca7",
+    "tracking": "-.02em",
+    "h2": [
+      {
+        "text": "Como gerar o QR Code PIX para imprimir",
+        "fontFamily": "Outfit",
+        "fontSize": "24px",
+        "fontWeight": "700",
+        "letterSpacing": "-0.48px",
+        "lineHeight": "30px",
+        "color": "rgb(247, 249, 248)"
+      },
+      {
+        "text": "Perguntas frequentes",
+        "fontFamily": "Outfit",
+        "fontSize": "24px",
+        "fontWeight": "700",
+        "letterSpacing": "-0.48px",
+        "lineHeight": "30px",
+        "color": "rgb(247, 249, 248)"
+      }
+    ],
+    "kicker": [
+      {
+        "text": "Ferramenta gratuita",
+        "fontFamily": "\"IBM Plex Mono\"",
+        "fontSize": "11px",
+        "fontWeight": "500",
+        "letterSpacing": "1.32px",
+        "lineHeight": "17.6px",
+        "color": "rgb(161, 172, 167)"
+      }
+    ],
+    "overflow": false,
+    "axe": []
+  },
+  {
+    "page": "privacidade",
+    "viewport": 1280,
+    "ok": false,
+    "subtle": "#a1aca7",
+    "tracking": "-.02em",
+    "h2": [
+      {
+        "text": "Telemetria técnica",
+        "fontFamily": "Outfit",
+        "fontSize": "24px",
+        "fontWeight": "700",
+        "letterSpacing": "-0.48px",
+        "lineHeight": "30px",
+        "color": "rgb(247, 249, 248)"
+      },
+      {
+        "text": "Armazenamento local e PWA",
+        "fontFamily": "Outfit",
+        "fontSize": "24px",
+        "fontWeight": "700",
+        "letterSpacing": "-0.48px",
+        "lineHeight": "30px",
+        "color": "rgb(247, 249, 248)"
+      },
+      {
+        "text": "Limites e reporte",
+        "fontFamily": "Outfit",
+        "fontSize": "24px",
+        "fontWeight": "700",
+        "letterSpacing": "-0.48px",
+        "lineHeight": "30px",
+        "color": "rgb(247, 249, 248)"
+      }
+    ],
+    "kicker": [
+      {
+        "text": "Documento do projeto",
+        "fontFamily": "\"IBM Plex Mono\"",
+        "fontSize": "16px",
+        "fontWeight": "500",
+        "letterSpacing": "1.92px",
+        "lineHeight": "28px",
+        "color": "rgb(214, 221, 217)"
+      }
+    ],
+    "overflow": false,
+    "axe": []
+  },
+  {
+    "page": "licencas",
+    "viewport": 1280,
+    "ok": false,
+    "subtle": "#a1aca7",
+    "tracking": "-.02em",
+    "h2": [
+      {
+        "text": "jsQR",
+        "fontFamily": "Outfit",
+        "fontSize": "24px",
+        "fontWeight": "700",
+        "letterSpacing": "-0.48px",
+        "lineHeight": "30px",
+        "color": "rgb(247, 249, 248)"
+      },
+      {
+        "text": "node-qrcode",
+        "fontFamily": "Outfit",
+        "fontSize": "24px",
+        "fontWeight": "700",
+        "letterSpacing": "-0.48px",
+        "lineHeight": "30px",
+        "color": "rgb(247, 249, 248)"
+      },
+      {
+        "text": "dijkstrajs",
+        "fontFamily": "Outfit",
+        "fontSize": "24px",
+        "fontWeight": "700",
+        "letterSpacing": "-0.48px",
+        "lineHeight": "30px",
+        "color": "rgb(247, 249, 248)"
+      },
+      {
+        "text": "Umami tracker",
+        "fontFamily": "Outfit",
+        "fontSize": "24px",
+        "fontWeight": "700",
+        "letterSpacing": "-0.48px",
+        "lineHeight": "30px",
+        "color": "rgb(247, 249, 248)"
+      },
+      {
+        "text": "Outfit",
+        "fontFamily": "Outfit",
+        "fontSize": "24px",
+        "fontWeight": "700",
+        "letterSpacing": "-0.48px",
+        "lineHeight": "30px",
+        "color": "rgb(247, 249, 248)"
+      },
+      {
+        "text": "Fontes e ícones da home",
+        "fontFamily": "Outfit",
+        "fontSize": "24px",
+        "fontWeight": "700",
+        "letterSpacing": "-0.48px",
+        "lineHeight": "30px",
+        "color": "rgb(247, 249, 248)"
+      },
+      {
+        "text": "O que o gate comprova",
+        "fontFamily": "Outfit",
+        "fontSize": "24px",
+        "fontWeight": "700",
+        "letterSpacing": "-0.48px",
+        "lineHeight": "30px",
+        "color": "rgb(247, 249, 248)"
+      }
+    ],
+    "kicker": [
+      {
+        "text": "Documento do projeto",
+        "fontFamily": "\"IBM Plex Mono\"",
+        "fontSize": "16px",
+        "fontWeight": "500",
+        "letterSpacing": "1.92px",
+        "lineHeight": "28px",
+        "color": "rgb(214, 221, 217)"
+      }
+    ],
+    "overflow": false,
+    "axe": []
+  }
+]

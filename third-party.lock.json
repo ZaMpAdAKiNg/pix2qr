@@ -17,7 +17,9 @@
       "sourceIntegrity": "sha512-1ca71Zgiu6ORjHqFBDpnSMTR2ReToX4l1Au1VFLyVeBTFavzQnv5JxMFr3ukHVKpSrSA2MCk0lNJSykjUfz7Zg==",
       "license": "MIT",
       "licenseFile": "licenses/node-qrcode-MIT.txt",
-      "bundled": ["dijkstrajs@1.0.3"],
+      "bundled": [
+        "dijkstrajs@1.0.3"
+      ],
       "sha256": "07d092a7bc6fd894bf0dc4a29b15bc4d8a52d40dcd447ff75070c11fb99476bb"
     },
     "umami.js": {
@@ -64,6 +66,32 @@
       "origin": "https://github.com/google/fonts/blob/ec0464b978de222073645d6d3366f3fdf03376d8/ofl/outfit/OFL.txt",
       "license": "OFL-1.1",
       "sha256": "c676351bf8576b9aba743cd5eaa8c0e7ee0d51f805d720447b4df4ddb6a2e416"
+    },
+    "fonts/ibm-plex-mono-400-latin.woff2": {
+      "version": "IBM Plex Mono latin 400/500",
+      "origin": "https://github.com/google/fonts/tree/main/ofl/ibmplexmono",
+      "license": "OFL-1.1",
+      "sha256": "c36f509c0a8f9f85f29cb44bc8701d8a9e0b14c499e77a884f789ead7093a7ac",
+      "licenseFile": "licenses/IBM-Plex-Mono-OFL-1.1.txt"
+    },
+    "fonts/ibm-plex-mono-500-latin.woff2": {
+      "version": "IBM Plex Mono latin 400/500",
+      "origin": "https://github.com/google/fonts/tree/main/ofl/ibmplexmono",
+      "license": "OFL-1.1",
+      "sha256": "a76f53ca6612e7b3828eec2311098675b7f9849ae4169a8bcef6302aec02a6c0",
+      "licenseFile": "licenses/IBM-Plex-Mono-OFL-1.1.txt"
+    },
+    "licenses/IBM-Plex-Mono-OFL-1.1.txt": {
+      "version": "IBM Plex Mono latin 400/500",
+      "origin": "https://github.com/google/fonts/tree/main/ofl/ibmplexmono",
+      "license": "OFL-1.1",
+      "sha256": "7e6b2818edbd8f6a01ae80641cc8f16a51080d08fb4e532be3a0b6f74adb07da"
+    },
+    "licenses/lucide-ISC.txt": {
+      "version": "lucide-static 0.468.0",
+      "origin": "https://registry.npmjs.org/lucide-static/-/lucide-static-0.468.0.tgz",
+      "license": "ISC",
+      "sha256": "1e7290b35280a048667bbf0ebabac1c7fd52a75300e8b2946ac165715997f2bc"
     }
   }
 }

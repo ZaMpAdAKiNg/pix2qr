@@ -9,6 +9,8 @@ entradas são agrupadas por data.
 
 ## [Não lançado]
 
+- [PIX-12] Estado de erro do campo PIX com ícone CircleAlert, `aria-invalid` e `aria-describedby` ligando o campo a `#error-msg`, borda e anel `--color-erro`; tudo limpa ao corrigir a chave. Coberto no E2E adversarial.
+
 - Adiciona link para converter USDT em PIX com a Salaria.tech no topo das quatro páginas, com faixa responsiva e foco acessível.
 
 - Unifica Placa, Privacidade e Licenças com o visual da home, compartilhando CSS e preservando a impressão clara e a exportação PNG.

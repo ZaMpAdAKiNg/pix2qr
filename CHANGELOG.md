@@ -9,6 +9,8 @@ entradas são agrupadas por data.
 
 ## [Não lançado]
 
+- Unifica Placa, Privacidade e Licenças com o visual da home, compartilhando CSS e preservando a impressão clara e a exportação PNG.
+
 - [PIX-7] Home com tokens verde-grafite/brasa, títulos Outfit 900, Plex Mono local e ícones Lucide. Campos e ações acessíveis, foco visível, layout responsivo e manifest atualizado; conteúdo, hooks e QR preservados.
 
 ### Added

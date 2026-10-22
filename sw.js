@@ -14,6 +14,7 @@ const DOCUMENT_PAGES = [
 const APP_SHELL = [
   "/",
   "/index.html",
+  "/site.css",
   "/app.js",
   "/pix-core.js",
   "/analytics-privacy.js",

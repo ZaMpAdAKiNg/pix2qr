@@ -35,7 +35,9 @@ test('analytics preserva payload/eventos e falha fechado em URL malformada', () 
 
 test('[hidden] override — .btn não fica visível quando [hidden] (F301 regressão)', () => {
   const html = readFileSync(indexHtmlPath, 'utf8');
-  assert.match(html, /\.btn\[hidden\]\s*\{\s*display:\s*none/);
+  assert.match(html, /<link rel="stylesheet" href="\/site\.css"/);
+  const css = readFileSync(path.join(path.dirname(indexHtmlPath), 'site.css'), 'utf8');
+  assert.match(css, /\.btn\[hidden\]\s*\{\s*display:\s*none/);
 });
 
 test('runtime usa somente Umami e mantém os filtros de privacidade', () => {

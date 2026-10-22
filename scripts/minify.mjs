@@ -30,6 +30,10 @@ const esbuild = (args, input) =>
 const BUILD_DIR = process.env.BUILD_DIR || '.';
 const target = (name) => join(BUILD_DIR, name);
 
+for (const name of ['site.css', 'pages.css']) {
+  esbuild([target(name), '--minify', `--outfile=${target(name)}`, '--allow-overwrite']);
+}
+
 // JS: app.js e sw.js são self-contained (nenhum global deles é referenciado
 // de fora), então minificação completa. pix-core.js preserva identifiers.
 esbuild([target('app.js'), '--minify', `--outfile=${target('app.js')}`, '--allow-overwrite']);

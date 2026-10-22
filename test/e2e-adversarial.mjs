@@ -164,6 +164,63 @@ async function exerciseStaleKeyAndCorruptPayload(page, label) {
   await assertNoRenderedPayment(page, `${label}: corrupted payload`);
 }
 
+// Erro de chave = ícone + mensagem + associação programática (nunca só cor):
+// o campo recebe aria-invalid/aria-describedby e perde os dois ao corrigir.
+async function errorState(page) {
+  return page.evaluate(() => {
+    const input = document.getElementById('chave-input');
+    const describedBy = input.getAttribute('aria-describedby');
+    const alert = describedBy ? document.getElementById(describedBy) : null;
+    const svg = document.querySelector('#error-msg svg');
+    return {
+      ariaInvalid: input.getAttribute('aria-invalid'),
+      describedBy,
+      alertIsErrorMsg: alert !== null && alert.id === 'error-msg' && alert.getAttribute('role') === 'alert',
+      alertText: alert ? alert.textContent.trim() : '',
+      alertVisible: getComputedStyle(document.getElementById('error-msg')).display !== 'none',
+      iconVisible: svg !== null && svg.getAttribute('aria-hidden') === 'true'
+        && getComputedStyle(svg).display !== 'none',
+      borderColor: getComputedStyle(input).borderColor,
+      errorColor: getComputedStyle(document.documentElement).getPropertyValue('--color-erro').trim(),
+    };
+  });
+}
+
+async function exerciseInvalidKeyErrorState(page, label) {
+  await page.fill('#chave-input', 'abc');
+  await page.locator('#chave-input').blur();
+  let state = await errorState(page);
+  assert.equal(state.ariaInvalid, 'true', `${label}: invalid key on blur did not set aria-invalid`);
+  assert.equal(state.describedBy, 'error-msg', `${label}: invalid key did not associate #error-msg`);
+  assert.ok(state.alertIsErrorMsg && state.alertVisible, `${label}: aria-describedby does not resolve to the visible alert`);
+  assert.match(state.alertText, /Chave PIX inválida/, `${label}: invalid key message missing`);
+  assert.ok(state.iconVisible, `${label}: error alert has no visible aria-hidden icon`);
+  assert.equal(state.borderColor, hexToRgb(state.errorColor),
+    `${label}: invalid key did not paint the --color-erro border`);
+  await assertNoRenderedPayment(page, `${label}: invalid key left a result`);
+
+  await page.click('#gerar-btn');
+  state = await errorState(page);
+  assert.equal(state.ariaInvalid, 'true', `${label}: generate with invalid key did not keep aria-invalid`);
+
+  await page.fill('#chave-input', `fix-${label}@example.invalid`);
+  state = await errorState(page);
+  assert.equal(state.ariaInvalid, null, `${label}: correcting the key did not clear aria-invalid`);
+  assert.equal(state.describedBy, null, `${label}: correcting the key did not clear aria-describedby`);
+  assert.equal(state.alertVisible, false, `${label}: correcting the key left the alert visible`);
+  assert.notEqual(state.borderColor, hexToRgb(state.errorColor), `${label}: error border persisted`);
+  const { payload } = await generateAndValidate(page, `${label}-after-error`, '12,34');
+  assert.ok(payload, `${label}: valid key after error did not generate`);
+  state = await errorState(page);
+  assert.equal(state.ariaInvalid, null, `${label}: generated QR kept aria-invalid`);
+}
+
+function hexToRgb(hex) {
+  const value = hex.replace('#', '');
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(value.slice(i, i + 2), 16));
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
 function pngWithDeclaredDimensions(width, height) {
   const bytes = Buffer.alloc(24);
   Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]).copy(bytes, 0);
@@ -292,6 +349,7 @@ async function runViewport(staticServer, viewport) {
 
     await exerciseInvalidAmounts(page, viewport.label);
     await exerciseStaleKeyAndCorruptPayload(page, viewport.label);
+    await exerciseInvalidKeyErrorState(page, viewport.label);
 
     if (viewport.label === 'desktop') {
       await exercisePayloadByteBoundary(page, viewport.label);

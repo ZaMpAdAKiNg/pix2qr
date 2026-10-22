@@ -10,6 +10,7 @@ const extraFields    = document.getElementById('extra-fields');
 const modeTagEl      = document.getElementById('mode-tag');
 const modeLabelEl    = document.getElementById('mode-label');
 const errorMsg       = document.getElementById('error-msg');
+const errorMsgText   = document.getElementById('error-msg-text');
 const gerarBtn       = document.getElementById('gerar-btn');
 const resultEl       = document.getElementById('result');
 const resultHeader   = resultEl.querySelector('.result-header');
@@ -23,6 +24,33 @@ const downloadSvgBtn = document.getElementById('download-svg-btn');
 const copyImgBtn     = document.getElementById('copy-img-btn');
 
 let currentPayload = '';
+
+// Erro visível = ícone + mensagem + associação (spec §3: nunca só cor). O
+// texto vai no span interno pra preservar o ícone; o campo culpado, quando
+// informado, recebe aria-invalid + aria-describedby apontando pro alerta, e
+// clearError só desmarca o campo que setError marcou.
+let errorField = null;
+function setError(msg, field) {
+  errorMsgText.textContent = msg;
+  errorMsg.classList.add('visible');
+  if (errorField && errorField !== field) clearErrorField();
+  if (field) {
+    field.setAttribute('aria-invalid', 'true');
+    field.setAttribute('aria-describedby', 'error-msg');
+    errorField = field;
+  }
+}
+function clearErrorField() {
+  if (!errorField) return;
+  errorField.removeAttribute('aria-invalid');
+  errorField.removeAttribute('aria-describedby');
+  errorField = null;
+}
+function clearError() {
+  errorMsgText.textContent = '';
+  errorMsg.classList.remove('visible');
+  clearErrorField();
+}
 
 function detectMode(value) {
   const v = value.trim();
@@ -53,13 +81,13 @@ function invalidateResult() {
 function showChaveErrorIfInvalid(parsed, raw) {
   if (!raw || !raw.trim()) return false; // vazio não é erro
   if (!parsed) {
-    errorMsg.textContent = 'Chave PIX inválida. Use CPF, CNPJ, e-mail ASCII, telefone E.164 (com +) ou chave aleatória.';
+    setError('Chave PIX inválida. Use CPF, CNPJ, e-mail ASCII, telefone E.164 (com +) ou chave aleatória.', chaveInput);
     invalidateResult();
     return true;
   }
   const msg = CHAVE_ERROR_BY_TIPO[parsed.tipo];
   if (msg) {
-    errorMsg.textContent = msg;
+    setError(msg, chaveInput);
     invalidateResult();
     return true;
   }
@@ -254,7 +282,7 @@ function trackToolStart(mode) {
 chaveInput.addEventListener('input', () => {
   trackToolStart('type');
   const mode = detectMode(chaveInput.value);
-  errorMsg.textContent = '';
+  clearError();
   // O QR/payload exibido vira stale assim que a chave muda — invalida pra que
   // Copiar/Baixar nunca peguem o payload de uma chave anterior (força clicar
   // "Gerar" de novo). Guard em currentPayload: na reconstrução de Copia-e-Cola
@@ -317,11 +345,11 @@ scanQrBtn.addEventListener('click', () => {
 qrFileInput.addEventListener('change', async (event) => {
   const file = event.target.files && event.target.files[0];
   if (!file) return;
-  errorMsg.textContent = '';
+  clearError();
   invalidateResult();
   hideCopiaColaSummary();
   if ((file.type && !file.type.startsWith('image/')) || file.size > 15 * 1024 * 1024) {
-    errorMsg.textContent = 'Selecione uma imagem de até 15 MB.';
+    setError('Selecione uma imagem de até 15 MB.');
     qrFileInput.value = '';
     return;
   }
@@ -339,7 +367,7 @@ qrFileInput.addEventListener('change', async (event) => {
   scanQrBtn.disabled = true;
   try {
     if (typeof jsQR !== 'function') {
-      errorMsg.textContent = 'Decoder de QR não carregou. Recarregue a página.';
+      setError('Decoder de QR não carregou. Recarregue a página.');
       return;
     }
     // Lê no máximo 1 MiB do cabeçalho e rejeita dimensão excessiva ANTES de
@@ -348,26 +376,26 @@ qrFileInput.addEventListener('change', async (event) => {
     const header = await file.slice(0, Math.min(file.size, 1024 * 1024)).arrayBuffer();
     const imageInfo = readImageDimensions(header);
     if (!imageInfo) {
-      errorMsg.textContent = 'Formato não suportado. Use PNG, JPEG, GIF ou WebP.';
+      setError('Formato não suportado. Use PNG, JPEG, GIF ou WebP.');
       return;
     }
     if (!hasSafeImageDimensions(imageInfo)) {
-      errorMsg.textContent = 'Imagem grande demais para processar com segurança (máximo de 25 megapixels).';
+      setError('Imagem grande demais para processar com segurança (máximo de 25 megapixels).');
       return;
     }
     const img = await loadImageFile(file);
     const srcW = img.naturalWidth;
     const srcH = img.naturalHeight;
     if (!srcW || !srcH) {
-      errorMsg.textContent = 'Imagem com dimensão zero.';
+      setError('Imagem com dimensão zero.');
       return;
     }
     if (!hasSafeImageDimensions({ width: srcW, height: srcH })) {
-      errorMsg.textContent = 'Imagem grande demais para processar com segurança (máximo de 25 megapixels).';
+      setError('Imagem grande demais para processar com segurança (máximo de 25 megapixels).');
       return;
     }
     if (!hasConsistentDecodedImageDimensions(imageInfo, srcW, srcH)) {
-      errorMsg.textContent = 'A dimensão decodificada não corresponde ao cabeçalho da imagem.';
+      setError('A dimensão decodificada não corresponde ao cabeçalho da imagem.');
       return;
     }
     // Clamp: limita o maior lado a MAX_QR_DECODE_SIDE e faz downscale proporcional
@@ -384,7 +412,7 @@ qrFileInput.addEventListener('change', async (event) => {
     const { data, width, height } = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const code = jsQR(data, width, height, { inversionAttempts: 'attemptBoth' });
     if (!code || !code.data) {
-      errorMsg.textContent = 'Não consegui ler um QR Code nessa imagem. Tente foto mais nítida ou enquadrada.';
+      setError('Não consegui ler um QR Code nessa imagem. Tente foto mais nítida ou enquadrada.');
       invalidateResult();
       return;
     }
@@ -407,7 +435,7 @@ qrFileInput.addEventListener('change', async (event) => {
       });
     }
   } catch (err) {
-    errorMsg.textContent = 'Erro ao processar imagem: ' + (err && err.message || err);
+    setError('Erro ao processar imagem: ' + (err && err.message || err));
     invalidateResult();
   } finally {
     qrFileInput.value = ''; // permite re-selecionar o mesmo arquivo
@@ -453,11 +481,11 @@ valorInput.addEventListener('blur', () => {
 const VALOR_INVALIDO_MSG = 'Valor inválido. Use o formato 1.234,56.';
 
 gerarBtn.addEventListener('click', () => {
-  errorMsg.textContent = '';
+  clearError();
   invalidateResult(); // reseta QR/payload antigo — só o sucesso repopula
   const raw = chaveInput.value.trim();
   if (!raw) {
-    errorMsg.textContent = 'Informe uma chave PIX ou código Copia e Cola.';
+    setError('Informe uma chave PIX ou código Copia e Cola.', chaveInput);
     return;
   }
   // Bloqueia geração se input é inválido; mostra erro específico.
@@ -477,7 +505,7 @@ gerarBtn.addEventListener('click', () => {
         // em aberto silenciosamente (o usuário claramente quis um valor).
         if (!normalizeValorParaPayload(addValor)) {
           invalidateResult();
-          errorMsg.textContent = VALOR_INVALIDO_MSG;
+          setError(VALOR_INVALIDO_MSG);
           return;
         }
         payload = withStaticAmount(raw, addValor);
@@ -491,13 +519,13 @@ gerarBtn.addEventListener('click', () => {
       const valorRaw = valorInput.value.trim();
       if (valorRaw && !normalizeValorParaPayload(valorRaw)) {
         invalidateResult();
-        errorMsg.textContent = VALOR_INVALIDO_MSG;
+        setError(VALOR_INVALIDO_MSG);
         return;
       }
       payload = generatePayload(raw, nomeInput.value, cidadeInput.value, valorInput.value);
     }
   } catch (e) {
-    errorMsg.textContent = 'Erro ao gerar payload: ' + e.message;
+    setError('Erro ao gerar payload: ' + e.message);
     return;
   }
   currentPayload = payload;
@@ -519,7 +547,7 @@ gerarBtn.addEventListener('click', () => {
     qrModuleCount = QRCode.create(payload, { errorCorrectionLevel: 'H' }).modules.size;
   } catch (e) {
     invalidateResult();
-    errorMsg.textContent = 'Erro ao gerar QR Code: ' + (e.message || e);
+    setError('Erro ao gerar QR Code: ' + (e.message || e));
     return;
   }
   const pixelsPerModule = Math.max(4, Math.ceil(320 / qrModuleCount));
@@ -542,7 +570,7 @@ gerarBtn.addEventListener('click', () => {
       // node-qrcode só falha se o payload exceder a capacidade física do
       // maior QR (v40) — irreal pra PIX. Tratamos com clareza mesmo assim.
       invalidateResult();
-      errorMsg.textContent = 'Erro ao gerar QR Code: ' + (err.message || err);
+      setError('Erro ao gerar QR Code: ' + (err.message || err));
       return;
     }
     // node-qrcode escreve style.width/height inline (px fixo) no canvas, o que
@@ -553,7 +581,7 @@ gerarBtn.addEventListener('click', () => {
     // Auto-verifica que o QR escaneia de volta pro payload ANTES de exibi-lo.
     if (!qrDecodificaPara(qrCanvas, payload)) {
       invalidateResult();
-      errorMsg.textContent = 'Falha ao verificar o QR gerado. Não use este código — tente novamente.';
+      setError('Falha ao verificar o QR gerado. Não use este código — tente novamente.');
       return;
     }
     qrWrap.appendChild(qrCanvas);
@@ -585,7 +613,7 @@ copyBtn.addEventListener('click', () => {
       copyBtn.classList.remove('success');
     }, 2000);
   }).catch(() => {
-    errorMsg.textContent = 'Não foi possível copiar. Selecione o texto manualmente.';
+    setError('Não foi possível copiar. Selecione o texto manualmente.');
   });
 });
 
@@ -668,7 +696,7 @@ function baixarQRAtual(source) {
   // node-qrcode sempre renderiza num <canvas> (nunca <img>), então basta lê-lo.
   const canvas = qrWrap.querySelector('canvas');
   if (!canvas) {
-    errorMsg.textContent = 'Gere o QR Code antes de baixar.';
+    setError('Gere o QR Code antes de baixar.');
     return;
   }
   const link = document.createElement('a');
@@ -684,12 +712,12 @@ downloadBtn.addEventListener('click', () => baixarQRAtual('button'));
 // Baixar SVG (vetor): nítido em qualquer escala — ideal pra impressão. O
 // node-qrcode gera o SVG via toString; quiet zone (margin 4) embutida no arquivo.
 function baixarSVG() {
-  if (!currentPayload) { errorMsg.textContent = 'Gere o QR Code antes de baixar.'; return; }
+  if (!currentPayload) { setError('Gere o QR Code antes de baixar.'); return; }
   QRCode.toString(currentPayload, {
     type: 'svg', errorCorrectionLevel: 'H', margin: 4,
     color: { dark: '#000000', light: '#ffffff' },
   }, (err, svg) => {
-    if (err) { errorMsg.textContent = 'Erro ao gerar SVG: ' + (err.message || err); return; }
+    if (err) { setError('Erro ao gerar SVG: ' + (err.message || err)); return; }
     const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
     const link = document.createElement('a');
     link.href = url;
@@ -705,13 +733,13 @@ downloadSvgBtn.addEventListener('click', baixarSVG);
 // colar direto no WhatsApp/doc sem baixar arquivo.
 function copiarImagem() {
   const canvas = qrWrap.querySelector('canvas');
-  if (!canvas) { errorMsg.textContent = 'Gere o QR Code antes de copiar.'; return; }
+  if (!canvas) { setError('Gere o QR Code antes de copiar.'); return; }
   if (!navigator.clipboard || typeof ClipboardItem === 'undefined') {
-    errorMsg.textContent = 'Seu navegador não suporta copiar imagem. Use "Baixar PNG".';
+    setError('Seu navegador não suporta copiar imagem. Use "Baixar PNG".');
     return;
   }
   composedCanvas(canvas).toBlob((blob) => {
-    if (!blob) { errorMsg.textContent = 'Não foi possível gerar a imagem.'; return; }
+    if (!blob) { setError('Não foi possível gerar a imagem.'); return; }
     navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]).then(() => {
       if (window.umami) umami.track('qr-image-copied');
       const original = copyImgBtn.innerHTML;
@@ -719,7 +747,7 @@ function copiarImagem() {
       copyImgBtn.classList.add('success');
       setTimeout(() => { copyImgBtn.innerHTML = original; copyImgBtn.classList.remove('success'); }, 2000);
     }).catch(() => {
-      errorMsg.textContent = 'Não foi possível copiar a imagem. Use "Baixar PNG".';
+      setError('Não foi possível copiar a imagem. Use "Baixar PNG".');
     });
   }, 'image/png');
 }

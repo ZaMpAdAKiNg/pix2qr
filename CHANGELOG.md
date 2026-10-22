@@ -30,6 +30,15 @@ entradas são agrupadas por data.
   de privacidade.
 
 ### Security
+- **umami.js vendorizado atualizado para o snapshot cloud 2026-10-22**: o ativo
+  local foi realinhado ao upstream `cloud.umami.is/script.js` (issue #14); o
+  novo sha256 está registrado em `third-party.lock.json` e `THIRD_PARTY.md`.
+  Diff revisado: endpoint inalterado (`gateway.umami.is/api/send`), sem novos
+  domínios, sem `eval`/`Function`, sem expansão de storage/cookies/
+  fingerprinting; `data-before-send` e a exclusão de query/hash seguem
+  respeitados. Únicas mudanças semânticas: novo atributo opt-in
+  `data-distinct-id` (não usado pelo pix2qr, logo sem efeito) e guarda
+  defensiva no handler de clique. CSPs intocadas.
 - **Precache atômico não depende mais de roteamento da plataforma**:
   `/privacidade` e `/licencas` saíram do `APP_SHELL`. A instalação do Service
   Worker é um `Promise.all` que aborta inteira em qualquer resposta não-200, e

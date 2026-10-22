@@ -9,7 +9,16 @@ entradas são agrupadas por data.
 
 ## [Não lançado]
 
+- Unifica Placa, Privacidade e Licenças com o visual da home, compartilhando CSS e preservando a impressão clara e a exportação PNG.
+
+- [PIX-7] Home com tokens verde-grafite/brasa, títulos Outfit 900, Plex Mono local e ícones Lucide. Campos e ações acessíveis, foco visível, layout responsivo e manifest atualizado; conteúdo, hooks e QR preservados.
+
 ### Added
+- **Ambiente de stage em `stage.pix2qr.xyz`** (branch `stage`): `vercel.json`
+  envia `X-Robots-Tag: noindex, nofollow` só nesse host, e o Umami das quatro
+  páginas ganhou `data-domains="pix2qr.xyz,localhost,127.0.0.1"` — stage e
+  previews não contam no painel; os hosts locais ficam para os E2E provarem o
+  envio. Coberto por `test/analytics-privacy.test.js`.
 - **Página `/qr-code-pix-para-imprimir`**: nova ferramenta de placa PIX
   imprimível — preview em A4, A5 ou 10×15 cm desenhado em canvas local com o
   mesmo core de payload da home, impressão isolada por `@media print` e

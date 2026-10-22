@@ -29,7 +29,7 @@
   <meta name="twitter:image" content="https://pix2qr.xyz/icons/icon-512.png" />
 
   <!-- PWA / iOS -->
-  <meta name="theme-color" content="#0c0c12" />
+  <meta name="theme-color" content="#161e1b" />
 
   <!-- CSP: idêntica à do index.html (fonte canônica é o header HTTP em vercel.json;
        este <meta> é fallback p/ file://). Esta página não tem script inline nem
@@ -46,354 +46,18 @@
   <script src="/analytics-privacy.js"></script>
   <script defer src="/umami.js"
           data-website-id="6d397cad-3f3c-4311-aabd-cf3010f33803"
+          data-domains="pix2qr.xyz,localhost,127.0.0.1"
           data-exclude-search="true"
           data-exclude-hash="true"
           data-do-not-track="true"
           data-before-send="pix2qrBeforeSend"></script>
 
-  <style>
-    @font-face {
-      font-family: 'Outfit';
-      font-style: normal;
-      font-weight: 100 900;
-      font-display: swap;
-      src: url('/fonts/outfit-latin.woff2') format('woff2');
-      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-    }
-    :root {
-      --font-sans: 'Outfit', system-ui, sans-serif;
-      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-
-      --bg-base:   #0c0c12;
-      --bg-topbar: #111118;
-      --bg-card:   #14141c;
-      --bg-card-2: #1c1c26;
-
-      --border:       rgba(255,255,255,.09);
-      --border-focus: #8576f5;
-
-      --primary:        #7364f0;
-      --primary-subtle: rgba(115,100,240,.15);
-      --primary-border: rgba(115,100,240,.45);
-
-      --fg:        #f0f0f8;
-      --fg-muted:  rgba(240,240,248,.5);
-
-      --radius-sm:   0.375rem;
-      --radius-md:   0.625rem;
-      --radius-2xl:  1.375rem;
-      --radius-full: 9999px;
-
-      --shadow-card: 0 2px 16px rgba(0,0,0,.35);
-
-      /* Documento, não formulário: a coluna do app (390px) é estreita demais
-         para prosa. O shell inteiro (topbar, conteúdo, rodapé) usa a mesma
-         medida, então nada desalinha em relação ao index. */
-      --shell-max: 680px;
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: var(--font-sans);
-      background: var(--bg-base);
-      color: var(--fg);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 0 0 5rem;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    .topbar {
-      width: 100%;
-      background: var(--bg-topbar);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.25rem 1rem;
-      min-height: 54px;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    .topbar-inner {
-      width: 100%;
-      max-width: var(--shell-max);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-    }
-
-    .topbar-logo {
-      display: flex;
-      align-items: center;
-      gap: 0.45rem;
-      font-size: 0.95rem;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-      color: var(--fg);
-      text-decoration: none;
-      border-radius: var(--radius-sm);
-    }
-
-    .topbar-logo svg { color: var(--primary); flex-shrink: 0; }
-
-    .topbar-logo:focus-visible {
-      outline: 2px solid var(--border-focus);
-      outline-offset: 2px;
-    }
-
-    .topbar-actions {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      margin-left: auto;
-    }
-
-    .github-repo-link {
-      min-height: 44px;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      padding: 0.38rem 0.58rem;
-      color: var(--fg-muted);
-      background: rgba(255,255,255,.025);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-full);
-      font-size: 0.68rem;
-      font-weight: 700;
-      line-height: 1;
-      text-decoration: none;
-      white-space: nowrap;
-      transition: color 0.15s, border-color 0.15s, background 0.15s, transform 0.1s;
-    }
-
-    .github-repo-link svg {
-      width: 16px;
-      height: 16px;
-      color: var(--fg);
-      flex-shrink: 0;
-    }
-
-    .github-repo-link:hover {
-      color: var(--fg);
-      border-color: var(--primary-border);
-      background: var(--primary-subtle);
-    }
-
-    .github-repo-link:focus-visible {
-      outline: 2px solid var(--border-focus);
-      outline-offset: 2px;
-      border-color: var(--primary-border);
-      background: var(--primary-subtle);
-    }
-
-    .github-repo-link:active {
-      transform: scale(0.985);
-    }
-
-    .page {
-      width: 100%;
-      max-width: var(--shell-max);
-      padding: 1.25rem 1rem 2rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.875rem;
-    }
-
-    .card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-2xl);
-      box-shadow: var(--shadow-card);
-      padding: 1.5rem;
-    }
-
-    @media (min-width: 600px) {
-      .page { padding: 1.5rem 1rem 2rem; }
-      .card { padding: 2rem; }
-    }
-
-    .doc-kicker {
-      font-size: 0.68rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--fg-muted);
-      margin-bottom: 0.4rem;
-    }
-
-    .doc h1 {
-      font-size: 1.6rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      line-height: 1.15;
-      margin-bottom: 1.25rem;
-    }
-
-    .doc h2 {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--fg);
-      margin: 2rem 0 0.75rem;
-      padding-top: 1.25rem;
-      border-top: 1px solid var(--border);
-    }
-
-    .doc p {
-      font-size: 0.9rem;
-      line-height: 1.7;
-      color: var(--fg-muted);
-    }
-
-    .doc p + p { margin-top: 0.9rem; }
-    .doc strong { color: var(--fg); font-weight: 600; }
-
-    .doc a {
-      color: var(--primary);
-      text-decoration: none;
-      border-bottom: 1px solid var(--primary-border);
-    }
-    .doc a:hover { border-bottom-color: var(--primary); }
-    .doc a:focus-visible {
-      outline: 2px solid var(--border-focus);
-      outline-offset: 2px;
-      border-radius: 2px;
-    }
-
-    .doc code {
-      font-family: var(--font-mono);
-      font-size: 0.82em;
-      color: var(--fg);
-      background: var(--bg-card-2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      padding: 0.08em 0.32em;
-      overflow-wrap: anywhere;
-    }
-
-    /* Linha final de licença: mesma voz do .legal-notice do index — texto menor,
-       destacado do corpo do documento sem virar outro card. */
-    .doc-disclaimer {
-      margin-top: 2rem;
-      padding-top: 1.25rem;
-      border-top: 1px solid var(--border);
-      font-size: 0.76rem;
-      line-height: 1.6;
-      color: var(--fg-muted);
-    }
-
-    /* O inventário é uma tabela de 5 colunas na fonte (THIRD_PARTY.md), mas
-       nenhuma delas cabe na medida de leitura: viraria scroll horizontal até
-       no desktop. Um bloco por componente carrega os MESMOS cinco campos —
-       o cabeçalho da coluna vira o rótulo do campo. */
-    .components {
-      margin: 1.25rem 0;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-
-    .component {
-      background: var(--bg-card-2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 0.9rem 1rem;
-    }
-
-    .component-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem;
-      margin-bottom: 0.7rem;
-      padding-bottom: 0.7rem;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .component-head h2 {
-      font-size: 0.92rem;
-      font-weight: 700;
-      color: var(--fg);
-      margin: 0;
-      padding-top: 0;
-      border-top: none;
-    }
-
-    /* .doc a define border-bottom; precisa dos dois níveis pra vencer. */
-    .doc .license-badge {
-      font-size: 0.65rem;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      color: var(--primary);
-      background: var(--primary-subtle);
-      border: 1px solid var(--primary-border);
-      border-radius: var(--radius-full);
-      padding: 0.22rem 0.55rem;
-      white-space: nowrap;
-    }
-
-    .doc .license-badge:hover { background: rgba(115,100,240,.28); }
-
-    .component-facts {
-      display: grid;
-      gap: 0.5rem;
-      font-size: 0.8rem;
-    }
-
-    .component-facts > div { display: grid; gap: 0.15rem; }
-
-    @media (min-width: 520px) {
-      .component-facts > div {
-        grid-template-columns: 10rem 1fr;
-        gap: 1rem;
-        align-items: baseline;
-      }
-    }
-
-    .component-facts dt {
-      font-size: 0.62rem;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      /* fg-muted (não fg-subtle): rótulo significativo precisa de contraste AA */
-      color: var(--fg-muted);
-    }
-
-    .component-facts dd {
-      color: var(--fg-muted);
-      line-height: 1.55;
-    }
-
-    footer {
-      font-size: 0.7rem;
-      /* fg-muted (não fg-subtle): texto do rodapé precisa de contraste AA */
-      color: var(--fg-muted);
-      text-align: center;
-      padding: 0 1rem;
-      max-width: var(--shell-max);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    footer a { color: var(--primary); text-decoration: none; }
-    footer a:hover { text-decoration: underline; }
-
-    .footer-meta { line-height: 1.6; }
-  </style>
+  <link rel="stylesheet" href="/site.css" />
+  <link rel="stylesheet" href="/pages.css" />
 </head>
-<body>
+<body class="document-page">
 
-<div class="topbar">
+<div class="topbar" role="banner">
   <div class="topbar-inner">
     <a class="topbar-logo" href="/">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -492,6 +156,9 @@
     fazem parte desse bundle. O transitivo executado no browser é o
     <code>dijkstrajs</code>, inventariado acima.</p>
 
+    <h2>Fontes e ícones da home</h2>
+    <p>IBM Plex Mono, pesos 400 e 500, fonte local sob <a href="/licenses/IBM-Plex-Mono-OFL-1.1.txt">SIL OFL 1.1</a>. Lucide Static 0.468.0, ícones SVG incorporados sob <a href="/licenses/lucide-ISC.txt">ISC, com aviso Feather/MIT</a>. Origens e hashes constam no inventário do repositório.</p>
+
     <h2>O que o gate comprova</h2>
 
     <p>O arquivo de repositório <code>third-party.lock.json</code> registra o SHA-256 de
@@ -513,9 +180,11 @@
 </div>
 
 <footer>
-  <span class="footer-meta">Conteúdo PIX processado localmente no navegador</span>
-  <span class="footer-meta"><a href="https://github.com/ZaMpAdAKiNg/pix2qr" rel="noopener">Código-fonte no GitHub</a> · <a href="/privacidade">Privacidade</a> · <a href="/licencas">Licenças de terceiros</a></span>
-</footer>
+    <span class="footer-meta">Conteúdo PIX processado localmente no navegador</span>
+    <span class="footer-meta"><a href="/qr-code-pix-para-imprimir">QR Code PIX para imprimir</a> — placa em A4, A5 ou balcão</span>
+    <span class="footer-meta">Mantido por <a href="https://github.com/ZaMpAdAKiNg" rel="noopener">ZaMpA</a></span>
+    <span class="footer-meta"><a href="https://github.com/ZaMpAdAKiNg/pix2qr" rel="noopener">Código-fonte no GitHub</a> · <a href="/privacidade">Privacidade</a> · <a href="/licencas">Licenças de terceiros</a></span>
+  </footer>
 
 </body>
 </html>

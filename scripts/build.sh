@@ -24,6 +24,7 @@ CACHE_NAME="pix2qr-pwa-${VERSION}"
 rm -rf dist
 mkdir -p dist/icons dist/fonts dist/licenses
 ROOT_FILES=(
+  site.css pages.css
   index.html privacidade.html licencas.html qr-code-pix-para-imprimir.html
   app.js placa.js pix-core.js analytics-privacy.js image-metadata.js
   qrcode.min.js jsQR.min.js umami.js
@@ -34,8 +35,9 @@ ICON_FILES=(
   icons/icon-192.png icons/icon-512-maskable.png icons/icon-512.png
   icons/screenshot-narrow.png icons/screenshot-wide.png
 )
-FONT_FILES=(fonts/outfit-latin.woff2)
+FONT_FILES=(fonts/outfit-latin.woff2 fonts/ibm-plex-mono-400-latin.woff2 fonts/ibm-plex-mono-500-latin.woff2)
 LICENSE_FILES=(
+  licenses/IBM-Plex-Mono-OFL-1.1.txt licenses/lucide-ISC.txt
   licenses/Outfit-OFL-1.1.txt licenses/dijkstrajs-MIT.txt
   licenses/jsQR-Apache-2.0.txt licenses/node-qrcode-MIT.txt
   licenses/umami-MIT.txt

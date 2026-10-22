@@ -1,0 +1,80 @@
+[
+  {
+    "slug": "privacidade",
+    "viewport": "desktop",
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "slug": "licencas",
+    "viewport": "desktop",
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "slug": "qr-code-pix-para-imprimir",
+    "viewport": "desktop",
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "slug": "privacidade",
+    "viewport": "mobile",
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "slug": "licencas",
+    "viewport": "mobile",
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "slug": "qr-code-pix-para-imprimir",
+    "viewport": "mobile",
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "slug": "privacidade",
+    "viewport": "small",
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "slug": "licencas",
+    "viewport": "small",
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "slug": "qr-code-pix-para-imprimir",
+    "viewport": "small",
+    "overflow": false,
+    "violations": []
+  },
+  {
+    "preset": "a4",
+    "canvasIdenticalToStage": true,
+    "pngIdentical": true,
+    "printIdentical": true,
+    "width": 1240,
+    "height": 1754
+  },
+  {
+    "preset": "a5",
+    "canvasIdenticalToStage": true,
+    "pngIdentical": true,
+    "printIdentical": true,
+    "width": 874,
+    "height": 1240
+  },
+  {
+    "preset": "balcao",
+    "canvasIdenticalToStage": true,
+    "pngIdentical": true,
+    "printIdentical": true,
+    "width": 591,
+    "height": 886
+  }
+]

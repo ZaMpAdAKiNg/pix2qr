@@ -31,7 +31,7 @@
   <meta name="twitter:image" content="https://pix2qr.xyz/icons/icon-512.png" />
 
   <!-- PWA / iOS -->
-  <meta name="theme-color" content="#0c0c12" />
+  <meta name="theme-color" content="#161e1b" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="PIX QR Code" />
@@ -55,945 +55,19 @@
        posta pra gateway.umami.is/api/send (default hardcoded; ver connect-src acima).
        Frescor vigiado pelo workflow umami-freshness (alerta em issue quando o upstream
        muda); integridade local pinada em third-party.lock.json. SRI fixo no script REMOTO foi
-       descartado de propósito: o upstream muda in-place e o hash quebrava o tracking. -->
+       descartado de propósito: o upstream muda in-place e o hash quebrava o tracking.
+       data-domains: só pix2qr.xyz conta no painel (stage/preview ficam mudos); localhost e
+       127.0.0.1 ficam na lista porque os E2E provam o envio a partir de servidor local. -->
   <script src="/analytics-privacy.js"></script>
   <script defer src="/umami.js"
           data-website-id="6d397cad-3f3c-4311-aabd-cf3010f33803"
+          data-domains="pix2qr.xyz,localhost,127.0.0.1"
           data-exclude-search="true"
           data-exclude-hash="true"
           data-do-not-track="true"
           data-before-send="pix2qrBeforeSend"></script>
 
-  <style>
-    @font-face {
-      font-family: 'Outfit';
-      font-style: normal;
-      font-weight: 100 900;
-      font-display: swap;
-      src: url('/fonts/outfit-latin.woff2') format('woff2');
-      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-    }
-    :root {
-      --font-sans: 'Outfit', system-ui, sans-serif;
-      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-
-      --bg-base:   #0c0c12;
-      --bg-topbar: #111118;
-      --bg-card:   #14141c;
-      --bg-card-2: #1c1c26;
-      --bg-input:  #1c1c26;
-
-      --border:       rgba(255,255,255,.09);
-      --border-focus: #8576f5;
-
-      --primary:            #7364f0;
-      --primary-hover:      #8576f5;
-      --primary-active:     #6255d6;
-      --primary-foreground: #fff;
-      --primary-subtle:     rgba(115,100,240,.15);
-      --primary-border:     rgba(115,100,240,.45);
-
-      --fg:        #f0f0f8;
-      --fg-muted:  rgba(240,240,248,.5);
-      --fg-subtle: rgba(240,240,248,.3);
-
-      --destructive: #f87171;
-
-      --radius-sm:   0.375rem;
-      --radius-md:   0.625rem;
-      --radius-lg:   0.875rem;
-      --radius-xl:   1.125rem;
-      --radius-2xl:  1.375rem;
-      --radius-full: 9999px;
-
-      --shadow-card: 0 2px 16px rgba(0,0,0,.35);
-      --shadow-btn:  0 2px 12px rgba(115,100,240,.35);
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: var(--font-sans);
-      background: var(--bg-base);
-      color: var(--fg);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 0 0 5rem;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    .topbar {
-      width: 100%;
-      background: var(--bg-topbar);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.25rem 1rem;
-      min-height: 54px;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    .topbar-inner {
-      width: 100%;
-      max-width: 390px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-    }
-
-    .topbar-logo {
-      display: flex;
-      align-items: center;
-      gap: 0.45rem;
-      font-size: 0.95rem;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-      color: var(--fg);
-    }
-
-    .topbar-logo svg { color: var(--primary); flex-shrink: 0; }
-
-    .topbar-actions {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      margin-left: auto;
-    }
-
-    .github-repo-link {
-      min-height: 44px;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      padding: 0.38rem 0.58rem;
-      color: var(--fg-muted);
-      background: rgba(255,255,255,.025);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-full);
-      font-size: 0.68rem;
-      font-weight: 700;
-      line-height: 1;
-      text-decoration: none;
-      white-space: nowrap;
-      transition: color 0.15s, border-color 0.15s, background 0.15s, transform 0.1s;
-    }
-
-    .github-repo-link svg {
-      width: 16px;
-      height: 16px;
-      color: var(--fg);
-      flex-shrink: 0;
-    }
-
-    .github-repo-link:hover {
-      color: var(--fg);
-      border-color: var(--primary-border);
-      background: var(--primary-subtle);
-    }
-
-    .github-repo-link:focus-visible {
-      outline: 2px solid var(--border-focus);
-      outline-offset: 2px;
-      border-color: var(--primary-border);
-      background: var(--primary-subtle);
-    }
-
-    .github-repo-link:active {
-      transform: scale(0.985);
-    }
-
-    .status-chip {
-      display: inline-flex;
-      align-items: center;
-      border: 1px solid rgba(248,113,113,.35);
-      color: #fda4af;
-      background: rgba(248,113,113,.12);
-      border-radius: var(--radius-full);
-      font-size: 0.65rem;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      padding: 0.22rem 0.55rem;
-      white-space: nowrap;
-    }
-    /* O atributo [hidden] (display:none da UA stylesheet) perde em especificidade
-       pra .status-chip{display:inline-flex} — sem esta regra o chip "Offline"
-       fica visível mesmo online (app.js seta .hidden mas o CSS vence). */
-    .status-chip[hidden] { display: none; }
-    .btn[hidden] { display: none; }
-
-    .install-btn {
-      padding: 0.48rem 0.72rem;
-      font-size: 0.68rem;
-      line-height: 1;
-      white-space: nowrap;
-    }
-
-    .page {
-      width: 100%;
-      max-width: 390px;
-      padding: 1.25rem 1rem 2rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.875rem;
-    }
-
-    @media (min-width: 600px) {
-      .page { padding: 1.5rem 0 2rem; }
-    }
-
-    .card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-2xl);
-      box-shadow: var(--shadow-card);
-      padding: 1.5rem;
-    }
-
-    .card-title {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--fg);
-      margin-bottom: 0.25rem;
-    }
-
-    .card-subtitle {
-      font-size: 0.8rem;
-      color: var(--fg-muted);
-      margin-bottom: 1.25rem;
-      line-height: 1.5;
-    }
-
-    .field { margin-bottom: 0.875rem; }
-    .field:last-child { margin-bottom: 0; }
-
-    label {
-      display: block;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--fg-muted);
-      margin-bottom: 0.35rem;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-    }
-
-    input[type="text"],
-    input[type="number"] {
-      width: 100%;
-      padding: 0.7rem 0.875rem;
-      background: var(--bg-input);
-      color: var(--fg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      font-family: var(--font-sans);
-      font-size: 0.9rem;
-      outline: none;
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-
-    input[type="text"]:focus,
-    input[type="number"]:focus {
-      border-color: var(--border-focus);
-      box-shadow: 0 0 0 3px var(--primary-subtle);
-    }
-
-    input::placeholder { color: var(--fg-subtle); }
-
-    .field-hint {
-      font-size: 0.7rem;
-      /* fg-muted (não fg-subtle): texto informativo precisa de contraste AA (4.5:1) */
-      color: var(--fg-muted);
-      margin-top: 0.3rem;
-    }
-
-    /* Aviso soft (não bloqueia): usado em Nome/Cidade quando detecta
-       coisa estranha (ex: dígitos). Tom amber pra diferenciar de erro. */
-    .field-warn {
-      display: flex;
-      align-items: center;
-      gap: 0.35rem;
-      font-size: 0.72rem;
-      color: #fbbf24;
-      margin-top: 0.3rem;
-      line-height: 1.35;
-    }
-    .field-warn[hidden] { display: none; }
-    .field-warn svg { flex-shrink: 0; opacity: 0.9; }
-
-    .safety-notice,
-    .result-check {
-      font-size: 0.76rem;
-      line-height: 1.5;
-      color: rgba(240,240,248,.78);
-      background: rgba(251, 191, 36, 0.07);
-      border: 1px solid rgba(251, 191, 36, 0.3);
-      border-radius: var(--radius-xl);
-      padding: 0.7rem 0.8rem;
-    }
-    .safety-notice { margin: 0.75rem 0; }
-    .safety-notice strong,
-    .result-check strong { color: #fbbf24; }
-    .result-check { margin: 0 0 0.85rem; }
-
-    /* Botão "Escanear QR": ghost style, fica logo abaixo da hint do input.
-       Em mobile, abre direto a câmera traseira via capture="environment". */
-    .scan-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.42rem;
-      margin-top: 0.5rem;
-      padding: 0.45rem 0.78rem;
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      color: var(--fg-muted);
-      font-family: var(--font-sans);
-      font-size: 0.72rem;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-      cursor: pointer;
-      transition: border-color 0.15s, color 0.15s, background 0.15s, transform 0.08s;
-    }
-    .scan-btn:hover {
-      border-color: var(--primary-border);
-      color: var(--primary-hover);
-      background: var(--primary-subtle);
-    }
-    .scan-btn:active { transform: scale(0.97); }
-    .scan-btn:focus-visible {
-      outline: 2px solid var(--border-focus);
-      outline-offset: 2px;
-      border-color: var(--primary-border);
-      background: var(--primary-subtle);
-    }
-    .scan-btn svg { flex-shrink: 0; }
-    .scan-btn[disabled] {
-      opacity: 0.6;
-      cursor: progress;
-      pointer-events: none;
-    }
-
-    .mode-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.7rem;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      padding: 0.3rem 0.75rem;
-      border-radius: var(--radius-full);
-      background: var(--primary-subtle);
-      border: 1px solid var(--primary-border);
-      color: var(--primary-hover);
-      margin-bottom: 0.875rem;
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-
-    .mode-pill.visible { opacity: 1; }
-    .mode-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-
-    #extra-fields {
-      overflow: hidden;
-      max-height: 0;
-      opacity: 0;
-      transition: max-height 0.35s ease, opacity 0.25s ease;
-    }
-
-    #extra-fields.visible { max-height: 400px; opacity: 1; }
-
-    .row-two {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.75rem;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.45rem;
-      font-family: var(--font-sans);
-      font-weight: 600;
-      cursor: pointer;
-      border-radius: var(--radius-md);
-      transition: background 0.15s, opacity 0.15s, transform 0.1s;
-      border: none;
-      letter-spacing: 0.01em;
-    }
-
-    .btn:active { transform: scale(0.985); }
-    .btn:disabled { opacity: 0.45; pointer-events: none; }
-
-    .btn-primary {
-      width: 100%;
-      padding: 0.8rem 1rem;
-      font-size: 0.95rem;
-      background: var(--primary);
-      color: var(--primary-foreground);
-      box-shadow: var(--shadow-btn);
-      border-radius: var(--radius-lg);
-      margin-top: 0.25rem;
-    }
-
-    .btn-primary:hover { background: var(--primary-hover); }
-    .btn-primary:active { background: var(--primary-active); }
-
-    .btn-outline {
-      padding: 0.6rem 1rem;
-      font-size: 0.8rem;
-      background: transparent;
-      /* primary-hover (#8576f5, 5.3:1) em vez de primary (#7364f0, 4.3:1):
-         o texto pequeno (0.68rem) do install-btn precisa de 4.5:1 AA */
-      color: var(--primary-hover);
-      border: 1px solid var(--primary-border);
-      border-radius: var(--radius-full);
-    }
-
-    .btn-outline:hover { background: var(--primary-subtle); }
-
-    .btn-ghost {
-      padding: 0.55rem 0.875rem;
-      font-size: 0.8rem;
-      background: var(--bg-card-2);
-      color: var(--fg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-    }
-
-    .btn-ghost:hover { border-color: var(--primary-border); color: var(--primary-hover); }
-
-    .btn-ghost.success {
-      background: var(--primary-subtle);
-      color: var(--primary-hover);
-      border-color: var(--primary-border);
-    }
-
-    .error-msg {
-      font-size: 0.78rem;
-      color: var(--destructive);
-      min-height: 1.1em;
-      margin-top: 0.35rem;
-    }
-
-    /* Result card escondido até QR ser gerado — antes só mudava opacity,
-       o que mantinha 956px de gap fantasma no layout (resultcard + tip-jar
-       dentro). display:none remove do flow; .visible recoloca + anima. */
-    #result {
-      display: none;
-    }
-
-    #result.visible {
-      display: block;
-      animation: result-fade-in 0.35s ease-out;
-    }
-
-    @keyframes result-fade-in {
-      from { opacity: 0; transform: translateY(8px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .qr-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 1.25rem;
-      background: #fff;
-      border-radius: var(--radius-xl);
-      margin-bottom: 1.25rem;
-      cursor: pointer;
-      transition: transform 0.1s;
-    }
-
-    .qr-container:hover { transform: scale(1.015); }
-    .qr-container:active { transform: scale(0.99); }
-
-    /* Canvas preserva pelo menos 4 pixels inteiros por módulo e cresce nos QRs
-       densos: alta resolução pra câmeras ruins + PNG baixado de qualidade
-       pra impressão, mas display visual fica capped em 280px pra caber bem em
-       mobile/desktop sem ficar gigante. image-rendering: pixelated mantém
-       bordas afiadas mesmo escalando — crítico pra leitura por câmera. */
-    #qr-wrap canvas {
-      display: block;
-      pointer-events: none;
-      width: 100%;
-      max-width: 280px;
-      height: auto;
-      image-rendering: pixelated;
-      image-rendering: -moz-crisp-edges;
-      image-rendering: crisp-edges;
-    }
-
-    .result-header {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 1.25rem;
-    }
-
-    /* Foco programático (movido pra cá após gerar o QR, pro leitor de tela
-       anunciar "QR Code gerado"). Sem anel visível: não é tabbável (tabindex=-1),
-       então o foco aqui é só pra anúncio/navegação por teclado a partir do resultado. */
-    .result-header:focus { outline: none; }
-
-    .check-badge {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      background: var(--primary-subtle);
-      border: 1px solid var(--primary-border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--primary-hover);
-      flex-shrink: 0;
-    }
-
-    .result-header-text { font-size: 0.9rem; font-weight: 700; }
-
-    .payload-label {
-      font-size: 0.7rem;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      /* fg-muted (não fg-subtle): label significativo precisa de contraste AA */
-      color: var(--fg-muted);
-      margin-bottom: 0.35rem;
-    }
-
-    /* Aviso de chave-cadastrada: a chave PIX precisa estar registrada no PSP do
-       recebedor pra receber. Só aparece quando o QR vem de uma CHAVE (não de
-       Copia-e-Cola, que já vem de um PSP). Âmbar sutil para manter o aviso visível.
-       Previne a confusão "não escaneia" que costuma ser chave não-registrada. */
-    .key-hint {
-      font-size: 0.78rem;
-      line-height: 1.45;
-      color: rgba(240,240,248,.72);
-      background: rgba(251, 191, 36, 0.07);
-      border: 1px solid rgba(251, 191, 36, 0.3);
-      border-radius: var(--radius-xl);
-      padding: 0.65rem 0.8rem;
-      margin: 0 0 0.85rem;
-    }
-    .key-hint[hidden] { display: none; }
-
-    .payload-box {
-      background: var(--bg-base);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 0.75rem;
-      font-family: var(--font-mono);
-      font-size: 0.67rem;
-      word-break: break-all;
-      color: var(--primary-hover);
-      line-height: 1.6;
-      margin-bottom: 0.875rem;
-      max-height: 68px;
-      overflow-y: auto;
-      cursor: text;
-      user-select: all;
-    }
-
-    .action-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-
-    footer {
-      font-size: 0.7rem;
-      /* fg-muted (não fg-subtle): texto do rodapé precisa de contraste AA */
-      color: var(--fg-muted);
-      text-align: center;
-      padding: 0 1rem;
-      max-width: 390px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    footer a { color: var(--primary); text-decoration: none; }
-    footer a:hover { text-decoration: underline; }
-
-    .footer-meta { line-height: 1.6; }
-
-    .legal-notice {
-      font-size: 0.76rem;
-      line-height: 1.6;
-      color: var(--fg-muted);
-    }
-    .legal-notice h2 {
-      font-size: 0.9rem;
-      color: var(--fg);
-      margin-bottom: 0.65rem;
-    }
-    .legal-notice p + p { margin-top: 0.65rem; }
-    .legal-notice strong { color: var(--fg); }
-
-    .donate-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.55rem 1rem;
-      font-family: var(--font-sans);
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--primary);
-      background: transparent;
-      border: 1px solid var(--primary-border);
-      border-radius: var(--radius-full);
-      cursor: pointer;
-      transition: background 0.15s, border-color 0.15s;
-    }
-
-    .donate-btn:hover  { background: var(--primary-subtle); }
-    .donate-btn:active { transform: scale(0.95); }
-
-    .donate-panel {
-      width: 100%;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-xl);
-      overflow: hidden;
-      max-height: 0;
-      opacity: 0;
-      transition: max-height 0.35s ease, opacity 0.25s ease;
-    }
-
-    .donate-panel.open {
-      max-height: 300px;
-      opacity: 1;
-    }
-
-    .donate-panel-inner { padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
-
-    .donate-row {
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-    }
-
-    .donate-row-label {
-      font-size: 0.68rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      /* fg-muted (não fg-subtle): label significativo precisa de contraste AA */
-      color: var(--fg-muted);
-    }
-
-    .donate-row-addr-wrap {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: var(--bg-card-2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 0.55rem 0.75rem;
-    }
-
-    .donate-addr {
-      flex: 1;
-      font-family: var(--font-mono);
-      font-size: 0.67rem;
-      color: var(--fg-muted);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      user-select: all;
-    }
-
-    .donate-copy {
-      flex-shrink: 0;
-      padding: 0.3rem 0.6rem;
-      font-family: var(--font-sans);
-      font-size: 0.7rem;
-      font-weight: 600;
-      background: transparent;
-      color: var(--primary);
-      border: 1px solid var(--primary-border);
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      transition: background 0.15s;
-      white-space: nowrap;
-    }
-
-    .donate-copy:hover { background: var(--primary-subtle); }
-    .donate-copy.copied { color: #4ade80; border-color: rgba(74,222,128,.4); }
-
-    @media (max-width: 420px) {
-      .topbar { padding-inline: 0.75rem; }
-      .topbar-inner { gap: 0.45rem; }
-      .topbar-actions { gap: 0.25rem; }
-      .github-repo-link { padding-inline: 0.48rem; }
-    }
-
-    /* telas pequenas: row-two vira coluna única */
-    @media (max-width: 360px) {
-      .row-two { grid-template-columns: 1fr; }
-    }
-
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.7);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem;
-      z-index: 50;
-    }
-    .modal-backdrop.open { display: flex; }
-
-    .modal {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-2xl);
-      padding: 1.5rem;
-      max-width: 360px;
-      width: 100%;
-      box-shadow: 0 12px 48px rgba(0,0,0,.6);
-    }
-
-
-    /* Resumo do Copia-e-Cola colado: mostra valor, chave, nome, cidade
-       em tempo real, antes mesmo de clicar "Gerar". Usuário confirma
-       que tá pagando o valor certo / pessoa certa. */
-    .cc-summary {
-      background: var(--bg-card-2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-xl);
-      padding: 0.85rem 0.95rem;
-      margin-bottom: 1rem;
-      animation: cc-summary-in 0.22s ease-out;
-    }
-    .cc-summary[hidden] { display: none; }
-
-    @keyframes cc-summary-in {
-      from { opacity: 0; transform: translateY(-4px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .cc-summary-title {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      color: var(--primary-hover);
-      margin-bottom: 0.6rem;
-    }
-    .cc-summary-title svg { flex-shrink: 0; }
-
-    .cc-row {
-      display: grid;
-      grid-template-columns: 80px 1fr;
-      gap: 0.5rem;
-      align-items: baseline;
-      font-size: 0.78rem;
-      padding: 0.18rem 0;
-    }
-    .cc-row[hidden] { display: none; }
-    .cc-label {
-      color: var(--fg-muted);
-      font-weight: 500;
-    }
-    .cc-value {
-      color: var(--fg);
-      font-weight: 600;
-      word-break: break-word;
-    }
-    .cc-value-money {
-      color: #4ade80;
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-    }
-    .cc-value-muted {
-      color: var(--fg-muted);
-      font-weight: 500;
-      font-style: italic;
-    }
-
-
-    /* Adicionar valor (opcional) — só pra QR Estático sem valor embutido.
-       Permite usuário transformar QR sem valor em QR com valor antes do Gerar. */
-    .cc-add-valor {
-      margin-top: 0.85rem;
-      padding-top: 0.85rem;
-      border-top: 1px solid var(--border);
-    }
-    .cc-add-valor[hidden] { display: none; }
-
-    .cc-add-valor-hint {
-      font-size: 0.72rem;
-      color: var(--fg-muted);
-      line-height: 1.45;
-      margin-bottom: 0.55rem;
-    }
-
-    .cc-add-valor-row {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .cc-add-valor-prefix {
-      color: var(--fg-muted);
-      font-weight: 600;
-      font-size: 0.85rem;
-      flex-shrink: 0;
-    }
-
-    .cc-add-valor input {
-      flex: 1;
-      padding: 0.55rem 0.7rem;
-      background: var(--bg-input);
-      color: var(--fg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      font-family: var(--font-sans);
-      font-size: 0.88rem;
-      outline: none;
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-    .cc-add-valor input:focus {
-      border-color: var(--border-focus);
-      box-shadow: 0 0 0 3px var(--primary-subtle);
-    }
-
-    .modal h3 {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--fg);
-      margin-bottom: 0.75rem;
-    }
-
-    .modal p {
-      font-size: 0.82rem;
-      color: var(--fg-muted);
-      line-height: 1.55;
-      margin-bottom: 0.9rem;
-    }
-
-    .modal ol {
-      padding-left: 1.2rem;
-      color: var(--fg);
-      font-size: 0.85rem;
-      line-height: 1.7;
-      margin-bottom: 1rem;
-    }
-
-    .modal ol li { margin-bottom: 0.15rem; }
-    .modal strong { color: var(--primary-hover); font-weight: 600; }
-    .modal .close-btn { width: 100%; margin-top: 0.25rem; }
-
-    /* FAQ section: <details> nativo + styling sutil. Bom pra SEO + LLMs. */
-    .faq {
-      margin-top: 0.5rem;
-    }
-    .faq-title {
-      font-size: 0.9rem;
-      font-weight: 700;
-      color: var(--fg);
-      margin-bottom: 0.85rem;
-    }
-    .faq details {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 0;
-      margin-bottom: 0.5rem;
-      overflow: hidden;
-    }
-    .faq summary {
-      cursor: pointer;
-      padding: 0.75rem 0.95rem;
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--fg);
-      list-style: none;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.5rem;
-    }
-    .faq summary::-webkit-details-marker { display: none; }
-    .faq summary::after {
-      content: "+";
-      font-size: 1.1rem;
-      color: var(--fg-muted);
-      transition: transform 0.2s;
-      flex-shrink: 0;
-    }
-    .faq details[open] summary::after { transform: rotate(45deg); }
-    .faq summary:hover { color: var(--primary-hover); }
-    .faq details[open] summary { border-bottom: 1px solid var(--border); }
-    .faq-answer {
-      padding: 0.75rem 0.95rem;
-      font-size: 0.78rem;
-      line-height: 1.55;
-      color: var(--fg-muted);
-    }
-    .faq-answer a {
-      color: var(--primary-hover);
-      text-decoration: none;
-    }
-    .faq-answer a:hover { text-decoration: underline; }
-
-    /* Tip jar pattern: bloco de doação dentro do card de resultado.
-       Aparece junto com o QR gerado — momento de "just-in-time gratitude"
-       quando o usuário acabou de receber valor. UX research mostra
-       conversão 3-5x maior que pedidos passivos no rodapé. */
-    .tip-jar {
-      margin-top: 1.25rem;
-      animation: tip-jar-fade 0.4s ease-out 0.2s backwards;
-    }
-    @keyframes tip-jar-fade {
-      from { opacity: 0; transform: translateY(6px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .tip-jar-divider {
-      height: 1px;
-      background: var(--border);
-      margin-bottom: 1rem;
-    }
-    .tip-jar-title {
-      font-size: 0.92rem;
-      font-weight: 700;
-      color: var(--fg);
-      margin-bottom: 0.3rem;
-      text-align: center;
-    }
-    .tip-jar-sub {
-      font-size: 0.74rem;
-      color: var(--fg-muted);
-      line-height: 1.5;
-      text-align: center;
-      margin-bottom: 0.85rem;
-    }
-    /* No contexto do tip-jar, o donate-btn é o foco — mais largo e centralizado. */
-    .tip-jar .donate-btn {
-      display: flex;
-      justify-content: center;
-      width: 100%;
-      padding: 0.65rem 1rem;
-      font-size: 0.78rem;
-    }
-
-  </style>
+  <link rel="stylesheet" href="/site.css" />
 
   <script type="application/ld+json">
 {
@@ -1122,7 +196,7 @@
   </div>
 </noscript>
 
-<div class="topbar">
+<div class="topbar" role="banner">
   <div class="topbar-inner">
     <div class="topbar-logo">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -1146,7 +220,7 @@
   </div>
 </div>
 
-<div class="page">
+<main class="page">
 
   <div class="card">
     <h1 class="card-title">Gerador de QR Code PIX</h1>
@@ -1165,12 +239,24 @@
       <p class="field-hint">Detecta CPF, CNPJ alfanumérico, e-mail, telefone E.164 (+), EVP e Pix Copia e Cola.</p>
       <input id="qr-file-input" type="file" accept="image/png,image/jpeg,image/gif,image/webp" capture="environment" hidden />
       <button id="scan-qr-btn" type="button" class="scan-btn" aria-label="Escanear QR Code de uma imagem ou foto">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect x="3" y="3" width="6" height="6" rx="1"/>
-          <rect x="15" y="3" width="6" height="6" rx="1"/>
-          <rect x="3" y="15" width="6" height="6" rx="1"/>
-          <path d="M15 15h2v2M19 19h2M15 19h2M19 15h2"/>
-        </svg>
+        <svg aria-hidden="true" focusable="false"
+  class="lucide lucide-scan-line"
+  xmlns="http://www.w3.org/2000/svg"
+  width="20"
+  height="20"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M3 7V5a2 2 0 0 1 2-2h2" />
+  <path d="M17 3h2a2 2 0 0 1 2 2v2" />
+  <path d="M21 17v2a2 2 0 0 1-2 2h-2" />
+  <path d="M7 21H5a2 2 0 0 1-2-2v-2" />
+  <path d="M7 12h10" />
+</svg>
         Escanear QR Code
       </button>
     </div>
@@ -1240,10 +326,22 @@
           <label for="nome-input">Nome</label>
           <input id="nome-input" type="text" placeholder="João Silva" maxlength="50" aria-describedby="nome-warn" />
           <p class="field-warn" id="nome-warn" hidden>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M12 8v4M12 16h.01"/>
-            </svg>
+            <svg aria-hidden="true" focusable="false"
+  class="lucide lucide-circle-alert"
+  xmlns="http://www.w3.org/2000/svg"
+  width="20"
+  height="20"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <line x1="12" x2="12" y1="8" y2="12" />
+  <line x1="12" x2="12.01" y1="16" y2="16" />
+</svg>
             Nome geralmente não tem números.
           </p>
         </div>
@@ -1251,10 +349,22 @@
           <label for="cidade-input">Cidade</label>
           <input id="cidade-input" type="text" placeholder="São Paulo" maxlength="30" aria-describedby="cidade-warn" />
           <p class="field-warn" id="cidade-warn" hidden>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M12 8v4M12 16h.01"/>
-            </svg>
+            <svg aria-hidden="true" focusable="false"
+  class="lucide lucide-circle-alert"
+  xmlns="http://www.w3.org/2000/svg"
+  width="20"
+  height="20"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <line x1="12" x2="12" y1="8" y2="12" />
+  <line x1="12" x2="12.01" y1="16" y2="16" />
+</svg>
             Cidade geralmente não tem números.
           </p>
         </div>
@@ -1274,9 +384,21 @@
     </aside>
 
     <button class="btn btn-primary" id="gerar-btn">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M5 12h14M12 5l7 7-7 7"/>
-      </svg>
+      <svg aria-hidden="true" focusable="false"
+  class="lucide lucide-arrow-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="20"
+  height="20"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M5 12h14" />
+  <path d="m12 5 7 7-7 7" />
+</svg>
       Gerar QR Code
     </button>
   </div>
@@ -1306,34 +428,78 @@
 
       <div class="action-row">
         <button class="btn btn-ghost" id="copy-btn">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="9" y="9" width="13" height="13" rx="2"/>
-            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-          </svg>
+          <svg aria-hidden="true" focusable="false"
+  class="lucide lucide-copy"
+  xmlns="http://www.w3.org/2000/svg"
+  width="20"
+  height="20"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+</svg>
           Copiar texto
         </button>
         <button class="btn btn-ghost" id="download-btn">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="7 10 12 15 17 10"/>
-            <line x1="12" y1="15" x2="12" y2="3"/>
-          </svg>
+          <svg aria-hidden="true" focusable="false"
+  class="lucide lucide-download"
+  xmlns="http://www.w3.org/2000/svg"
+  width="20"
+  height="20"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+  <polyline points="7 10 12 15 17 10" />
+  <line x1="12" x2="12" y1="15" y2="3" />
+</svg>
           Baixar PNG
         </button>
         <button class="btn btn-ghost" id="download-svg-btn">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="7 10 12 15 17 10"/>
-            <line x1="12" y1="15" x2="12" y2="3"/>
-          </svg>
+          <svg aria-hidden="true" focusable="false"
+  class="lucide lucide-download"
+  xmlns="http://www.w3.org/2000/svg"
+  width="20"
+  height="20"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+  <polyline points="7 10 12 15 17 10" />
+  <line x1="12" x2="12" y1="15" y2="3" />
+</svg>
           Baixar SVG
         </button>
         <button class="btn btn-ghost" id="copy-img-btn">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="2"/>
-            <circle cx="9" cy="9" r="2"/>
-            <path d="M21 15l-5-5L5 21"/>
-          </svg>
+          <svg aria-hidden="true" focusable="false"
+  class="lucide lucide-image"
+  xmlns="http://www.w3.org/2000/svg"
+  width="20"
+  height="20"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+  <circle cx="9" cy="9" r="2" />
+  <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+</svg>
           Copiar imagem
         </button>
       </div>
@@ -1439,7 +605,7 @@
     <span class="footer-meta"><a href="https://github.com/ZaMpAdAKiNg/pix2qr" rel="noopener">Código-fonte no GitHub</a> · <a href="/privacidade">Privacidade</a> · <a href="/licencas">Licenças de terceiros</a></span>
   </footer>
 
-</div>
+</main>
 
 
 <script src="/qrcode.min.js" defer></script>

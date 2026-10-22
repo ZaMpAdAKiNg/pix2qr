@@ -55,10 +55,13 @@
        posta pra gateway.umami.is/api/send (default hardcoded; ver connect-src acima).
        Frescor vigiado pelo workflow umami-freshness (alerta em issue quando o upstream
        muda); integridade local pinada em third-party.lock.json. SRI fixo no script REMOTO foi
-       descartado de propósito: o upstream muda in-place e o hash quebrava o tracking. -->
+       descartado de propósito: o upstream muda in-place e o hash quebrava o tracking.
+       data-domains: só pix2qr.xyz conta no painel (stage/preview ficam mudos); localhost e
+       127.0.0.1 ficam na lista porque os E2E provam o envio a partir de servidor local. -->
   <script src="/analytics-privacy.js"></script>
   <script defer src="/umami.js"
           data-website-id="6d397cad-3f3c-4311-aabd-cf3010f33803"
+          data-domains="pix2qr.xyz,localhost,127.0.0.1"
           data-exclude-search="true"
           data-exclude-hash="true"
           data-do-not-track="true"

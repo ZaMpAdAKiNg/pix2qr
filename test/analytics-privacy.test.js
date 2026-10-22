@@ -56,3 +56,24 @@ test('runtime usa somente Umami e mantém os filtros de privacidade', () => {
   assert.match(html, /class="github-repo-link" href="https:\/\/github\.com\/ZaMpAdAKiNg\/pix2qr"/);
   assert.match(html, /<span>Repo público<\/span>/);
 });
+
+test('stage não conta no Umami nem é indexado; produção segue intacta', () => {
+  // As páginas extras só existem na fonte; o artefato minificado cobre o index.
+  const pages = [indexHtmlPath];
+  if (!process.env.PIX_INDEX_PATH) {
+    for (const name of ['privacidade.html', 'licencas.html', 'qr-code-pix-para-imprimir.html']) {
+      pages.push(path.resolve(__dirname, '..', name));
+    }
+  }
+  for (const page of pages) {
+    const html = readFileSync(page, 'utf8');
+    assert.match(html, /data-domains="pix2qr\.xyz,localhost,127\.0\.0\.1"/, page);
+    assert.doesNotMatch(html, /data-domains="[^"]*stage\./, page);
+  }
+  const vercel = JSON.parse(readFileSync(require.resolve('../vercel.json'), 'utf8'));
+  const robots = vercel.headers.filter((rule) =>
+    rule.headers.some((h) => h.key.toLowerCase() === 'x-robots-tag'));
+  assert.equal(robots.length, 1);
+  assert.deepEqual(robots[0].has, [{ type: 'host', value: 'stage.pix2qr.xyz' }]);
+  assert.deepEqual(robots[0].headers, [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }]);
+});

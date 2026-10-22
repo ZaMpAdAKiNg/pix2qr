@@ -24,6 +24,7 @@ CACHE_NAME="pix2qr-pwa-${VERSION}"
 rm -rf dist
 mkdir -p dist/icons dist/fonts dist/licenses
 ROOT_FILES=(
+  site.css pages.css
   index.html privacidade.html licencas.html qr-code-pix-para-imprimir.html
   app.js placa.js pix-core.js analytics-privacy.js image-metadata.js
   qrcode.min.js jsQR.min.js umami.js

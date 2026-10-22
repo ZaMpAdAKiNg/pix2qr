@@ -94,3 +94,15 @@ test('as páginas entram no deploy pela allowlist e pelo gate do artefato', () =
   }
   assert.doesNotMatch(gate, /'LICENSE'/);
 });
+
+test('banner Salaria preserva destino e isolamento nas quatro páginas', () => {
+  for (const file of ['index.html', ...PAGES.map(page => page.file)]) {
+    const html = read(file);
+    const links = [...html.matchAll(/<a\b[^>]*href="https:\/\/salaria\.tech\?ref=DAE"[^>]*>[\s\S]*?<\/a>/g)];
+    assert.equal(links.length, 1, file);
+    assert.match(links[0][0], /target="_blank"/);
+    assert.match(links[0][0], /rel="noopener"/);
+    assert.match(links[0][0], /Salaria\.tech/);
+    assert.doesNotMatch(links[0][0], /\son\w+=|data-umami/);
+  }
+});

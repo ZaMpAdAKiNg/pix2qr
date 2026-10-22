@@ -91,7 +91,7 @@ svg { flex-shrink: 0; vertical-align: middle; }
 :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
 [hidden], .btn[hidden] { display: none !important; }
 .topbar { position: sticky; top: 0; z-index: var(--pix-z-nav); background: var(--color-bg); border-bottom: 1px solid var(--color-border); padding: .5rem var(--pix-gutter); }
-.topbar-inner { max-width: var(--pix-container-tool); min-height: 48px; margin: auto; display: flex; align-items: center; justify-content: space-between; gap: .75rem; flex-wrap: wrap; }
+.topbar-inner { max-width: 72rem; min-height: 48px; margin: auto; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: .75rem; }
 .topbar-logo { display: flex; align-items: center; gap: .5rem; font-size: 1.125rem; font-weight: 800; letter-spacing: var(--tracking-titulo); }
 .topbar-logo svg { color: var(--color-accent); }
 .topbar-actions { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; }
@@ -184,3 +184,19 @@ footer { display: flex; flex-direction: column; gap: .75rem; font-size: .875rem;
 @media (min-width: 640px) { .row-two { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 639px) { .card { padding: 16px; } .topbar-actions { gap: .375rem; } .github-repo-link { font-size: .75rem; } .topbar-logo { font-size: 1rem; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } button:active { transform: none !important; } }
+
+/* Product referral: static, local shell; no tracking or remote assets. */
+.topbar-actions { justify-self: end; }
+.salaria-banner { display: flex; align-items: center; justify-content: center; gap: .75rem; min-height: 44px; padding: .5rem 1rem; border: 1px solid var(--color-border); border-radius: var(--pix-radius-pill); background: var(--color-surface-2); color: var(--color-fg); font-size: .875rem; line-height: 1.5; text-decoration: none; text-align: center; }
+.salaria-banner strong { font-weight: 600; white-space: nowrap; }
+.salaria-banner svg { color: var(--color-accent); transition: transform 200ms var(--ease-padrao); }
+.salaria-banner:hover, .salaria-banner:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+.salaria-banner:hover svg { transform: translate(1px, -1px); }
+@media (max-width: 719px) {
+  html { scroll-padding-top: 10rem; }
+  .topbar-inner { grid-template-columns: 1fr auto; }
+  .salaria-banner { grid-column: 1 / -1; grid-row: 2; border-radius: var(--radius-campo); }
+  .topbar-actions { grid-column: 2; grid-row: 1; }
+}
+@media (prefers-reduced-motion: reduce) { .salaria-banner:hover svg { transform: none; } }
+@media print { .salaria-banner { display: none; } }

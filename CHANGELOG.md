@@ -9,6 +9,8 @@ entradas são agrupadas por data.
 
 ## [Não lançado]
 
+- Adiciona link para converter USDT em PIX com a Salaria.tech no topo das quatro páginas, com faixa responsiva e foco acessível.
+
 - Unifica Placa, Privacidade e Licenças com o visual da home, compartilhando CSS e preservando a impressão clara e a exportação PNG.
 
 - [PIX-7] Home com tokens verde-grafite/brasa, títulos Outfit 900, Plex Mono local e ícones Lucide. Campos e ações acessíveis, foco visível, layout responsivo e manifest atualizado; conteúdo, hooks e QR preservados.

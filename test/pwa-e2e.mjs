@@ -564,8 +564,46 @@ try {
     );
   }
 
+  // PIX-11: a placa imprimível é a terceira página de documento. Ela tem o seu
+  // próprio #gerar-btn, então a prova de que NÃO é o gerador da home é o h1 e
+  // o #print-btn, que só existem na placa. Online, com o SW controlando, a
+  // navegação precisa chegar à placa real.
+  await page.goto(`${syntheticServer.origin}/qr-code-pix-para-imprimir`, { waitUntil: 'load' });
+  assert.equal(
+    new URL(page.url()).pathname,
+    '/qr-code-pix-para-imprimir',
+    'PWA E2E FAIL: navegação saiu de /qr-code-pix-para-imprimir',
+  );
+  assert.equal(
+    (await page.textContent('h1'))?.trim(),
+    'QR Code PIX para imprimir',
+    'PWA E2E FAIL: /qr-code-pix-para-imprimir não serviu a placa (app shell do gerador no lugar dela?)',
+  );
+  assert.equal(
+    await page.locator('#print-btn').count(),
+    1,
+    'PWA E2E FAIL: /qr-code-pix-para-imprimir sem #print-btn',
+  );
+
+  // Offline, a placa não está no precache: o aceitável é erro de rede
+  // explícito. O inaceitável é a home do gerador respondida na URL da placa.
+  await context.setOffline(true);
+  let offlineHeading = null;
+  try {
+    await page.goto(`${syntheticServer.origin}/qr-code-pix-para-imprimir`, { waitUntil: 'load' });
+    offlineHeading = (await page.textContent('h1').catch(() => null))?.trim() ?? null;
+  } catch {
+    // erro de rede do browser: é a resposta explícita esperada sem precache
+  }
+  await context.setOffline(false);
+  assert.notEqual(
+    offlineHeading,
+    'Gerador de QR Code PIX',
+    'PWA E2E FAIL: offline, /qr-code-pix-para-imprimir serviu a home do gerador',
+  );
+
   console.log(
-    'PWA E2E PASS: shell HTML+6 scripts atômico, reload único, faults assimétricos, PIX offline e páginas de documento online sob SW ativo',
+    'PWA E2E PASS: shell HTML+6 scripts atômico, reload único, faults assimétricos, PIX offline, páginas de documento e placa online sob SW ativo (placa offline nunca vira home)',
   );
 } catch (error) {
   console.error(error?.stack || error?.message || String(error));

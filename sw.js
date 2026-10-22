@@ -1,6 +1,8 @@
 const CACHE_NAME = "pix2qr-pwa-dev"; // substituído por scripts/build.sh no deploy
 // Páginas de documento: URLs limpas resolvidas por rewrite declarado em
-// vercel.json (/privacidade → privacidade.html). Elas NÃO entram no APP_SHELL:
+// vercel.json (/privacidade → privacidade.html). A placa imprimível
+// (/qr-code-pix-para-imprimir) segue a mesma política: é uma página própria,
+// servida por rewrite e fora do shell. Elas NÃO entram no APP_SHELL:
 // o precache é atômico e um único item não-200 abortaria a instalação inteira,
 // derrubando o offline de todo mundo por causa de uma questão de roteamento.
 // Cada navegação para elas vai à rede; nenhum requisito pede que funcionem
@@ -9,6 +11,7 @@ const CACHE_NAME = "pix2qr-pwa-dev"; // substituído por scripts/build.sh no dep
 const DOCUMENT_PAGES = [
   "/privacidade",
   "/licencas",
+  "/qr-code-pix-para-imprimir",
 ];
 
 const APP_SHELL = [

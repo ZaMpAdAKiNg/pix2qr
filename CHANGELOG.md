@@ -15,6 +15,15 @@ entradas são agrupadas por data.
 
 - [PIX-7] Home com tokens verde-grafite/brasa, títulos Outfit 900, Plex Mono local e ícones Lucide. Campos e ações acessíveis, foco visível, layout responsivo e manifest atualizado; conteúdo, hooks e QR preservados.
 
+### Fixed
+- [PIX-11] **Placa imprimível alcançável com o Service Worker ativo**:
+  `/qr-code-pix-para-imprimir` entrou em `DOCUMENT_PAGES` de `sw.js`. Antes,
+  qualquer navegação para a placa depois de uma visita à home era respondida
+  pelo `/index.html` do cache e o usuário via o gerador na URL da placa, online
+  e offline. Agora a navegação vai à rede (rewrite da plataforma) e, offline,
+  resulta em erro de rede explícito, nunca na home. Coberto em `test/sw.test.js`
+  e no `test/pwa-e2e.mjs` (navegação online com SW controlando e offline).
+
 ### Added
 - **Ambiente de stage em `stage.pix2qr.xyz`** (branch `stage`): `vercel.json`
   envia `X-Robots-Tag: noindex, nofollow` só nesse host, e o Umami das quatro

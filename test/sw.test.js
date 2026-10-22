@@ -52,7 +52,7 @@ test('o precache atômico não contém nenhum caminho que dependa de rewrite', (
   const start = swSource.indexOf('const APP_SHELL = [');
   const appShell = swSource.slice(start, swSource.indexOf('];', start));
   assert.doesNotMatch(appShell, /DOCUMENT_PAGES/);
-  for (const cleanUrl of ['/privacidade', '/licencas']) {
+  for (const cleanUrl of ['/privacidade', '/licencas', '/qr-code-pix-para-imprimir']) {
     assert.doesNotMatch(appShell, new RegExp(`"${cleanUrl}"`), cleanUrl);
   }
   // Todo item do shell é servido por um arquivo real do artefato: "/" (index)
@@ -83,6 +83,9 @@ test('navegação e todos os scripts críticos são cache-only no CACHE_NAME ati
   assert.match(swSource, /const DOCUMENT_PAGE_PATHS = new Set\(DOCUMENT_PAGES\)/);
   assert.match(swSource, /"\/privacidade"/);
   assert.match(swSource, /"\/licencas"/);
+  // PIX-11: a placa imprimível também é navegação de documento. Sem ela na
+  // lista, quem já visitou a home recebia o gerador na URL da placa.
+  assert.match(swSource, /"\/qr-code-pix-para-imprimir"/);
   assert.match(fetchHandler, /VERSIONED_SHELL_PATHS\.has\(shellPath\)/);
   assert.match(fetchHandler, /caches\.open\(CACHE_NAME\)/);
   assert.match(fetchHandler, /cache\.match\(shellPath\)/);

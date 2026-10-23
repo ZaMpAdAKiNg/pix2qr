@@ -106,3 +106,17 @@ test('banner Salaria preserva destino e isolamento nas quatro páginas', () => {
     assert.doesNotMatch(links[0][0], /\son\w+=|data-umami/);
   }
 });
+
+test('favicon SVG da Salaria declarado uma vez nas quatro páginas, com o PNG 32×32 de fallback', () => {
+  const svgLink = '<link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />';
+  const pngLink = '<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />';
+  for (const file of ['index.html', ...PAGES.map(page => page.file)]) {
+    const html = read(file);
+    assert.equal(html.split(svgLink).length - 1, 1, file);
+    assert.equal(html.split(pngLink).length - 1, 1, file);
+    assert.ok(html.indexOf(svgLink) < html.indexOf(pngLink), `${file}: SVG antes do PNG`);
+  }
+  assert.match(read('scripts/build.sh'), /\bicons\/favicon\.svg\b/);
+  assert.match(read('scripts/check-artifact.mjs'), /'icons\/favicon\.svg'/);
+  assert.match(read('sw.js'), /"\/icons\/favicon\.svg"/);
+});

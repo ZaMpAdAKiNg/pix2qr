@@ -19,6 +19,8 @@ entradas são agrupadas por data.
 
 - [PIX-7] Home com tokens verde-grafite/brasa, títulos Outfit 900, Plex Mono local e ícones Lucide. Campos e ações acessíveis, foco visível, layout responsivo e manifest atualizado; conteúdo, hooks e QR preservados.
 
+- [PIX-16] Banner do Salaria.tech nas quatro páginas passa a enviar `ref=PIX2QR` (antes DAE), identificador de origem definido pelo dono; texto, `aria-label`, `target` e `rel` inalterados.
+
 ### Fixed
 - [PIX-11] **Placa imprimível alcançável com o Service Worker ativo**:
   `/qr-code-pix-para-imprimir` entrou em `DOCUMENT_PAGES` de `sw.js`. Antes,

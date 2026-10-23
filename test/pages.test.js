@@ -120,3 +120,32 @@ test('favicon SVG da Salaria declarado uma vez nas quatro páginas, com o PNG 32
   assert.match(read('scripts/check-artifact.mjs'), /'icons\/favicon\.svg'/);
   assert.match(read('sw.js'), /"\/icons\/favicon\.svg"/);
 });
+
+// O iOS preenche transparência com preto e recorta com a própria máscara, que
+// não coincide com o arco rx 14 do ícone `any`: só o maskable, opaco, serve.
+test('apple-touch-icon aponta para o PNG maskable opaco nas quatro páginas', () => {
+  const touchLink = '<link rel="apple-touch-icon" href="/icons/icon-192-maskable.png" />';
+  for (const file of ['index.html', ...PAGES.map(page => page.file)]) {
+    const html = read(file);
+    assert.equal(html.split(touchLink).length - 1, 1, file);
+    assert.equal((html.match(/rel="apple-touch-icon"/g) || []).length, 1, file);
+  }
+});
+
+test('ícones do app instalado têm as dimensões declaradas, em PNG RGBA 8-bit', () => {
+  const { readImageDimensions } = require('../image-metadata.js');
+  const ICONS = [
+    ['icons/icon-192.png', 192],
+    ['icons/icon-512.png', 512],
+    ['icons/icon-1024.png', 1024],
+    ['icons/icon-192-maskable.png', 192],
+    ['icons/icon-512-maskable.png', 512],
+  ];
+  for (const [file, size] of ICONS) {
+    const bytes = readFileSync(require.resolve(`../${file}`));
+    const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+    assert.deepEqual(readImageDimensions(buffer), { format: 'png', width: size, height: size }, file);
+    assert.equal(bytes[24], 8, `${file}: profundidade de bits`);
+    assert.equal(bytes[25], 6, `${file}: tipo de cor RGBA`);
+  }
+});

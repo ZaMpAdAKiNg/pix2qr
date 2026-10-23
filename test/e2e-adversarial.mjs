@@ -22,7 +22,8 @@ const VIEWPORTS = [
   { label: 'desktop', width: 1280, height: 900 },
   { label: 'mobile-390x844', width: 390, height: 844 },
 ];
-const PUBLIC_PNG_ASSETS = [
+const PUBLIC_IMAGE_ASSETS = [
+  'icons/favicon.svg',
   'icons/favicon-32.png',
   'icons/icon-1024.png',
   'icons/icon-192-maskable.png',
@@ -299,10 +300,11 @@ async function exerciseDownloads(page, label) {
   }
 }
 
-async function sweepPublicPngAssets(page) {
-  assert.equal(PUBLIC_PNG_ASSETS.length, 8);
-  for (const relativePath of PUBLIC_PNG_ASSETS) {
+async function sweepPublicImageAssets(page) {
+  assert.equal(PUBLIC_IMAGE_ASSETS.length, 9);
+  for (const relativePath of PUBLIC_IMAGE_ASSETS) {
     const bytes = await readFile(path.join(DIST, relativePath));
+    const mime = relativePath.endsWith('.svg') ? 'image/svg+xml' : 'image/png';
     const inspection = await page.evaluate(async ({ source, asset }) => {
       const image = new Image();
       const loaded = new Promise((resolve, reject) => {
@@ -324,12 +326,12 @@ async function sweepPublicPngAssets(page) {
         decodedLength: decoded?.data?.length || 0,
       };
     }, {
-      source: `data:image/png;base64,${bytes.toString('base64')}`,
+      source: `data:${mime};base64,${bytes.toString('base64')}`,
       asset: relativePath,
     });
-    assert.ok(inspection.width > 0 && inspection.height > 0, `${relativePath}: PNG did not decode as an image`);
+    assert.ok(inspection.width > 0 && inspection.height > 0, `${relativePath}: image did not decode`);
     assert.equal(inspection.decodedLength, 0,
-      `${relativePath}: public PNG contains a decodable QR (${inspection.decodedLength} chars)`);
+      `${relativePath}: public image contains a decodable QR (${inspection.decodedLength} chars)`);
   }
 }
 
@@ -355,7 +357,7 @@ async function runViewport(staticServer, viewport) {
       await exercisePayloadByteBoundary(page, viewport.label);
       await exerciseImageScanAndGuards(page, viewport.label);
       await exerciseDownloads(page, viewport.label);
-      await sweepPublicPngAssets(page);
+      await sweepPublicImageAssets(page);
     } else {
       const layout = await page.evaluate(() => ({
         viewportWidth: document.documentElement.clientWidth,

@@ -31,7 +31,7 @@ ROOT_FILES=(
   manifest.webmanifest robots.txt sitemap.xml llms.txt sw.js
 )
 ICON_FILES=(
-  icons/favicon-32.png icons/icon-1024.png icons/icon-192-maskable.png
+  icons/favicon.svg icons/favicon-32.png icons/icon-1024.png icons/icon-192-maskable.png
   icons/icon-192.png icons/icon-512-maskable.png icons/icon-512.png
   icons/screenshot-narrow.png icons/screenshot-wide.png
 )

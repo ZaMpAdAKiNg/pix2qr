@@ -9,6 +9,8 @@ entradas são agrupadas por data.
 
 ## [Não lançado]
 
+- [PIX-14] Favicon das quatro páginas trocado pelo símbolo S da Salaria: `icons/favicon.svg` (cópia byte a byte do favicon oficial) declarado antes do PNG 32×32 regenerado do mesmo SVG, e precacheado no `sw.js`. Ícones do app instalado (manifest, apple-touch-icon) inalterados.
+
 - [PIX-12] Estado de erro do campo PIX com ícone CircleAlert, `aria-invalid` e `aria-describedby` ligando o campo a `#error-msg`, borda e anel `--color-erro`; tudo limpa ao corrigir a chave. Coberto no E2E adversarial.
 
 - Adiciona link para converter USDT em PIX com a Salaria.tech no topo das quatro páginas, com faixa responsiva e foco acessível.

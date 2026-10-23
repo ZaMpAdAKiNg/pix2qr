@@ -1,6 +1,6 @@
 # DNA visual para o pix2qr — PIX-6
 
-Especificação para home, placa, privacidade e licenças. Base auditada: `9d24d09`, em 22/10/2026. Entrega documental; os cards de implementação aplicam este contrato em `stage`. O pix2qr mantém nome, símbolo, conteúdo e comportamento próprios.
+Especificação para home, placa, privacidade e licenças. Base auditada: `9d24d09`, em 22/10/2026. Entrega documental; os cards de implementação aplicam este contrato em `stage`. O pix2qr mantém nome, símbolo, conteúdo e comportamento próprios; exceção: o símbolo S da Salaria é o favicon das quatro páginas, por decisão do dono em 2026-10-22 (seção 2).
 
 ## 1. Tokens, tipografia, layout e motion
 
@@ -150,6 +150,15 @@ Usar `font-variant-numeric: tabular-nums` em números. Todo número, inclusive e
 | `marca/fontes/IBMPlexMono-500-latin.woff2` | `a76f53ca6612e7b3828eec2311098675b7f9849ae4169a8bcef6302aec02a6c0` | OFL 1.1; Proposto: fonts/ibm-plex-mono-500-latin.woff2 |
 
 `provided`: licença OFL 1.1 e origem em `marca/PROVENIENCIA.md`; Outfit já tem `licenses/Outfit-OFL-1.1.txt`. No card que adicionar Plex, incluir seu texto OFL completo e copyrights, conferir os bytes do arquivo de licença e registrar também seu SHA-256 no lock. Este card não adiciona fontes nem declara hash de licença que ainda não foi incorporada. Assets novos exigem allowlist do build, gate de artefato, precache quando shell, `third-party.lock.json`, `THIRD_PARTY.md` e página de licenças.
+
+### Favicon (símbolo S da Salaria)
+
+Por decisão do dono em 2026-10-22, o favicon das quatro páginas é o símbolo S da Salaria, usado somente como favicon. `apple-touch-icon`, os ícones do `manifest.webmanifest` e `icons/icon-1024.png` continuam os do PIX QR.
+
+| Arquivo | SHA-256 | Origem / licença |
+|---|---|---|
+| `icons/favicon.svg` | `86d8b44b6408033390584c877fba30362ba9b3486b7814cdb51a21e294730889` | Cópia byte a byte de `salaria.money/app/icon.svg`, o favicon oficial segundo `marca/PROVENIENCIA.md`. Símbolo da Salaria, marca do dono, direitos reservados, fora da licença MIT do código. |
+| `icons/favicon-32.png` | `2b4573308a9b4561c532abd69de71b931f410a15d6f428c5b74aa57e46e58739` | Fallback 32×32 renderizado desse SVG pelo Chrome local (playwright-core), cantos transparentes. Mesma nota de marca. |
 
 ## 3. Componentes e estados
 
@@ -352,7 +361,7 @@ Chips com tintas semânticas, hover branco 6% e vidro exigem aferição do compo
 
 | Manter | Adaptar ao pix2qr | Não copiar |
 |---|---|---|
-| Verde-grafite, brasa, Outfit pesada, mono nos dados | Hierarquia compacta com formulário e resultado próximos | Wordmark, símbolo ou identidade literal de outra marca |
+| Verde-grafite, brasa, Outfit pesada, mono nos dados | Hierarquia compacta com formulário e resultado próximos | Wordmark, símbolo ou identidade literal de outra marca (exceção: o símbolo S da Salaria somente como favicon, decisão do dono em 2026-10-22) |
 | Pílulas, campos 16px, cartões 24px | Opacidade estável no formulário; contraste e foco externo | Código de componentes, screenshots e referências privadas |
 | Motion lento nos efeitos e feedback curto nos controles | Operações locais sem espera artificial | WebGL, globo/moedas 3D, números que mudam sem fonte |
 | Texto técnico preciso | Conteúdo próprio e nomes acessíveis preservados | Copy, fluxos ou regras de outro produto |

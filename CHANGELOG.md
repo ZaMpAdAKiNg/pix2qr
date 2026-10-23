@@ -9,6 +9,8 @@ entradas são agrupadas por data.
 
 ## [Não lançado]
 
+- [PIX-15] Ícones do app instalado (manifest 192/512 `any` e maskable, `icon-1024`) regenerados com o símbolo S da Salaria por `scripts/render-icons.mjs`; maskable opaco com o S a 0,85 dentro do círculo seguro, e `apple-touch-icon` das quatro páginas apontando para o maskable opaco. `og:image`/`twitter:image` (`icon-512.png`) também passam a mostrar o S.
+
 - [PIX-14] Favicon das quatro páginas trocado pelo símbolo S da Salaria: `icons/favicon.svg` (cópia byte a byte do favicon oficial) declarado antes do PNG 32×32 regenerado do mesmo SVG, e precacheado no `sw.js`. Ícones do app instalado (manifest, apple-touch-icon) inalterados.
 
 - [PIX-12] Estado de erro do campo PIX com ícone CircleAlert, `aria-invalid` e `aria-describedby` ligando o campo a `#error-msg`, borda e anel `--color-erro`; tudo limpa ao corrigir a chave. Coberto no E2E adversarial.

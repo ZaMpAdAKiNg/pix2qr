@@ -34,6 +34,12 @@ const PUBLIC_IMAGE_ASSETS = [
   'icons/screenshot-wide.png',
 ];
 
+// Ícones do app instalado (PIX-15): `any` com cantos transparentes; maskable
+// opaco #1f2a26 até a borda e com o S inteiro dentro do círculo seguro do
+// Android (raio 0,4 × lado).
+const APP_ICONS_ANY = new Set(['icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-1024.png']);
+const APP_ICONS_MASKABLE = new Set(['icons/icon-192-maskable.png', 'icons/icon-512-maskable.png']);
+
 const analyticsEndpoint = /^https:\/\/(?:cloud\.umami\.is|gateway\.umami\.is|api-gateway\.umami\.dev)\//;
 
 async function text(page, selector) {
@@ -320,10 +326,23 @@ async function sweepPublicImageAssets(page) {
       context.drawImage(image, 0, 0);
       const pixels = context.getImageData(0, 0, canvas.width, canvas.height);
       const decoded = window.jsQR(pixels.data, pixels.width, pixels.height, { inversionAttempts: 'attemptBoth' });
+      // Distância (em frações do lado) do pixel cor de brasa mais afastado do centro.
+      let emberReach = 0;
+      const center = pixels.width / 2;
+      for (let y = 0; y < pixels.height; y += 1) {
+        for (let x = 0; x < pixels.width; x += 1) {
+          const i = (y * pixels.width + x) * 4;
+          if (pixels.data[i] > 200 && pixels.data[i + 1] < 120 && pixels.data[i + 2] < 100) {
+            emberReach = Math.max(emberReach, Math.hypot(x + 0.5 - center, y + 0.5 - center) / pixels.width);
+          }
+        }
+      }
       return {
         width: canvas.width,
         height: canvas.height,
         decodedLength: decoded?.data?.length || 0,
+        corner: Array.from(pixels.data.slice(0, 4)),
+        emberReach,
       };
     }, {
       source: `data:${mime};base64,${bytes.toString('base64')}`,
@@ -332,6 +351,15 @@ async function sweepPublicImageAssets(page) {
     assert.ok(inspection.width > 0 && inspection.height > 0, `${relativePath}: image did not decode`);
     assert.equal(inspection.decodedLength, 0,
       `${relativePath}: public image contains a decodable QR (${inspection.decodedLength} chars)`);
+    if (APP_ICONS_ANY.has(relativePath)) {
+      assert.equal(inspection.corner[3], 0, `${relativePath}: corner (0,0) must be transparent`);
+    }
+    if (APP_ICONS_MASKABLE.has(relativePath)) {
+      assert.deepEqual(inspection.corner, [31, 42, 38, 255], `${relativePath}: corner (0,0) must be opaque #1f2a26`);
+      assert.ok(inspection.emberReach > 0, `${relativePath}: S stroke not found`);
+      assert.ok(inspection.emberReach <= 0.4,
+        `${relativePath}: S stroke reaches ${inspection.emberReach.toFixed(3)} × side, outside the maskable safe zone`);
+    }
   }
 }
 

@@ -1,6 +1,6 @@
 # DNA visual para o pix2qr — PIX-6
 
-Especificação para home, placa, privacidade e licenças. Base auditada: `9d24d09`, em 22/10/2026. Entrega documental; os cards de implementação aplicam este contrato em `stage`. O pix2qr mantém nome, símbolo, conteúdo e comportamento próprios; exceção: o símbolo S da Salaria é o favicon das quatro páginas, por decisão do dono em 2026-10-22 (seção 2).
+Especificação para home, placa, privacidade e licenças. Base auditada: `9d24d09`, em 22/10/2026. Entrega documental; os cards de implementação aplicam este contrato em `stage`. O pix2qr mantém nome, símbolo, conteúdo e comportamento próprios; exceção: o símbolo S da Salaria é o favicon das quatro páginas (decisão do dono em 2026-10-22) e também os ícones do app instalado, por decisão do dono em 2026-10-23 (seção 2).
 
 ## 1. Tokens, tipografia, layout e motion
 
@@ -151,14 +151,21 @@ Usar `font-variant-numeric: tabular-nums` em números. Todo número, inclusive e
 
 `provided`: licença OFL 1.1 e origem em `marca/PROVENIENCIA.md`; Outfit já tem `licenses/Outfit-OFL-1.1.txt`. No card que adicionar Plex, incluir seu texto OFL completo e copyrights, conferir os bytes do arquivo de licença e registrar também seu SHA-256 no lock. Este card não adiciona fontes nem declara hash de licença que ainda não foi incorporada. Assets novos exigem allowlist do build, gate de artefato, precache quando shell, `third-party.lock.json`, `THIRD_PARTY.md` e página de licenças.
 
-### Favicon (símbolo S da Salaria)
+### Favicon e ícones do app (símbolo S da Salaria)
 
-Por decisão do dono em 2026-10-22, o favicon das quatro páginas é o símbolo S da Salaria, usado somente como favicon. `apple-touch-icon`, os ícones do `manifest.webmanifest` e `icons/icon-1024.png` continuam os do PIX QR.
+Por decisão do dono em 2026-10-22, o favicon das quatro páginas é o símbolo S da Salaria; em 2026-10-23 o dono estendeu o símbolo ao favicon e ícones do app instalado: os ícones do `manifest.webmanifest`, `icons/icon-1024.png` e o `apple-touch-icon`, que aponta para `icons/icon-192-maskable.png` (o iOS preenche transparência com preto, então o arquivo precisa ser opaco). `og:image` e `twitter:image` usam `icons/icon-512.png` e, portanto, também mostram o S.
+
+Os cinco PNGs saem de `scripts/render-icons.mjs` (Chrome local via playwright-core rasteriza o SVG num canvas; o PNG RGBA 8-bit é codificado pelo script, então duas rodadas geram os mesmos bytes). Tratamento `any`: render fiel do SVG, cantos transparentes. Tratamento `maskable 0,85`: quadrado `#1f2a26` opaco até a borda, sem arco, e o S escalado por 0,85 em torno de (32,32), para que a ponta mais distante do traço (≈25,81 → ≈21,94 unidades do centro) fique dentro do círculo seguro de raio 0,4 × 64 = 25,6.
 
 | Arquivo | SHA-256 | Origem / licença |
 |---|---|---|
 | `icons/favicon.svg` | `86d8b44b6408033390584c877fba30362ba9b3486b7814cdb51a21e294730889` | Cópia byte a byte de `salaria.money/app/icon.svg`, o favicon oficial segundo `marca/PROVENIENCIA.md`. Símbolo da Salaria, marca do dono, direitos reservados, fora da licença MIT do código. |
 | `icons/favicon-32.png` | `2b4573308a9b4561c532abd69de71b931f410a15d6f428c5b74aa57e46e58739` | Fallback 32×32 renderizado desse SVG pelo Chrome local (playwright-core), cantos transparentes. Mesma nota de marca. |
+| `icons/icon-192.png` | `7a54120d38aefec4e83952265b7e242fc591ab5c20ce71a5ea4cacb84811e4db` | 192×192, `any`, gerado por `scripts/render-icons.mjs`. Símbolo da Salaria, marca do dono, direitos reservados, fora da licença MIT do código. |
+| `icons/icon-512.png` | `daa71113b27d6a638e45cfc084d154c84dfa8134ea715a66f7e5b2d241ca23a1` | 512×512, `any`; também `og:image`/`twitter:image`. Mesma nota de marca. |
+| `icons/icon-1024.png` | `45fb2c33b1533701b4e29d40942f8761e21cbecfd11a63eea74a5884a48b0495` | 1024×1024, `any`. Mesma nota de marca. |
+| `icons/icon-192-maskable.png` | `80443fbb8dca1f91a775d214453459118b8d6900aacc9a9f92c22ad22677ea2e` | 192×192, `maskable 0,85`; também `apple-touch-icon`. Mesma nota de marca. |
+| `icons/icon-512-maskable.png` | `0ac7d42af207bd10497d60b4f47413197054b1b58efc7ef017f0f7d47b19f22c` | 512×512, `maskable 0,85`. Mesma nota de marca. |
 
 ## 3. Componentes e estados
 
@@ -361,7 +368,7 @@ Chips com tintas semânticas, hover branco 6% e vidro exigem aferição do compo
 
 | Manter | Adaptar ao pix2qr | Não copiar |
 |---|---|---|
-| Verde-grafite, brasa, Outfit pesada, mono nos dados | Hierarquia compacta com formulário e resultado próximos | Wordmark, símbolo ou identidade literal de outra marca (exceção: o símbolo S da Salaria somente como favicon, decisão do dono em 2026-10-22) |
+| Verde-grafite, brasa, Outfit pesada, mono nos dados | Hierarquia compacta com formulário e resultado próximos | Wordmark, símbolo ou identidade literal de outra marca (exceção: o símbolo S da Salaria como favicon e ícones do app instalado, por decisão do dono em 2026-10-22 e 2026-10-23) |
 | Pílulas, campos 16px, cartões 24px | Opacidade estável no formulário; contraste e foco externo | Código de componentes, screenshots e referências privadas |
 | Motion lento nos efeitos e feedback curto nos controles | Operações locais sem espera artificial | WebGL, globo/moedas 3D, números que mudam sem fonte |
 | Texto técnico preciso | Conteúdo próprio e nomes acessíveis preservados | Copy, fluxos ou regras de outro produto |

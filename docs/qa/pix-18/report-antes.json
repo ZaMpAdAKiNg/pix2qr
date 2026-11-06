@@ -1,0 +1,282 @@
+[
+  {
+    "shot": "home-topbar-375-antes.png",
+    "horizontalScroll": false,
+    "scrollWidth": 375,
+    "clientWidth": 375,
+    "topbar": {
+      "x": 0,
+      "y": 0,
+      "w": 375,
+      "h": 117
+    },
+    "banner": {
+      "x": 16,
+      "y": 64,
+      "w": 343,
+      "h": 44
+    },
+    "why": null,
+    "whyLines": null,
+    "whyOverlapsLogo": false,
+    "whyOverlapsActions": false,
+    "whyOverlapsBanner": false,
+    "describedBy": null,
+    "describedByResolves": true,
+    "ariaLabel": "Converta USDT em PIX com a Salaria.tech (abre em nova aba)",
+    "href": "https://salaria.tech?ref=PIX2QR",
+    "target": "_blank",
+    "rel": "noopener",
+    "whyText": null,
+    "scrollPaddingTop": "160px",
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+    ],
+    "pageErrors": []
+  },
+  {
+    "shot": "qr-code-pix-para-imprimir-topbar-375-antes.png",
+    "horizontalScroll": false,
+    "scrollWidth": 375,
+    "clientWidth": 375,
+    "topbar": {
+      "x": 0,
+      "y": 0,
+      "w": 375,
+      "h": 117
+    },
+    "banner": {
+      "x": 16,
+      "y": 64,
+      "w": 343,
+      "h": 44
+    },
+    "why": null,
+    "whyLines": null,
+    "whyOverlapsLogo": false,
+    "whyOverlapsActions": false,
+    "whyOverlapsBanner": false,
+    "describedBy": null,
+    "describedByResolves": true,
+    "ariaLabel": "Converta USDT em PIX com a Salaria.tech (abre em nova aba)",
+    "href": "https://salaria.tech?ref=PIX2QR",
+    "target": "_blank",
+    "rel": "noopener",
+    "whyText": null,
+    "scrollPaddingTop": "160px",
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+    ],
+    "pageErrors": []
+  },
+  {
+    "shot": "privacidade-topbar-375-antes.png",
+    "horizontalScroll": false,
+    "scrollWidth": 375,
+    "clientWidth": 375,
+    "topbar": {
+      "x": 0,
+      "y": 0,
+      "w": 375,
+      "h": 117
+    },
+    "banner": {
+      "x": 16,
+      "y": 64,
+      "w": 343,
+      "h": 44
+    },
+    "why": null,
+    "whyLines": null,
+    "whyOverlapsLogo": false,
+    "whyOverlapsActions": false,
+    "whyOverlapsBanner": false,
+    "describedBy": null,
+    "describedByResolves": true,
+    "ariaLabel": "Converta USDT em PIX com a Salaria.tech (abre em nova aba)",
+    "href": "https://salaria.tech?ref=PIX2QR",
+    "target": "_blank",
+    "rel": "noopener",
+    "whyText": null,
+    "scrollPaddingTop": "160px",
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+    ],
+    "pageErrors": []
+  },
+  {
+    "shot": "licencas-topbar-375-antes.png",
+    "horizontalScroll": false,
+    "scrollWidth": 375,
+    "clientWidth": 375,
+    "topbar": {
+      "x": 0,
+      "y": 0,
+      "w": 375,
+      "h": 117
+    },
+    "banner": {
+      "x": 16,
+      "y": 64,
+      "w": 343,
+      "h": 44
+    },
+    "why": null,
+    "whyLines": null,
+    "whyOverlapsLogo": false,
+    "whyOverlapsActions": false,
+    "whyOverlapsBanner": false,
+    "describedBy": null,
+    "describedByResolves": true,
+    "ariaLabel": "Converta USDT em PIX com a Salaria.tech (abre em nova aba)",
+    "href": "https://salaria.tech?ref=PIX2QR",
+    "target": "_blank",
+    "rel": "noopener",
+    "whyText": null,
+    "scrollPaddingTop": "160px",
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+    ],
+    "pageErrors": []
+  },
+  {
+    "shot": "home-topbar-1280-antes.png",
+    "horizontalScroll": false,
+    "scrollWidth": 1280,
+    "clientWidth": 1280,
+    "topbar": {
+      "x": 0,
+      "y": 0,
+      "w": 1280,
+      "h": 65
+    },
+    "banner": {
+      "x": 475,
+      "y": 10,
+      "w": 330.1,
+      "h": 44
+    },
+    "why": null,
+    "whyLines": null,
+    "whyOverlapsLogo": false,
+    "whyOverlapsActions": false,
+    "whyOverlapsBanner": false,
+    "describedBy": null,
+    "describedByResolves": true,
+    "ariaLabel": "Converta USDT em PIX com a Salaria.tech (abre em nova aba)",
+    "href": "https://salaria.tech?ref=PIX2QR",
+    "target": "_blank",
+    "rel": "noopener",
+    "whyText": null,
+    "scrollPaddingTop": "96px",
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+    ],
+    "pageErrors": []
+  },
+  {
+    "shot": "qr-code-pix-para-imprimir-topbar-1280-antes.png",
+    "horizontalScroll": false,
+    "scrollWidth": 1280,
+    "clientWidth": 1280,
+    "topbar": {
+      "x": 0,
+      "y": 0,
+      "w": 1280,
+      "h": 65
+    },
+    "banner": {
+      "x": 475,
+      "y": 10,
+      "w": 330.1,
+      "h": 44
+    },
+    "why": null,
+    "whyLines": null,
+    "whyOverlapsLogo": false,
+    "whyOverlapsActions": false,
+    "whyOverlapsBanner": false,
+    "describedBy": null,
+    "describedByResolves": true,
+    "ariaLabel": "Converta USDT em PIX com a Salaria.tech (abre em nova aba)",
+    "href": "https://salaria.tech?ref=PIX2QR",
+    "target": "_blank",
+    "rel": "noopener",
+    "whyText": null,
+    "scrollPaddingTop": "96px",
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+    ],
+    "pageErrors": []
+  },
+  {
+    "shot": "privacidade-topbar-1280-antes.png",
+    "horizontalScroll": false,
+    "scrollWidth": 1280,
+    "clientWidth": 1280,
+    "topbar": {
+      "x": 0,
+      "y": 0,
+      "w": 1280,
+      "h": 65
+    },
+    "banner": {
+      "x": 475,
+      "y": 10,
+      "w": 330.1,
+      "h": 44
+    },
+    "why": null,
+    "whyLines": null,
+    "whyOverlapsLogo": false,
+    "whyOverlapsActions": false,
+    "whyOverlapsBanner": false,
+    "describedBy": null,
+    "describedByResolves": true,
+    "ariaLabel": "Converta USDT em PIX com a Salaria.tech (abre em nova aba)",
+    "href": "https://salaria.tech?ref=PIX2QR",
+    "target": "_blank",
+    "rel": "noopener",
+    "whyText": null,
+    "scrollPaddingTop": "96px",
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+    ],
+    "pageErrors": []
+  },
+  {
+    "shot": "licencas-topbar-1280-antes.png",
+    "horizontalScroll": false,
+    "scrollWidth": 1280,
+    "clientWidth": 1280,
+    "topbar": {
+      "x": 0,
+      "y": 0,
+      "w": 1280,
+      "h": 65
+    },
+    "banner": {
+      "x": 475,
+      "y": 10,
+      "w": 330.1,
+      "h": 44
+    },
+    "why": null,
+    "whyLines": null,
+    "whyOverlapsLogo": false,
+    "whyOverlapsActions": false,
+    "whyOverlapsBanner": false,
+    "describedBy": null,
+    "describedByResolves": true,
+    "ariaLabel": "Converta USDT em PIX com a Salaria.tech (abre em nova aba)",
+    "href": "https://salaria.tech?ref=PIX2QR",
+    "target": "_blank",
+    "rel": "noopener",
+    "whyText": null,
+    "scrollPaddingTop": "96px",
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_CONNECTION_REFUSED"
+    ],
+    "pageErrors": []
+  }
+]

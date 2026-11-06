@@ -172,12 +172,14 @@ async function exerciseStaleKeyAndCorruptPayload(page, label) {
 }
 
 // Erro de chave = ícone + mensagem + associação programática (nunca só cor):
-// o campo recebe aria-invalid/aria-describedby e perde os dois ao corrigir.
+// o campo recebe aria-invalid e o alerta entra no aria-describedby, na frente
+// da frase de motivo que já descreve o campo (PIX-17). Ao corrigir, sai só o
+// alerta: a frase de motivo continua ligada ao campo.
 async function errorState(page) {
   return page.evaluate(() => {
     const input = document.getElementById('chave-input');
-    const describedBy = input.getAttribute('aria-describedby');
-    const alert = describedBy ? document.getElementById(describedBy) : null;
+    const describedBy = (input.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean);
+    const alert = describedBy.includes('error-msg') ? document.getElementById('error-msg') : null;
     const svg = document.querySelector('#error-msg svg');
     return {
       ariaInvalid: input.getAttribute('aria-invalid'),
@@ -198,7 +200,8 @@ async function exerciseInvalidKeyErrorState(page, label) {
   await page.locator('#chave-input').blur();
   let state = await errorState(page);
   assert.equal(state.ariaInvalid, 'true', `${label}: invalid key on blur did not set aria-invalid`);
-  assert.equal(state.describedBy, 'error-msg', `${label}: invalid key did not associate #error-msg`);
+  assert.deepEqual(state.describedBy, ['error-msg', 'chave-hint'],
+    `${label}: invalid key did not put #error-msg ahead of the reason line`);
   assert.ok(state.alertIsErrorMsg && state.alertVisible, `${label}: aria-describedby does not resolve to the visible alert`);
   assert.match(state.alertText, /Chave PIX inválida/, `${label}: invalid key message missing`);
   assert.ok(state.iconVisible, `${label}: error alert has no visible aria-hidden icon`);
@@ -213,13 +216,43 @@ async function exerciseInvalidKeyErrorState(page, label) {
   await page.fill('#chave-input', `fix-${label}@example.invalid`);
   state = await errorState(page);
   assert.equal(state.ariaInvalid, null, `${label}: correcting the key did not clear aria-invalid`);
-  assert.equal(state.describedBy, null, `${label}: correcting the key did not clear aria-describedby`);
+  assert.deepEqual(state.describedBy, ['chave-hint'],
+    `${label}: correcting the key did not leave only the reason line in aria-describedby`);
   assert.equal(state.alertVisible, false, `${label}: correcting the key left the alert visible`);
   assert.notEqual(state.borderColor, hexToRgb(state.errorColor), `${label}: error border persisted`);
   const { payload } = await generateAndValidate(page, `${label}-after-error`, '12,34');
   assert.ok(payload, `${label}: valid key after error did not generate`);
   state = await errorState(page);
   assert.equal(state.ariaInvalid, null, `${label}: generated QR kept aria-invalid`);
+}
+
+// Sugestão de teste com valor baixo (PIX-17): aparece em QR estático, avisa
+// quando o valor é fixo e some em cobrança dinâmica, que é de uso único.
+async function exerciseLowValueTestHint(page, label) {
+  const visible = (selector) => page.locator(selector).isVisible();
+
+  await generateAndValidate(page, `${label}-test-open`, '');
+  assert.equal(await visible('#result-test'), true, `${label}: open-amount QR did not suggest the low-value test`);
+  assert.match(await text(page, '#result-test'), /valor baixo[\s\S]*outra conta/i,
+    `${label}: test hint lost "valor baixo" / "outra conta"`);
+  assert.equal(await visible('#result-test-fixed'), false, `${label}: open-amount QR showed the fixed-amount note`);
+
+  await generateAndValidate(page, `${label}-test-fixed`, '12,34');
+  assert.equal(await visible('#result-test'), true, `${label}: fixed-amount QR did not suggest the low-value test`);
+  assert.equal(await visible('#result-test-fixed'), true, `${label}: fixed-amount QR did not warn about the fixed amount`);
+
+  const dynamic = finishPayload(
+    PixCore.tlv(0, '01') + PixCore.tlv(1, '12')
+    + PixCore.tlv(26, PixCore.tlv(0, 'br.gov.bcb.pix') + PixCore.tlv(25, 'pix.example.com/8b3da2f39a4140d1a91abd93113bd441'))
+    + PixCore.tlv(52, '0000') + PixCore.tlv(53, '986') + PixCore.tlv(58, 'BR')
+    + PixCore.tlv(59, 'LOJA E2E') + PixCore.tlv(60, 'BRASILIA') + PixCore.tlv(62, PixCore.tlv(5, '***')),
+  );
+  assert.equal(PixCore.parseCopiaCola(dynamic)?.paymentType, 'dynamic', `${label}: synthetic dynamic fixture is not dynamic`);
+  await page.fill('#chave-input', dynamic);
+  await page.click('#gerar-btn');
+  assert.equal(await waitForPayload(page, `${label} dynamic render`), dynamic, `${label}: dynamic payload did not render`);
+  assert.equal(await visible('#result-test'), false,
+    `${label}: dynamic charge suggested a "test" payment, which would be the real one`);
 }
 
 function hexToRgb(hex) {
@@ -380,6 +413,7 @@ async function runViewport(staticServer, viewport) {
     await exerciseInvalidAmounts(page, viewport.label);
     await exerciseStaleKeyAndCorruptPayload(page, viewport.label);
     await exerciseInvalidKeyErrorState(page, viewport.label);
+    await exerciseLowValueTestHint(page, viewport.label);
 
     if (viewport.label === 'desktop') {
       await exercisePayloadByteBoundary(page, viewport.label);

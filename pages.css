@@ -35,8 +35,11 @@ fieldset.presets { border: 0; margin: 1.5rem 0; }
 .preview-wrap { display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem; }
 #placa-preview { display: flex; justify-content: center; background: #fff; border-radius: var(--radius-campo); padding: .75rem; }
 #placa-preview canvas { display: block; width: 100%; max-width: 340px; height: auto; }
-.preview-actions { display: flex; flex-wrap: wrap; gap: .75rem; }
-.preview-actions .btn { flex: 1 1 10rem; width: auto; }
+.preview-actions { display: grid; gap: 1rem .75rem; list-style: none; }
+.preview-actions li { display: grid; align-content: start; gap: .5rem; }
+.preview-actions .btn { width: 100%; min-height: 52px; }
+.preview-actions .hint { margin-top: 0; }
+.preview-wrap .safety-notice { margin: 0; }
 .faq-item + .faq-item { border-top: 1px solid var(--color-border); margin-top: 1.5rem; padding-top: 1.5rem; }
 .faq-item h3 { font-size: 1.125rem; line-height: 1.4; margin-bottom: .5rem; }
-@media (min-width: 640px) { .component-facts > div { grid-template-columns: 9rem 1fr; gap: 1rem; } }
+@media (min-width: 640px) { .component-facts > div { grid-template-columns: 9rem 1fr; gap: 1rem; } .preview-actions { grid-template-columns: 1fr 1fr; } }

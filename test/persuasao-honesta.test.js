@@ -140,3 +140,43 @@ test('páginas e scripts publicados não carregam urgência, prova social nem co
   // Prova social estruturada também não entra sem base real.
   assert.doesNotMatch(home, /aggregateRating|"review"|ratingValue/);
 });
+
+// PIX-18: o banner da Salaria é a chamada de ação de outro negócio do mesmo
+// dono. A linha ao lado declara o vínculo e diz o que o link leva; sem ela o
+// banner pede o clique emprestando a confiança da ferramenta grátis.
+test('banner da Salaria declara o vínculo ao lado, ligado por aria-describedby, nas quatro páginas', () => {
+  const pages = { home, placa, privacidade: read('privacidade.html'), licencas: read('licencas.html') };
+  for (const [name, html] of Object.entries(pages)) {
+    const banner = html.match(/<a class="salaria-banner" [^>]*>/);
+    assert.ok(banner, `${name}: banner da Salaria ausente`);
+    assert.match(banner[0], /\baria-label="[^"]*\(abre em nova aba\)"/, `${name}: aria-label perdeu "(abre em nova aba)"`);
+    const describedBy = banner[0].match(/\baria-describedby="([^"]+)"/);
+    assert.ok(describedBy, `${name}: banner da Salaria sem aria-describedby`);
+    const why = textOf(html, describedBy[1]);
+    assert.match(why, /A Salaria é outro serviço de quem faz o pix2qr\./, name);
+    assert.match(why, /só diz à Salaria que você veio daqui/, name);
+    assert.match(why, /Nada do que você digitou vai junto\./, name);
+  }
+});
+
+test('privacidade diz o que o link da Salaria leva e bate com o href do banner', () => {
+  const privacidade = read('privacidade.html');
+  const href = privacidade.match(/<a class="salaria-banner" [^>]*\bhref="([^"]+)"/);
+  assert.ok(href, 'privacidade: banner da Salaria ausente');
+  // O endereço leva só a marca de origem, igual para todo visitante.
+  assert.deepEqual([...new URL(href[1]).searchParams.entries()], [['ref', 'PIX2QR']]);
+  const text = stripTags(privacidade);
+  assert.match(privacidade, /<code>ref=PIX2QR<\/code>/);
+  assert.match(text, /marca de origem/);
+  assert.match(text, /igual para todo visitante/);
+  assert.match(text, /nada do que você digitou no pix2qr vai junto/);
+  // O que sustenta a frase: Referer suprimido no header servido e nenhum dado
+  // digitado gravado no endereço da página pelos scripts.
+  const rules = JSON.parse(read('vercel.json')).headers;
+  const everyPath = rules.find((rule) => rule.source === '/(.*)' && !rule.has).headers;
+  assert.equal(everyPath.find((header) => header.key === 'Referrer-Policy').value, 'no-referrer');
+  assert.match(text, /Referrer-Policy: no-referrer/);
+  for (const source of [read('app.js'), read('placa.js')]) {
+    assert.doesNotMatch(source, /\b(pushState|replaceState)\b|location\.(hash|search|href)\s*=[^=]/);
+  }
+});

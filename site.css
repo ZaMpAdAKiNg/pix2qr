@@ -79,7 +79,7 @@
   --pix-duration-dialog: 320ms;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { color-scheme: dark; background: var(--color-bg); scroll-padding-top: 6rem; }
+html { color-scheme: dark; background: var(--color-bg); scroll-padding-top: 8rem; }
 body { font-family: var(--font-sans); color: var(--color-fg); background: var(--color-bg); line-height: 1.6; -webkit-font-smoothing: antialiased; padding-bottom: 3rem; }
 ::selection { background: var(--color-accent-deep); color: var(--color-white); }
 a { color: var(--color-fg-muted); text-decoration: underline; text-underline-offset: 4px; }
@@ -207,11 +207,14 @@ footer { display: flex; flex-direction: column; gap: .75rem; font-size: .875rem;
 .salaria-banner svg { color: var(--color-accent); transition: transform 200ms var(--ease-padrao); }
 .salaria-banner:hover, .salaria-banner:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
 .salaria-banner:hover svg { transform: translate(1px, -1px); }
+.salaria-slot { display: grid; gap: .25rem; }
+.salaria-why { margin: 0; max-width: 24rem; justify-self: center; font-size: .75rem; line-height: 1.4; color: var(--color-fg-subtle); text-align: center; text-wrap: balance; }
 @media (max-width: 719px) {
-  html { scroll-padding-top: 10rem; }
+  html { scroll-padding-top: 12rem; }
   .topbar-inner { grid-template-columns: 1fr auto; }
-  .salaria-banner { grid-column: 1 / -1; grid-row: 2; border-radius: var(--radius-campo); }
+  .salaria-slot { grid-column: 1 / -1; grid-row: 2; }
+  .salaria-banner { border-radius: var(--radius-campo); }
   .topbar-actions { grid-column: 2; grid-row: 1; }
 }
 @media (prefers-reduced-motion: reduce) { .salaria-banner:hover svg { transform: none; } }
-@media print { .salaria-banner { display: none; } }
+@media print { .salaria-slot { display: none; } }

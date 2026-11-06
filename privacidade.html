@@ -69,10 +69,13 @@
       </svg>
       PIX QR Code
     </a>
-    <a class="salaria-banner" href="https://salaria.tech?ref=PIX2QR" target="_blank" rel="noopener" aria-label="Converta USDT em PIX com a Salaria.tech (abre em nova aba)">
-      <span>Converta USDT em PIX com a <strong>Salaria.tech</strong></span>
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10M7 17 17 7"/></svg>
-    </a>
+    <div class="salaria-slot">
+      <a class="salaria-banner" href="https://salaria.tech?ref=PIX2QR" target="_blank" rel="noopener" aria-label="Converta USDT em PIX com a Salaria.tech (abre em nova aba)" aria-describedby="salaria-why">
+        <span>Converta USDT em PIX com a <strong>Salaria.tech</strong></span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10M7 17 17 7"/></svg>
+      </a>
+      <p id="salaria-why" class="salaria-why">A Salaria é outro serviço de quem faz o pix2qr. O link só diz à Salaria que você veio daqui. Nada do que você digitou vai junto.</p>
+    </div>
     <div class="topbar-actions">
       <a class="github-repo-link" href="https://github.com/ZaMpAdAKiNg/pix2qr" rel="noopener external" aria-label="Repo público — abrir o repositório do pix2qr no GitHub">
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -115,6 +118,15 @@
     porém, não controla nem comprova sozinho as políticas, retenção e configuração dos
     serviços de terceiros. Bloqueadores de conteúdo ou uso offline podem impedir a
     telemetria.</p>
+
+    <h2>Link para a Salaria</h2>
+
+    <p>O banner do topo leva à Salaria, outro serviço de quem faz o pix2qr. O
+    endereço do link carrega só a marca de origem <code>ref=PIX2QR</code>, igual
+    para todo visitante, e nada do que você digitou no pix2qr vai junto. O site não
+    grava chave, valor nem código PIX no endereço da página, e o cabeçalho
+    <code>Referrer-Policy: no-referrer</code> impede que o endereço desta página
+    siga para a Salaria.</p>
 
     <h2>Armazenamento local e PWA</h2>
 

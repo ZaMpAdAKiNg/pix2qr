@@ -22,6 +22,8 @@ const copyBtn        = document.getElementById('copy-btn');
 const downloadBtn    = document.getElementById('download-btn');
 const downloadSvgBtn = document.getElementById('download-svg-btn');
 const copyImgBtn     = document.getElementById('copy-img-btn');
+const resultTest      = document.getElementById('result-test');
+const resultTestFixed = document.getElementById('result-test-fixed');
 
 let currentPayload = '';
 
@@ -29,6 +31,13 @@ let currentPayload = '';
 // texto vai no span interno pra preservar o ícone; o campo culpado, quando
 // informado, recebe aria-invalid + aria-describedby apontando pro alerta, e
 // clearError só desmarca o campo que setError marcou.
+// O campo já nasce com aria-describedby apontando pra frase de motivo (PIX-17):
+// o alerta entra na frente dela e, ao limpar, só o id do alerta sai.
+const ERROR_MSG_ID = 'error-msg';
+function describedByWithoutError(field) {
+  return (field.getAttribute('aria-describedby') || '')
+    .split(/\s+/).filter((id) => id && id !== ERROR_MSG_ID);
+}
 let errorField = null;
 function setError(msg, field) {
   errorMsgText.textContent = msg;
@@ -36,14 +45,16 @@ function setError(msg, field) {
   if (errorField && errorField !== field) clearErrorField();
   if (field) {
     field.setAttribute('aria-invalid', 'true');
-    field.setAttribute('aria-describedby', 'error-msg');
+    field.setAttribute('aria-describedby', [ERROR_MSG_ID, ...describedByWithoutError(field)].join(' '));
     errorField = field;
   }
 }
 function clearErrorField() {
   if (!errorField) return;
   errorField.removeAttribute('aria-invalid');
-  errorField.removeAttribute('aria-describedby');
+  const remaining = describedByWithoutError(errorField);
+  if (remaining.length) errorField.setAttribute('aria-describedby', remaining.join(' '));
+  else errorField.removeAttribute('aria-describedby');
   errorField = null;
 }
 function clearError() {
@@ -591,6 +602,15 @@ gerarBtn.addEventListener('click', () => {
     const hintMsg = KEY_HINT[parsedCheck && parsedCheck.tipo];
     keyHint.textContent = hintMsg || '';
     keyHint.hidden = !hintMsg;
+    // Sugestão de teste com valor baixo (PIX-17): só faz sentido em QR estático
+    // simples, que pode ser pago mais de uma vez. Cobrança dinâmica e Pix
+    // Automático são de uso único ou autorizam recorrência — pagar "pra testar"
+    // seria o pagamento de verdade. Com valor fixo embutido, o teste pede outro
+    // QR sem valor, e a frase extra avisa isso.
+    const generated = parseCopiaCola(payload);
+    const testable = Boolean(generated) && generated.paymentType === 'static' && !generated.isComposto;
+    if (resultTest) resultTest.hidden = !testable;
+    if (resultTestFixed) resultTestFixed.hidden = !(testable && generated.valor);
     resultEl.classList.add('visible');
     // Move o foco pro cabeçalho do resultado: leitores de tela anunciam
     // "QR Code gerado" e o teclado segue daqui pros botões Copiar/Baixar.
@@ -807,7 +827,14 @@ updateConnectivityUI();
 
 // ── Instalação PWA ────────────────────────────────────────────────────────
 const installBtn = document.getElementById('install-btn');
+const installWhy = document.getElementById('install-why');
 let deferredInstallPrompt = null;
+
+// O botão e a frase de motivo dele (PIX-17) aparecem e somem juntos.
+function setInstallVisible(visible) {
+  installBtn.hidden = !visible;
+  if (installWhy) installWhy.hidden = !visible;
+}
 
 // Textos de instrução por plataforma.
 // Usa marcador **texto** para negrito — renderizado via DOM (sem innerHTML).
@@ -973,12 +1000,12 @@ if (!isStandalone) {
   window.addEventListener('beforeinstallprompt', (event) => {
     event.preventDefault();
     deferredInstallPrompt = event;
-    installBtn.hidden = false;
+    setInstallVisible(true);
   });
 
   // iOS, Safari Mac e Firefox nunca disparam beforeinstallprompt — mostra botão direto
   if (platform === 'ios' || platform === 'safari-mac' || platform === 'firefox') {
-    installBtn.hidden = false;
+    setInstallVisible(true);
   }
 
   installBtn.addEventListener('click', async () => {
@@ -989,7 +1016,7 @@ if (!isStandalone) {
       promptEvent.prompt();
       const { outcome } = await promptEvent.userChoice;
       if (outcome === 'accepted') {
-        installBtn.hidden = true;
+        setInstallVisible(false);
         if (window.umami) umami.track('pwa-installed');
       }
       // Se dismissed: próximo clique cai no modal fallback (já que zeramos o prompt)
@@ -1002,7 +1029,7 @@ if (!isStandalone) {
 
   window.addEventListener('appinstalled', () => {
     deferredInstallPrompt = null;
-    installBtn.hidden = true;
+    setInstallVisible(false);
     if (window.umami) umami.track('pwa-installed');
   });
 }

@@ -220,7 +220,8 @@
         <span>Repo público</span>
       </a>
       <span id="offline-chip" class="status-chip" hidden>Offline</span>
-      <button id="install-btn" class="btn btn-outline install-btn" type="button" hidden>Instalar app</button>
+      <button id="install-btn" class="btn btn-outline install-btn" type="button" aria-describedby="install-why" hidden>Instalar app</button>
+      <p id="install-why" class="install-why" hidden>Cria um atalho que abre sem internet.</p>
     </div>
   </div>
 </div>
@@ -240,10 +241,12 @@
         autocomplete="off"
         spellcheck="false"
         maxlength="1024"
+        aria-describedby="chave-hint"
       />
-      <p class="field-hint">Detecta CPF, CNPJ alfanumérico, e-mail, telefone E.164 (+), EVP e Pix Copia e Cola.</p>
+      <p class="field-hint" id="chave-hint">É a chave que diz ao banco qual conta recebe o pagamento. Detecta CPF, CNPJ alfanumérico, e-mail, telefone E.164 (+), EVP e Pix Copia e Cola.</p>
       <input id="qr-file-input" type="file" accept="image/png,image/jpeg,image/gif,image/webp" capture="environment" hidden />
-      <button id="scan-qr-btn" type="button" class="scan-btn" aria-label="Escanear QR Code de uma imagem ou foto">
+      <div class="scan-row">
+      <button id="scan-qr-btn" type="button" class="scan-btn" aria-label="Escanear QR Code de uma imagem ou foto" aria-describedby="scan-why">
         <svg aria-hidden="true" focusable="false"
   class="lucide lucide-scan-line"
   xmlns="http://www.w3.org/2000/svg"
@@ -264,6 +267,8 @@
 </svg>
         Escanear QR Code
       </button>
+      <p class="field-hint" id="scan-why">A leitura acontece neste navegador: a foto ou imagem não sai do aparelho.</p>
+      </div>
     </div>
 
     <div id="mode-tag" class="mode-pill">
@@ -313,15 +318,17 @@
       </div>
 
       <div id="cc-add-valor" class="cc-add-valor" hidden>
-        <p class="cc-add-valor-hint">
+        <p class="cc-add-valor-hint" id="cc-add-valor-hint">
           Esse QR não tem valor embutido. Você pode adicionar um valor antes de gerar:
         </p>
         <div class="cc-add-valor-row">
           <span class="cc-add-valor-prefix">R$</span>
           <input type="text" id="cc-add-valor-input" inputmode="decimal"
                  pattern="[0-9]*[.,]?[0-9]{0,2}" placeholder="0,00"
-                 maxlength="24" aria-label="Adicionar valor opcional ao QR Code" />
+                 maxlength="24" aria-label="Adicionar valor opcional ao QR Code"
+                 aria-describedby="cc-add-valor-hint cc-add-valor-why" />
         </div>
+        <p class="field-hint" id="cc-add-valor-why">Só entram o valor e um novo verificador no fim do código. O resto fica como veio.</p>
       </div>
     </div>
 
@@ -329,7 +336,8 @@
       <div class="row-two">
         <div class="field">
           <label for="nome-input">Nome</label>
-          <input id="nome-input" type="text" placeholder="João Silva" maxlength="50" aria-describedby="nome-warn" />
+          <input id="nome-input" type="text" placeholder="João Silva" maxlength="50" aria-describedby="nome-why nome-warn" />
+          <p class="field-hint" id="nome-why">O padrão do QR exige um nome. Ele entra sem acentos, com até 25 caracteres. Vazio, vira "PIX".</p>
           <p class="field-warn" id="nome-warn" hidden>
             <svg aria-hidden="true" focusable="false"
   class="lucide lucide-circle-alert"
@@ -352,7 +360,8 @@
         </div>
         <div class="field">
           <label for="cidade-input">Cidade</label>
-          <input id="cidade-input" type="text" placeholder="São Paulo" maxlength="30" aria-describedby="cidade-warn" />
+          <input id="cidade-input" type="text" placeholder="São Paulo" maxlength="30" aria-describedby="cidade-why cidade-warn" />
+          <p class="field-hint" id="cidade-why">A cidade também é obrigatória no código, com até 15 caracteres. Vazia, vira <span class="nowrap">"SAO PAULO"</span>.</p>
           <p class="field-warn" id="cidade-warn" hidden>
             <svg aria-hidden="true" focusable="false"
   class="lucide lucide-circle-alert"
@@ -376,7 +385,8 @@
       </div>
       <div class="field">
         <label for="valor-input">Valor (R$)</label>
-        <input id="valor-input" type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]{0,2}" maxlength="24" placeholder="Deixe vazio para valor aberto" />
+        <input id="valor-input" type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]{0,2}" maxlength="24" placeholder="Deixe vazio para valor aberto" aria-describedby="valor-why" />
+        <p class="field-hint" id="valor-why">Com valor, o QR já leva a quantia. Vazio, quem paga digita.</p>
       </div>
     </div>
 
@@ -406,7 +416,7 @@
       do Banco Central e não inicia, autoriza nem garante pagamentos.
     </aside>
 
-    <button class="btn btn-primary" id="gerar-btn">
+    <button class="btn btn-primary" id="gerar-btn" aria-describedby="gerar-why">
       <svg aria-hidden="true" focusable="false"
   class="lucide lucide-arrow-right"
   xmlns="http://www.w3.org/2000/svg"
@@ -424,6 +434,7 @@
 </svg>
       Gerar QR Code
     </button>
+    <p class="field-hint" id="gerar-why">O navegador monta o código e faz uma leitura de teste antes de mostrar o QR.</p>
   </div>
 
   <!-- Result card -->
@@ -442,15 +453,16 @@
 
       <p class="result-check"><strong>Confira antes de confirmar:</strong> o app do banco é a fonte final para nome do recebedor, chave e valor.</p>
 
-      <div class="qr-container" id="qr-container" role="button" tabindex="0" aria-label="Clique para baixar o QR Code">
+      <div class="qr-container" id="qr-container" role="button" tabindex="0" aria-label="Clique para baixar o QR Code" aria-describedby="download-why">
         <div id="qr-wrap"></div>
       </div>
 
       <p class="payload-label">Pix Copia e Cola</p>
       <div class="payload-box" id="payload-display"></div>
 
-      <div class="action-row">
-        <button class="btn btn-ghost" id="copy-btn">
+      <ul class="action-row">
+        <li class="action-item">
+        <button class="btn btn-ghost" id="copy-btn" aria-describedby="copy-why">
           <svg aria-hidden="true" focusable="false"
   class="lucide lucide-copy"
   xmlns="http://www.w3.org/2000/svg"
@@ -468,7 +480,10 @@
 </svg>
           Copiar texto
         </button>
-        <button class="btn btn-ghost" id="download-btn">
+        <p class="field-hint" id="copy-why">Serve para pagar sem câmera: quem paga cola o código no app do banco.</p>
+        </li>
+        <li class="action-item">
+        <button class="btn btn-ghost" id="download-btn" aria-describedby="download-why">
           <svg aria-hidden="true" focusable="false"
   class="lucide lucide-download"
   xmlns="http://www.w3.org/2000/svg"
@@ -487,7 +502,10 @@
 </svg>
           Baixar PNG
         </button>
-        <button class="btn btn-ghost" id="download-svg-btn">
+        <p class="field-hint" id="download-why">A imagem sai com a margem branca que a câmera precisa para ler.</p>
+        </li>
+        <li class="action-item">
+        <button class="btn btn-ghost" id="download-svg-btn" aria-describedby="download-svg-why">
           <svg aria-hidden="true" focusable="false"
   class="lucide lucide-download"
   xmlns="http://www.w3.org/2000/svg"
@@ -506,7 +524,10 @@
 </svg>
           Baixar SVG
         </button>
-        <button class="btn btn-ghost" id="copy-img-btn">
+        <p class="field-hint" id="download-svg-why">Vetor para gráfica: amplia sem perder nitidez.</p>
+        </li>
+        <li class="action-item">
+        <button class="btn btn-ghost" id="copy-img-btn" aria-describedby="copy-img-why">
           <svg aria-hidden="true" focusable="false"
   class="lucide lucide-image"
   xmlns="http://www.w3.org/2000/svg"
@@ -525,13 +546,17 @@
 </svg>
           Copiar imagem
         </button>
-      </div>
+        <p class="field-hint" id="copy-img-why">Para colar a imagem numa conversa ou documento, sem salvar arquivo.</p>
+        </li>
+      </ul>
+
+      <p class="result-check" id="result-test"><strong>Antes de imprimir ou divulgar:</strong> teste com um valor baixo. De outra conta, pague este QR. Confira o nome que o banco mostra antes de confirmar. Depois, veja se o crédito aparece no extrato de quem recebe. <span id="result-test-fixed" hidden>Este QR tem valor fixo: para o teste, gere outro sem valor.</span></p>
 
       <div class="tip-jar">
         <div class="tip-jar-divider"></div>
         <p class="tip-jar-title">Te ajudei? Paga um café ☕</p>
-        <p class="tip-jar-sub">Processamento PIX local e sem cadastro — manter o domínio + tempo custa. Qualquer valor ajuda.</p>
-      <button id="donate-toggle" class="donate-btn" aria-expanded="false" aria-controls="donate-panel">
+        <p class="tip-jar-sub" id="donate-why">O pix2qr é gratuito. A doação cobre o domínio e as horas de manutenção. É opcional: a ferramenta funciona igual para quem não doa.</p>
+      <button id="donate-toggle" class="donate-btn" aria-expanded="false" aria-controls="donate-panel" aria-describedby="donate-why">
         Mostrar endereços para doação
       </button>
 
@@ -559,6 +584,74 @@
       </div><!-- /.tip-jar -->
     </div><!-- /.card -->
   </div><!-- /#result -->
+
+  <section class="card limits" id="nao-faz" aria-labelledby="nao-faz-title">
+    <h2 id="nao-faz-title">O que o pix2qr não faz</h2>
+    <p><strong>O pix2qr não se conecta a banco nenhum.</strong> Por isso ele não confere quem é o dono da chave nem avisa se o pagamento chegou. O nome gravado no QR é o que a pessoa digitou ao gerar o código. Quem confirma o titular é o app do banco, antes do pagamento. Quem prova o recebimento é o extrato da conta, e não um comprovante enviado por mensagem.</p>
+
+    <h3>Três coisas que o pix2qr nunca pede</h3>
+    <ul class="never-list">
+      <li>
+        <svg aria-hidden="true" focusable="false"
+  class="lucide lucide-x"
+  xmlns="http://www.w3.org/2000/svg"
+  width="20"
+  height="20"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M18 6 6 18" />
+  <path d="m6 6 12 12" />
+</svg>
+        <p><strong>Senha, código de verificação ou token do banco.</strong> O site só usa a chave PIX, o nome, a cidade, o valor e a imagem que você escolhe ler.</p>
+      </li>
+      <li>
+        <svg aria-hidden="true" focusable="false"
+  class="lucide lucide-x"
+  xmlns="http://www.w3.org/2000/svg"
+  width="20"
+  height="20"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M18 6 6 18" />
+  <path d="m6 6 12 12" />
+</svg>
+        <p><strong>Cadastro ou login.</strong> Não existe conta no pix2qr. Nenhuma etapa pede <span class="nowrap">e-mail</span>, telefone ou senha para liberar o uso.</p>
+      </li>
+      <li>
+        <svg aria-hidden="true" focusable="false"
+  class="lucide lucide-x"
+  xmlns="http://www.w3.org/2000/svg"
+  width="20"
+  height="20"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M18 6 6 18" />
+  <path d="m6 6 12 12" />
+</svg>
+        <p><strong>Pagamento para usar.</strong> Gerar, ler, baixar e imprimir são gratuitos. A doação que aparece depois do QR é opcional e não libera nada.</p>
+      </li>
+    </ul>
+
+    <aside class="safety-notice" role="note">
+      <strong>Falso suporte:</strong> o pix2qr não tem atendimento por telefone, WhatsApp, <span class="nowrap">e-mail</span> ou rede social e nunca entra em contato com quem usa o site. Quem pedir senha, código ou dinheiro em nome do pix2qr não fala pelo projeto: trate como golpe.
+    </aside>
+    <p class="limits-channel">Canal oficial do projeto: <a href="https://github.com/ZaMpAdAKiNg/pix2qr" rel="noopener">repositório público no GitHub</a></p>
+  </section>
 
   <section class="card faq" aria-labelledby="faq-title">
     <h2 class="faq-title" id="faq-title">Perguntas frequentes</h2>
@@ -624,6 +717,7 @@
 <footer>
     <span class="footer-meta">Conteúdo PIX processado localmente no navegador</span>
     <span class="footer-meta"><a href="/qr-code-pix-para-imprimir">QR Code PIX para imprimir</a> — placa em A4, A5 ou balcão</span>
+    <span class="footer-meta"><a href="/#nao-faz">O que o pix2qr não faz</a> — o limite da ferramenta e o que ela nunca pede</span>
     <span class="footer-meta">Mantido por <a href="https://github.com/ZaMpAdAKiNg" rel="noopener">ZaMpA</a></span>
     <span class="footer-meta"><a href="https://github.com/ZaMpAdAKiNg/pix2qr" rel="noopener">Código-fonte no GitHub</a> · <a href="/privacidade">Privacidade</a> · <a href="/licencas">Licenças de terceiros</a></span>
   </footer>

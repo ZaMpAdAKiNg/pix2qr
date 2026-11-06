@@ -105,53 +105,70 @@
     <div class="field">
       <label for="chave-input">Chave PIX</label>
       <input id="chave-input" type="text" autocomplete="off" spellcheck="false"
-             placeholder="CPF, CNPJ, e-mail, telefone ou chave aleatória" />
-      <p class="hint">Use uma chave já cadastrada no seu banco. A validação segue o
-      padrão BR Code do Banco Central.</p>
+             placeholder="CPF, CNPJ, e-mail, telefone ou chave aleatória"
+             aria-describedby="chave-hint" />
+      <p class="hint" id="chave-hint">É a chave que indica a conta que recebe o pagamento.
+      Use uma já cadastrada no seu banco. A validação segue o padrão BR Code do
+      Banco Central.</p>
     </div>
 
     <div class="field">
       <label for="nome-input">Nome do recebedor</label>
       <input id="nome-input" type="text" autocomplete="off" maxlength="25"
-             placeholder="Como aparece para quem paga" />
+             placeholder="Como aparece para quem paga" aria-describedby="nome-why" />
+      <p class="hint" id="nome-why">Sai impresso na placa e entra no QR, onde fica sem acentos.</p>
     </div>
 
     <div class="field">
       <label for="cidade-input">Cidade</label>
       <input id="cidade-input" type="text" autocomplete="off" maxlength="15"
-             placeholder="Cidade do recebedor" />
+             placeholder="Cidade do recebedor" aria-describedby="cidade-why" />
+      <p class="hint" id="cidade-why">O padrão do QR exige a cidade. Vazia, vira <span class="nowrap">"SAO PAULO"</span>.</p>
     </div>
 
     <div class="field">
       <label for="valor-input">Valor fixo — opcional</label>
       <input id="valor-input" type="text" inputmode="decimal" autocomplete="off"
-             placeholder="Deixe vazio para o pagador digitar" />
-      <p class="hint">Placa de balcão costuma ficar <strong>sem valor</strong>: cada
-      cliente digita o quanto vai pagar.</p>
+             placeholder="Deixe vazio para o pagador digitar" aria-describedby="valor-why" />
+      <p class="hint" id="valor-why">Com valor, a quantia sai impressa e fica fixa no QR.
+      Placa de balcão costuma ficar <strong>sem valor</strong>: cada cliente digita o
+      quanto vai pagar.</p>
     </div>
 
-    <fieldset class="presets">
+    <fieldset class="presets" aria-describedby="preset-why">
       <legend>Tamanho da placa</legend>
       <div class="preset-options">
         <label><input type="radio" name="preset" value="a4" checked /> A4 — parede ou vitrine</label>
         <label><input type="radio" name="preset" value="a5" /> A5 — balcão</label>
         <label><input type="radio" name="preset" value="balcao" /> 10×15 cm — display</label>
       </div>
+      <p class="hint" id="preset-why">O tamanho define a proporção e a resolução da imagem.</p>
     </fieldset>
 
     <p class="error" id="error-msg" role="alert" aria-live="polite"></p>
 
-    <button class="btn btn-primary" id="gerar-btn" type="button">Gerar placa PIX</button>
+    <button class="btn btn-primary" id="gerar-btn" type="button" aria-describedby="gerar-why">Gerar placa PIX</button>
+    <p class="hint" id="gerar-why">O navegador desenha a placa aqui mesmo, sem enviar a chave nem o nome.</p>
 
     <div class="preview-wrap" id="preview-wrap" hidden>
       <div id="placa-preview" aria-label="Pré-visualização da placa PIX"></div>
-      <div class="preview-actions">
-        <button class="btn btn-primary" id="print-btn" type="button">Imprimir</button>
-        <button class="btn btn-secondary" id="download-btn" type="button">Baixar PNG</button>
-      </div>
-      <p class="hint">Antes de expor a placa, <strong>escaneie o QR com o app do seu
-      banco</strong> e confira nome e chave. O QR PIX estático não vence e funciona
-      para qualquer banco.</p>
+      <ul class="preview-actions">
+        <li>
+          <button class="btn btn-primary" id="print-btn" type="button" aria-describedby="print-why">Imprimir</button>
+          <p class="hint" id="print-why">Abre a impressão do navegador só com a placa, sem o resto da página.</p>
+        </li>
+        <li>
+          <button class="btn btn-secondary" id="download-btn" type="button" aria-describedby="download-why">Baixar PNG</button>
+          <p class="hint" id="download-why">Salva a imagem neste aparelho, para imprimir depois ou levar à gráfica.</p>
+        </li>
+      </ul>
+      <aside class="safety-notice" role="note" id="placa-test">
+        <strong>Antes de imprimir ou expor a placa:</strong> teste com um valor baixo.
+        De outra conta, pague este QR. Confira o nome que o banco mostra antes de
+        confirmar. Depois, veja se o crédito aparece no extrato de quem recebe. Com
+        valor fixo, faça o teste em uma versão sem valor.
+      </aside>
+      <p class="hint">O QR PIX estático não vence e funciona para qualquer banco.</p>
     </div>
   </main>
 
@@ -165,8 +182,11 @@
       10×15 cm para display de acrílico.</li>
       <li><strong>Imprima ou baixe o PNG</strong> em alta resolução. A margem branca ao
       redor do QR (zona de silêncio) já vem correta para leitura.</li>
+      <li><strong>Teste antes de expor</strong>: de outra conta, pague um valor baixo
+      pelo QR da placa. Confira o nome que o banco mostra antes de confirmar e o
+      crédito no extrato de quem recebe.</li>
     </ol>
-    <p>Não precisa de app do banco, cadastro ou design: o mesmo motor que gera o
+    <p>Para montar a placa não é preciso app do banco, cadastro nem design: o mesmo motor que gera o
     <a href="/">QR Code PIX na página inicial</a> desenha a placa — e nada do que você
     digita sai do seu dispositivo.</p>
   </section>
@@ -220,7 +240,8 @@
     (BR Code) e a especificação EMV® QRCPS —
     <a href="/privacidade">detalhes de privacidade</a> e
     <a href="https://github.com/ZaMpAdAKiNg/pix2qr" rel="noopener external">código aberto auditável</a>.
-    Antes de expor a placa, confira o QR no app do seu banco.</p>
+    Antes de expor a placa, confira o QR no app do seu banco. Veja também
+    <a href="/#nao-faz">o que o pix2qr não faz e o que ele nunca pede</a>.</p>
   </section>
 
 </div>
@@ -230,6 +251,7 @@
 <footer>
     <span class="footer-meta">Conteúdo PIX processado localmente no navegador</span>
     <span class="footer-meta"><a href="/qr-code-pix-para-imprimir">QR Code PIX para imprimir</a> — placa em A4, A5 ou balcão</span>
+    <span class="footer-meta"><a href="/#nao-faz">O que o pix2qr não faz</a> — o limite da ferramenta e o que ela nunca pede</span>
     <span class="footer-meta">Mantido por <a href="https://github.com/ZaMpAdAKiNg" rel="noopener">ZaMpA</a></span>
     <span class="footer-meta"><a href="https://github.com/ZaMpAdAKiNg/pix2qr" rel="noopener">Código-fonte no GitHub</a> · <a href="/privacidade">Privacidade</a> · <a href="/licencas">Licenças de terceiros</a></span>
   </footer>

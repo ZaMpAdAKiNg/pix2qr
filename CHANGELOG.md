@@ -9,6 +9,8 @@ entradas são agrupadas por data.
 
 ## [Não lançado]
 
+- [PIX-17] Cada botão e campo que pede uma ação ganhou uma frase de motivo ligada por `aria-describedby`, na home e na placa: chave, nome, cidade, valor, escanear, gerar, copiar, baixar, imprimir, instalar e doação. A home ganhou a seção "O que o pix2qr não faz" (`#nao-faz`), com um limite real, três coisas que o site nunca pede e o aviso de falso suporte; o rodapé das quatro páginas aponta para ela. O resultado e a placa sugerem um teste com valor baixo, de outra conta, antes de imprimir ou divulgar; a sugestão some em cobrança dinâmica e em Pix Automático. O erro de chave passa a somar `#error-msg` ao `aria-describedby` do campo em vez de substituí-lo. A varredura de urgência, prova social e comparação sem fonte nas páginas publicadas não achou ocorrência e virou teste (`test/persuasao-honesta.test.js`).
+
 - [PIX-15] Ícones do app instalado (manifest 192/512 `any` e maskable, `icon-1024`) regenerados com o símbolo S da Salaria por `scripts/render-icons.mjs`; maskable opaco com o S a 0,85 dentro do círculo seguro, e `apple-touch-icon` das quatro páginas apontando para o maskable opaco. `og:image`/`twitter:image` (`icon-512.png`) também passam a mostrar o S.
 
 - [PIX-14] Favicon das quatro páginas trocado pelo símbolo S da Salaria: `icons/favicon.svg` (cópia byte a byte do favicon oficial) declarado antes do PNG 32×32 regenerado do mesmo SVG, e precacheado no `sw.js`. Ícones do app instalado (manifest, apple-touch-icon) inalterados.

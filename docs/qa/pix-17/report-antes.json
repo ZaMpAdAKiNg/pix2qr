@@ -1,0 +1,72 @@
+[
+  {
+    "shot": "home-vazia-375-antes.png",
+    "scrollWidth": 375,
+    "clientWidth": 375,
+    "horizontalScroll": false
+  },
+  {
+    "shot": "home-resultado-375-antes.png",
+    "scrollWidth": 375,
+    "clientWidth": 375,
+    "horizontalScroll": false
+  },
+  {
+    "shot": "qr-code-pix-para-imprimir-375-antes.png",
+    "scrollWidth": 375,
+    "clientWidth": 375,
+    "horizontalScroll": false
+  },
+  {
+    "shot": "privacidade-375-antes.png",
+    "scrollWidth": 375,
+    "clientWidth": 375,
+    "horizontalScroll": false
+  },
+  {
+    "shot": "licencas-375-antes.png",
+    "scrollWidth": 375,
+    "clientWidth": 375,
+    "horizontalScroll": false
+  },
+  {
+    "viewport": "375",
+    "consoleErrors": [],
+    "pageErrors": []
+  },
+  {
+    "shot": "home-vazia-1280-antes.png",
+    "scrollWidth": 1280,
+    "clientWidth": 1280,
+    "horizontalScroll": false
+  },
+  {
+    "shot": "home-resultado-1280-antes.png",
+    "scrollWidth": 1280,
+    "clientWidth": 1280,
+    "horizontalScroll": false
+  },
+  {
+    "shot": "qr-code-pix-para-imprimir-1280-antes.png",
+    "scrollWidth": 1280,
+    "clientWidth": 1280,
+    "horizontalScroll": false
+  },
+  {
+    "shot": "privacidade-1280-antes.png",
+    "scrollWidth": 1280,
+    "clientWidth": 1280,
+    "horizontalScroll": false
+  },
+  {
+    "shot": "licencas-1280-antes.png",
+    "scrollWidth": 1280,
+    "clientWidth": 1280,
+    "horizontalScroll": false
+  },
+  {
+    "viewport": "1280",
+    "consoleErrors": [],
+    "pageErrors": []
+  }
+]

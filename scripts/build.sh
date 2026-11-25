@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Build hook invocado pela Vercel (ou localmente). Gera dist/ sem alterar fontes.
+# Build hook invocado pela Vercel, pelo Workers Builds da Cloudflare ou
+# localmente. Gera dist/ sem alterar fontes.
 # Injeta o SHA do commit no CACHE_NAME do service worker pra invalidar
 # automaticamente o cache de todos os clientes a cada deploy.
 set -euo pipefail
@@ -7,10 +8,13 @@ cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 # Fonte da versão, em ordem de preferência:
 #   1. $VERCEL_GIT_COMMIT_SHA  (disponível em builds da Vercel)
-#   2. git rev-parse --short HEAD  (dev local com git)
-#   3. timestamp UNIX  (fallback)
-if [[ -n "${VERCEL_GIT_COMMIT_SHA:-}" ]]; then
-  VERSION="${VERCEL_GIT_COMMIT_SHA:0:7}"
+#   2. $WORKERS_CI_COMMIT_SHA  (disponível no Workers Builds da Cloudflare)
+#   3. git rev-parse --short HEAD  (dev local com git)
+#   4. timestamp UNIX  (fallback)
+# scripts/check-artifact.mjs recomputa a versão com esta mesma ordem.
+CI_COMMIT_SHA="${VERCEL_GIT_COMMIT_SHA:-${WORKERS_CI_COMMIT_SHA:-}}"
+if [[ -n "${CI_COMMIT_SHA}" ]]; then
+  VERSION="${CI_COMMIT_SHA:0:7}"
 elif command -v git >/dev/null 2>&1 && git rev-parse --short HEAD >/dev/null 2>&1; then
   VERSION="$(git rev-parse --short HEAD)"
 else
@@ -29,6 +33,7 @@ ROOT_FILES=(
   app.js placa.js pix-core.js analytics-privacy.js image-metadata.js
   qrcode.min.js jsQR.min.js umami.js
   manifest.webmanifest robots.txt sitemap.xml llms.txt sw.js
+  _headers _redirects
 )
 ICON_FILES=(
   icons/favicon.svg icons/favicon-32.png icons/icon-1024.png icons/icon-192-maskable.png
@@ -55,6 +60,9 @@ cp "${ROOT_FILES[@]}" dist/
 cp "${ICON_FILES[@]}" dist/icons/
 cp "${FONT_FILES[@]}" dist/fonts/
 cp "${LICENSE_FILES[@]}" dist/licenses/
+# _headers e _redirects são a configuração HTTP da Cloudflare: o Workers os lê
+# do dist/ e não os serve como arquivo. Na Vercel, até o corte do DNS, eles
+# respondem como texto puro (o mesmo conteúdo que já é público no GitHub).
 
 # Injeta a versão somente no artefato. O checkout fonte permanece intocado.
 sed -i.bak -E 's|^(const CACHE_NAME = ")[^"]*(";.*)$|\1'"${CACHE_NAME}"'\2|' dist/sw.js

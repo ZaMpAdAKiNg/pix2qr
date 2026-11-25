@@ -43,12 +43,14 @@ test('[hidden] override — .btn não fica visível quando [hidden] (F301 regres
 test('runtime usa somente Umami e mantém os filtros de privacidade', () => {
   const html = readFileSync(indexHtmlPath, 'utf8');
   const vercel = readFileSync(require.resolve('../vercel.json'), 'utf8');
+  const cloudflare = readFileSync(require.resolve('../_headers'), 'utf8');
   assert.match(html, /data-exclude-search="true"/);
   assert.match(html, /data-exclude-hash="true"/);
   assert.match(html, /data-do-not-track="true"/);
   assert.match(html, /data-before-send="pix2qrBeforeSend"/);
   assert.doesNotMatch(html, /_vercel\/insights|vitals\.vercel-insights\.com/i);
   assert.doesNotMatch(vercel, /vitals\.vercel-insights\.com/i);
+  assert.doesNotMatch(cloudflare, /vitals\.vercel-insights\.com|cloudflareinsights\.com/i);
   assert.match(html, /"codeRepository": "https:\/\/github\.com\/ZaMpAdAKiNg\/pix2qr"/);
   assert.match(html, />Código-fonte no GitHub<\/a>/);
   // O rodapé aponta para as páginas HTML, nunca de volta para o markdown cru.
@@ -78,4 +80,22 @@ test('stage não conta no Umami nem é indexado; produção segue intacta', () =
   assert.equal(robots.length, 1);
   assert.deepEqual(robots[0].has, [{ type: 'host', value: 'stage.pix2qr.xyz' }]);
   assert.deepEqual(robots[0].headers, [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }]);
+
+  // Na Cloudflare: o mesmo noindex no stage e no endereço *.workers.dev do
+  // Worker; a regra global (/*) não leva X-Robots-Tag, senão a produção sumiria
+  // do Google no dia do corte.
+  const { parseHeadersFile } = require('../scripts/hosting-config.js');
+  const rules = parseHeadersFile(readFileSync(require.resolve('../_headers'), 'utf8'));
+  const cfRobots = rules.filter((rule) =>
+    rule.headers.some((h) => h.key.toLowerCase() === 'x-robots-tag'));
+  assert.deepEqual(cfRobots.map((rule) => rule.pattern), [
+    'https://stage.pix2qr.xyz/*',
+    'https://:version.:subdomain.workers.dev/*',
+  ]);
+  for (const rule of cfRobots) {
+    assert.deepEqual(rule.headers, [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }], rule.pattern);
+  }
+  for (const rule of rules.filter((r) => !/^https:\/\//.test(r.pattern))) {
+    assert.ok(!rule.headers.some((h) => h.key.toLowerCase() === 'x-robots-tag'), rule.pattern);
+  }
 });

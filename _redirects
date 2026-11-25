@@ -1,0 +1,8 @@
+# Redirects do pix2qr na Cloudflare: os mesmos do "redirects" do vercel.json,
+# com o mesmo status 308. O www → apex não cabe aqui (a Cloudflare não aceita
+# redirect por domínio neste arquivo) e vira uma regra de redirect da zona no
+# corte do DNS. As URLs limpas (/privacidade → privacidade.html) não precisam de
+# regra: o html_handling padrão do Workers já as resolve.
+/PRIVACY.md /privacidade 308
+/THIRD_PARTY.md /licencas 308
+/SECURITY.md https://github.com/ZaMpAdAKiNg/pix2qr/blob/main/SECURITY.md 308

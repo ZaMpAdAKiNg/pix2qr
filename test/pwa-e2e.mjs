@@ -157,9 +157,10 @@ async function createSyntheticServer() {
         send(response, 400, 'text/plain; charset=utf-8', 'Bad Request\n');
         return;
       }
-      // Espelha os rewrites declarados em vercel.json: /privacidade serve
-      // privacidade.html. NÃO é default da plataforma — cleanUrls tem default
-      // `false` na Vercel; a resolução só existe porque o rewrite a declara.
+      // Espelha os rewrites declarados em vercel.json e o html_handling do
+      // wrangler.jsonc: /privacidade serve privacidade.html. Na Vercel NÃO é
+      // default da plataforma — cleanUrls tem default `false`; a resolução só
+      // existe porque o rewrite a declara.
       const candidates = path.extname(resolved) ? [resolved] : [resolved, `${resolved}.html`];
       let served;
       for (const candidate of candidates) {

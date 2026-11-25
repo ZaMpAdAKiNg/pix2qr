@@ -10,15 +10,20 @@
 //           contra o código a cada CI, nunca mantida de memória.
 //   --post  DEPOIS do build, contra os arquivos minificados:
 //           (a) JSON-LD byte-idêntico — o sha256 dele está fixado na CSP
-//               (vercel.json + meta do index.html); alterá-lo mata o site;
+//               (vercel.json, _headers da Cloudflare e meta do index.html);
+//               alterá-lo mata o site;
 //           (b) CACHE_NAME do deploy presente no sw.js E o pattern que o
 //               sed do build.sh consome ausente — pega tanto "não injetou"
 //               quanto "minificou ANTES do sed" (cache PWA nunca invalida);
 //           (c) todos os globals do pix-core.js sobrevivem no artefato
-//               (--minify-identifiers os destruiria; app.js quebra em runtime).
+//               (--minify-identifiers os destruiria; app.js quebra em runtime);
+//           (f) os cabeçalhos globais do _headers publicado (Cloudflare) são os
+//               mesmos do vercel.json, valor por valor, enquanto os dois
+//               existirem — a produção não muda de política ao trocar de casa.
 import { readFileSync, readdirSync, lstatSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
+import hosting from './hosting-config.js';
 
 const mode = process.argv[2];
 const fail = (msg) => { console.error(`GATE FAIL: ${msg}`); process.exit(1); };
@@ -57,12 +62,22 @@ const html = readFileSync(dist('index.html'), 'utf8');
 const ldBlocks = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
   .map((m) => m[1]);
 if (ldBlocks.length === 0) fail('nenhum bloco JSON-LD no index.html pós-build — o minify o destruiu');
-const vercelCsp = readFileSync('vercel.json', 'utf8');
+const vercel = JSON.parse(readFileSync('vercel.json', 'utf8'));
+const vercelHeaders = hosting.vercelGlobalHeaders(vercel);
+const cloudflareHeaders = hosting.cloudflareGlobalHeaders(hosting.parseHeadersFile(readFileSync(dist('_headers'), 'utf8')));
+const cspOf = (headers, origin) => {
+  const found = headers.filter((h) => h.key.toLowerCase() === 'content-security-policy');
+  if (found.length !== 1) fail(`${origin} precisa de exatamente uma Content-Security-Policy global (achei ${found.length})`);
+  return found[0].value;
+};
+const vercelCsp = cspOf(vercelHeaders, 'vercel.json');
+const cloudflareCsp = cspOf(cloudflareHeaders, 'dist/_headers');
 const metaCsp = html.match(/<meta http-equiv="Content-Security-Policy" content="([^"]*)"/)?.[1];
 if (!metaCsp) fail('meta CSP sumiu do index.html pós-build');
 for (const block of ldBlocks) {
   const hash = `sha256-${createHash('sha256').update(block).digest('base64')}`;
   if (!vercelCsp.includes(hash)) fail(`hash do JSON-LD pós-build (${hash}) ≠ hash fixado na CSP do vercel.json — site inteiro morto por CSP no deploy`);
+  if (!cloudflareCsp.includes(hash)) fail(`hash do JSON-LD pós-build (${hash}) ≠ hash fixado na CSP do _headers — site inteiro morto por CSP no deploy da Cloudflare`);
   if (!metaCsp.includes(hash)) fail(`hash do JSON-LD pós-build (${hash}) não está na meta CSP do index.html`);
 }
 ok(`JSON-LD byte-idêntico (${ldBlocks.length} bloco(s), hash CSP preservado)`);
@@ -70,8 +85,9 @@ ok(`JSON-LD byte-idêntico (${ldBlocks.length} bloco(s), hash CSP preservado)`);
 // ---- (b) CACHE_NAME injetado, e injetado ANTES do minify ----
 // A versão é recomputada com a MESMA regra do build.sh; divergência entre os
 // dois tornaria o gate mentiroso — mudou lá, mude aqui.
-const version = process.env.VERCEL_GIT_COMMIT_SHA
-  ? process.env.VERCEL_GIT_COMMIT_SHA.slice(0, 7)
+const ciCommitSha = process.env.VERCEL_GIT_COMMIT_SHA || process.env.WORKERS_CI_COMMIT_SHA;
+const version = ciCommitSha
+  ? ciCommitSha.slice(0, 7)
   : execFileSync('git', ['rev-parse', '--short', 'HEAD'], { encoding: 'utf8' }).trim();
 const sw = readFileSync(dist('sw.js'), 'utf8');
 const cacheName = `pix2qr-pwa-${version}`;
@@ -100,6 +116,7 @@ const publicRoot = [
   'app.js', 'placa.js', 'pix-core.js', 'analytics-privacy.js', 'image-metadata.js',
   'qrcode.min.js', 'jsQR.min.js',
   'umami.js', 'manifest.webmanifest', 'robots.txt', 'sitemap.xml', 'llms.txt', 'sw.js',
+  '_headers', '_redirects',
 ];
 const expectedFiles = [
   ...publicRoot,
@@ -137,5 +154,20 @@ const shellMissing = shellPaths
   .filter((relative) => !actualFiles.includes(relative));
 if (shellMissing.length) fail(`APP_SHELL precacheia caminhos que não existem no artefato: ${shellMissing.join(', ')} — install do SW falharia e o offline morreria para todos`);
 ok(`APP_SHELL cruzado com o artefato (${shellPaths.length} caminhos, todos presentes no dist)`);
+
+// ---- (f) paridade dos cabeçalhos globais: Vercel × Cloudflare ----
+// Mesmos nomes, mesmos valores byte a byte e nenhum a mais de um lado. Um
+// cabeçalho esquecido num dos dois só apareceria em produção depois do corte.
+const asMap = (headers) => new Map(headers.map((h) => [h.key.toLowerCase(), h.value]));
+const vercelMap = asMap(vercelHeaders);
+const cloudflareMap = asMap(cloudflareHeaders);
+for (const [key, value] of vercelMap) {
+  if (!cloudflareMap.has(key)) fail(`_headers não tem o cabeçalho global "${key}" que o vercel.json manda`);
+  if (cloudflareMap.get(key) !== value) fail(`cabeçalho "${key}" diverge: vercel.json "${value}" × _headers "${cloudflareMap.get(key)}"`);
+}
+for (const key of cloudflareMap.keys()) {
+  if (!vercelMap.has(key)) fail(`_headers manda o cabeçalho global "${key}" que o vercel.json não tem`);
+}
+ok(`cabeçalhos globais idênticos no vercel.json e no _headers (${vercelMap.size})`);
 
 console.log('[check-artifact] todos os gates passaram');

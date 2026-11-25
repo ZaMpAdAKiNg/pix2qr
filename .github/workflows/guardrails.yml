@@ -65,10 +65,12 @@ jobs:
         run: node --test test/*.test.js
 
       # Disciplina de CHANGELOG: toda mudança de COMPORTAMENTO (código, HTML, SW,
-      # manifest, vercel.json) precisa de uma entrada no CHANGELOG.md. Só roda em
-      # PR (no push direto pra main não há base pra comparar). Escape pra exceções
-      # genuínas: "[skip changelog]" no título do PR. github.* entra via env: com
-      # aspas (BASE/PR_TITLE) — nunca interpolado no script, sem risco de injection.
+      # manifest, vercel.json e os arquivos de hospedagem da Cloudflare:
+      # _headers, _redirects, wrangler.jsonc) precisa de uma entrada no
+      # CHANGELOG.md. Só roda em PR (no push direto pra main não há base pra
+      # comparar). Escape pra exceções genuínas: "[skip changelog]" no título do
+      # PR. github.* entra via env: com aspas (BASE/PR_TITLE) — nunca
+      # interpolado no script, sem risco de injection.
       - name: Require CHANGELOG entry for behavioral changes
         if: github.event_name == 'pull_request'
         env:
@@ -83,7 +85,7 @@ jobs:
           git cat-file -e "${BASE_SHA}^{commit}"
           CHANGED="$(git diff --name-only "${BASE_SHA}...HEAD")"
           printf 'Arquivos no PR:\n%s\n---\n' "$CHANGED"
-          SRC='^(app\.js|pix-core\.js|index\.html|sw\.js|manifest\.webmanifest|vercel\.json)$'
+          SRC='^(app\.js|pix-core\.js|index\.html|sw\.js|manifest\.webmanifest|vercel\.json|_headers|_redirects|wrangler\.jsonc)$'
           if printf '%s\n' "$CHANGED" | grep -qE "$SRC"; then
             if printf '%s\n' "$CHANGED" | grep -qxF 'CHANGELOG.md'; then
               echo "OK: mudança de comportamento acompanhada de entrada no CHANGELOG."

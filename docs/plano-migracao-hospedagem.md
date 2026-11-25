@@ -1,7 +1,8 @@
 # Plano de migração da hospedagem do pix2qr
 
 Card PIX-19 · levantamento de 25/11/2026 · só leitura: nada foi criado nem alterado na
-Vercel, na Cloudflare, no DNS ou no domínio.
+Vercel, na Cloudflare, no DNS ou no domínio. Card PIX-20 · 25/11/2026: decisões do dono
+registradas (seção 5) e comparação Workers × Pages (seção 2.1).
 
 ## Resposta curta
 
@@ -11,11 +12,12 @@ Vercel, na Cloudflare, no DNS ou no domínio.
   Vercel) só vale se o dono preferir não mudar de plataforma.
 - **Recomendação: Workers com assets estáticos**, que a Cloudflare indica hoje para
   projeto novo no lugar do Pages ([Pages](https://developers.cloudflare.com/pages/):
-  «Start new projects with Workers.»). O Pages também serviria.
+  «Start new projects with Workers.»). O Pages também serviria; o dono aprovou o Workers
+  em 25/11/2026 (seção 5).
 - **Dois cuidados mandam na ordem do corte.** O domínio está na lista de *preload* de
   HSTS dos navegadores (C12): qualquer minuto sem certificado válido derruba o site para
-  todo mundo, sem volta para HTTP. E o domínio foi registrado pela Vercel (C6), então
-  sair 100% inclui transferir o registro, que vence em 23/02/2027.
+  todo mundo, sem volta para HTTP. E o domínio foi registrado pela Vercel (C6): o registro
+  fica lá por enquanto (decisão 5), só os nameservers mudam; ele vence em 23/02/2027.
 - **Alvo de tempo fora do ar: zero.** O DNS muda primeiro, ainda apontando para a
   Vercel; o site só troca de casa depois que o certificado da Cloudflare estiver ativo,
   e a volta é um clique enquanto a Vercel continuar no ar.
@@ -120,27 +122,52 @@ Uma migração precisa trocar a «fonte canônica» destes pontos:
 
 ## 2. Viabilidade no Cloudflare
 
-### 2.1 Pages ou Workers
+### 2.1 Workers × Pages para o pix2qr
 
-A Cloudflare recomenda **Workers** para projeto novo: a página do Pages diz «Start new projects
-with Workers.» e chama o Workers de «Cloudflare's primary platform for building applications»
-([Pages](https://developers.cloudflare.com/pages/),
-[migração Pages → Workers](https://developers.cloudflare.com/workers/static-assets/migration-guides/migrate-from-pages/)).
-Para o pix2qr, o Workers também tem três vantagens concretas:
+**A diferença em palavras simples.** Os dois são produtos da Cloudflare que entregam os arquivos
+do site pela mesma rede. O **Pages** foi feito só para sites. O **Workers** é a plataforma
+principal da Cloudflare, que também roda código e hoje serve arquivos estáticos («static assets»)
+sem código nenhum. Para um site estático como o pix2qr, o visitante não vê diferença. A diferença
+está no que acontece numa página que não existe, em como se monta o stage e no rumo que a
+Cloudflare dá a cada produto.
 
-1. **404 de verdade por padrão.** No Pages, sem `404.html`, uma rota inexistente recebe a home
-   («Pages' default single-page application behavior serves the root»,
-   [Serving Pages](https://developers.cloudflare.com/pages/configuration/serving-pages/)), o que
-   viraria soft 404 para o Google. No Workers, sem script, a resposta é `404 Not Found`
-   ([Static Assets](https://developers.cloudflare.com/workers/static-assets/)).
-2. **Requisição de asset estático é grátis e sem limite** («Requests to static assets are free and
-   unlimited», [preços do Workers](https://developers.cloudflare.com/workers/platform/pricing/)).
-3. **Stage como ambiente separado** no mesmo arquivo de configuração
-   ([Wrangler environments](https://developers.cloudflare.com/workers/wrangler/environments/)).
+| Critério (uso atual) | Workers com assets estáticos | Pages | Fonte |
+|---|---|---|---|
+| Site estático | ✅ serve o `dist/` sem script | ✅ | [compatibilidade Pages → Workers](https://developers.cloudflare.com/workers/static-assets/migration-guides/migrate-from-pages/) |
+| PWA (`sw.js`, manifest, cache) | ✅ arquivos comuns, com os cabeçalhos do `_headers` | ✅ igual | [Headers](https://developers.cloudflare.com/workers/static-assets/headers/) |
+| 404 de verdade | ✅ sem script, rota inexistente recebe `404 Not Found` | ⚠️ sem `404.html`, «Pages assumes that you are deploying a single-page application» e serve a home com 200 (soft 404 para o Google). Resolve com um `404.html` | [Static Assets](https://developers.cloudflare.com/workers/static-assets/), [Serving Pages](https://developers.cloudflare.com/pages/configuration/serving-pages/) |
+| Cabeçalhos e redirects | ✅ «`_headers` and `_redirects` files are supported natively» | ✅ os mesmos arquivos | [migração](https://developers.cloudflare.com/workers/static-assets/migration-guides/migrate-from-pages/) |
+| Stage com login | ✅ Cloudflare Access na frente de `stage.pix2qr.xyz`; o stage é um segundo Worker (`env.stage`) ligado à branch `stage` | ✅ o mesmo Access; o stage é um alias da branch `stage` («you can point any hostname at a branch», [migração](https://developers.cloudflare.com/workers/static-assets/migration-guides/migrate-from-pages/)) | [Access self-hosted](https://developers.cloudflare.com/cloudflare-one/applications/configure-apps/self-hosted-public-app/), [Environments](https://developers.cloudflare.com/workers/wrangler/environments/), [branch aliases](https://developers.cloudflare.com/pages/how-to/custom-branch-aliases/) |
+| Preview por PR | ✅ «Preview builds run for branches that are not your production branch»; públicos por padrão, protegíveis com Access | ✅ preview por branch; «By default, these deployment URLs are public», protegíveis com «Enable access policy» | [Builds](https://developers.cloudflare.com/workers/ci-cd/builds/), [Previews](https://developers.cloudflare.com/workers/previews/), [Pages previews](https://developers.cloudflare.com/pages/configuration/preview-deployments/) |
+| Deploy pelo GitHub | ✅ Workers Builds; o link do preview pode ir como comentário no PR | ✅ integração Git com link e status no PR; «If you deploy using the Git integration, you cannot switch to Direct Upload later» | [Builds](https://developers.cloudflare.com/workers/ci-cd/builds/), [Pages Git](https://developers.cloudflare.com/pages/configuration/git-integration/) |
+| Domínio | exige os nameservers na Cloudflare | apex também exige; subdomínio aceita CNAME externo | [migração](https://developers.cloudflare.com/workers/static-assets/migration-guides/migrate-from-pages/), [Pages custom domains](https://developers.cloudflare.com/pages/configuration/custom-domains/) |
+| Custo | US$ 0; «Requests to static assets are free and unlimited»; 3.000 min de build/mês | US$ 0; 500 builds/mês | [preços Workers](https://developers.cloudflare.com/workers/platform/pricing/), [limites do Builds](https://developers.cloudflare.com/workers/ci-cd/builds/limits-and-pricing/), [limites do Pages](https://developers.cloudflare.com/pages/platform/limits/) |
+| O que a Cloudflare recomenda | «Start new projects with Workers.» e «Workers supports most Pages use cases and offers a broader feature set» | — | [Pages](https://developers.cloudflare.com/pages/) |
+| Futuro do Pages | — | a doc lida **não anuncia fim** do Pages; ela recomenda Workers para projeto novo e publica um guia de migração do Pages para o Workers | [Pages](https://developers.cloudflare.com/pages/), [migração](https://developers.cloudflare.com/workers/static-assets/migration-guides/migrate-from-pages/) |
 
-O Pages continua uma opção aceitável. Se o dono preferir o Pages, a tabela abaixo vale igual, com duas
-diferenças: ele precisa de um `404.html` e o stage é feito com alias de branch
-([custom branch aliases](https://developers.cloudflare.com/pages/how-to/custom-branch-aliases/)).
+**Prós do Workers para o pix2qr:** 404 de verdade sem arquivo extra; é o caminho que a Cloudflare
+indica para projeto novo, então o pix2qr não precisa migrar de novo depois; build e stage ficam
+num só arquivo de configuração.
+**Contras do Workers:** o stage é um segundo Worker, um pouco mais de configuração; o endereço do
+preview segue o formato fixo `<preview>.<domínio>`, sem escolher hostname por branch; só aceita
+domínio com DNS na Cloudflare (já decidido, então não pesa).
+**Prós do Pages:** stage por alias de branch, configurado no painel; proteção dos previews num
+botão («Enable access policy»).
+**Contras do Pages:** sem `404.html`, rota inexistente vira a home com 200; a Cloudflare não o
+indica para projeto novo; a ligação com o Git não pode virar envio direto depois.
+
+**O login do stage muda a recomendação? Não.** Nos dois produtos o login é o mesmo Cloudflare
+Access, que protege qualquer hostname de uma zona ativa da conta («Domains must belong to an
+active zone in your Cloudflare account»,
+[Access self-hosted](https://developers.cloudflare.com/cloudflare-one/applications/configure-apps/self-hosted-public-app/)).
+A zona `pix2qr.xyz` vai existir de qualquer jeito (decisão 2 da seção 5). O Access também
+protege os previews do Workers («You can protect all Previews on an account, one Worker's
+Previews, or specific hostnames», [Previews](https://developers.cloudflare.com/workers/previews/)).
+O limite de usuários do plano grátis do Zero Trust não aparece na
+[página de planos](https://www.cloudflare.com/plans/zero-trust-services/); conferir no painel.
+
+**Veredito: Workers com assets estáticos**, o mesmo da recomendação original, agora aprovado
+pelo dono (seção 5).
 
 ### 2.2 Como cada item se traduz (Workers com assets estáticos)
 
@@ -162,7 +189,7 @@ diferenças: ele precisa de um `404.html` e o stage é feito com alias de branch
 | 404 | padrão do Workers sem script: 404 | [Static Assets](https://developers.cloudflare.com/workers/static-assets/) |
 | domínio `pix2qr.xyz` | Custom Domain do Worker: a Cloudflare cria o DNS e o certificado. **Exige a zona na Cloudflare** | [Custom Domains](https://developers.cloudflare.com/workers/configuration/routing/custom-domains/) |
 | `stage.pix2qr.xyz` com a branch `stage` | segundo Worker (`pix2qr-stage`, via `env.stage`) ligado ao mesmo repositório, com branch de produção `stage` e Custom Domain próprio | [Environments](https://developers.cloudflare.com/workers/wrangler/environments/), [Builds avançado](https://developers.cloudflare.com/workers/ci-cd/builds/advanced-setups/) |
-| login da Vercel no stage | Cloudflare Access na frente de `stage.pix2qr.xyz` (Zero Trust tem plano grátis; o limite de usuários não está na página oficial lida), ou só o `noindex` | [Zero Trust plans](https://www.cloudflare.com/plans/zero-trust-services/) |
+| login da Vercel no stage | Cloudflare Access na frente de `stage.pix2qr.xyz`, decidido pelo dono (Zero Trust tem plano grátis; o limite de usuários não está na página oficial lida) | [Zero Trust plans](https://www.cloudflare.com/plans/zero-trust-services/) |
 | preview por PR | Workers Builds faz build de toda branch que não é a de produção e publica uma URL de preview `<nome>-pix2qr.<subdomínio>.workers.dev`; **é pública por padrão**, e o Access pode protegê-la | [Builds](https://developers.cloudflare.com/workers/ci-cd/builds/), [Previews](https://developers.cloudflare.com/workers/previews/) |
 | comentário do bot no PR | o Workers Builds publica o status no GitHub; o comentário com link igual ao da Vercel não foi confirmado na doc lida | não verificado |
 | Umami | não muda: o script é do próprio site e envia para `gateway.umami.is` | `index.html` |
@@ -205,6 +232,8 @@ plano Free. **Ainda não existe zona `pix2qr.xyz`, nem Worker ou Pages do pix2qr
 ---
 
 ## 3. Plano B: levar o projeto para outra conta Vercel
+
+> **Descartado pelo dono em 25/11/2026** (seção 5, decisão 6). Fica só como registro.
 
 Fonte desta seção: [Transferring projects](https://vercel.com/docs/projects/transferring-projects),
 salvo onde houver outro link.
@@ -259,7 +288,7 @@ until your certificate is active»
 
 ### Fase 0: decisões e preparo (sem tocar em produção)
 
-1. O dono responde às perguntas da seção 5.
+1. Decisões do dono: tomadas em 25/11/2026 (seção 5).
 2. Card de código (branch + PR, como sempre):
    - `wrangler.jsonc` com `assets.directory = "./dist"`, `html_handling` padrão, sem script, e
      `env.stage`;
@@ -307,7 +336,7 @@ Contra a URL `workers.dev`:
    Domain do Worker `pix2qr-stage` (a Cloudflare cria o registro e emite um Advanced Certificate;
    não dá para criar Custom Domain onde já existe CNAME,
    [Custom Domains](https://developers.cloudflare.com/workers/configuration/routing/custom-domains/)).
-   Se usar Access, configurar antes. Repetir os testes da fase 1 em `https://stage.pix2qr.xyz`.
+   Configurar o Cloudflare Access antes (decisão 4). Repetir os testes da fase 1 em `https://stage.pix2qr.xyz`.
 2. **Produção:** em horário de pouco uso, apagar o registro do apex e adicionar `pix2qr.xyz` como
    Custom Domain do Worker `pix2qr`. Logo depois, `www` com nuvem laranja e a Single Redirect
    `www` → apex.
@@ -320,7 +349,8 @@ Contra a URL `workers.dev`:
 
 1. Na Vercel: tirar os domínios do projeto e desligar os deploys automáticos. O projeto fica
    parado para rollback, e só é apagado depois do registro transferido.
-2. Transferir o **registro** do domínio para a Cloudflare Registrar: o `.xyz` é aceito
+2. **Adiado pelo dono (decisão 5):** o registro fica na Vercel por enquanto. Quando for
+   decidido, transferir o **registro** do domínio para a Cloudflare Registrar: o `.xyz` é aceito
    ([TLD policies](https://www.cloudflare.com/tld-policies/)), a zona já precisa estar ativa, o
    domínio tem mais de 60 dias e o preço é o de custo, sem margem. O auth code sai do menu do
    domínio na Vercel, que só o dono do time vê. A transferência soma um ano à data de vencimento
@@ -370,19 +400,26 @@ incidente por uma semana.
 
 ---
 
-## 5. Perguntas que só o dono responde
+## 5. Decisões do dono em 25/11/2026
 
-1. **Por que sair da conta atual, e com que urgência?** A resposta decide entre Cloudflare e
-   plano B, e se a fase 2 pode esperar. Há um detalhe da conta registrado no card PIX-19, fora
-   deste arquivo público.
-2. **O DNS do pix2qr.xyz pode ir para a Cloudflare?** É obrigatório para o apex, tanto no Workers
-   quanto no Pages.
-3. **Workers (recomendado) ou Pages?**
-4. **O stage precisa de login**, com o Cloudflare Access e o e-mail de quem entra, ou basta o
-   `noindex`? E os previews de PR podem ser públicos?
-5. **O registro do domínio vai para a Cloudflare Registrar** antes de 23/02/2027?
-6. **No plano B: qual conta ou time de destino, e em que plano?** No Hobby, vale considerar o
-   banner da Salaria e o pedido de doação diante da regra de uso não comercial.
+As seis perguntas do PIX-19 foram respondidas pelo dono. Os motivos de conta ficam no board,
+fora deste arquivo público.
+
+1. **Sair da conta atual da Vercel**, um projeto por vez, o pix2qr primeiro. A migração tem
+   pressa: a fase 2 não espera.
+2. **O DNS do pix2qr.xyz vai para a Cloudflare.**
+3. **Workers com assets estáticos**, o que for melhor para o uso atual (comparação e veredito na
+   seção 2.1).
+4. **O stage `stage.pix2qr.xyz` exige login** com o Cloudflare Access; só o `noindex` não basta.
+   O Access entra antes de o stage virar para a Cloudflare (fase 3).
+5. **O registro do domínio fica na Vercel por enquanto.** Só os nameservers mudam. A
+   transferência do registro para a Cloudflare Registrar (fase 4, passo 2) fica para uma decisão
+   futura, antes do vencimento em 23/02/2027.
+6. **Plano B descartado:** o destino é a Cloudflare, não outra conta Vercel. A seção 3 fica só
+   como registro.
+
+Ainda em aberto, sem bloquear o corte: se os previews de PR podem ser públicos ou ficam atrás do
+mesmo Access do stage.
 
 ---
 

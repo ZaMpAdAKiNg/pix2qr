@@ -1,0 +1,63 @@
+name: deploy-check
+
+# Aviso de deploy divergente. A Cloudflare não avisa quando um build do
+# Workers Builds falha; este workflow avisa. A cada push em main ele espera
+# até https://pix2qr.xyz/sw.js trazer o CACHE_NAME do commit
+# (pix2qr-pwa-<sha7>, injetado por scripts/build.sh). Se o site não mostrar
+# esse commit em 15 minutos, o job falha e o GitHub manda o e-mail de falha
+# de workflow ao dono do repositório.
+#
+# Só lê uma URL pública: sem segredo, sem token, sem escrita no repositório.
+# O stage (stage.pix2qr.xyz) fica de fora: ele pede login do Cloudflare Access.
+# github.sha entra no script via env:, nunca interpolado direto no run:.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Dois merges seguidos: o run do commit anterior é cancelado, porque o site
+# passa a servir o commit novo e o antigo nunca mais bateria.
+concurrency:
+  group: deploy-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  production:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Produção serve o commit do push
+        env:
+          COMMIT_SHA: ${{ github.sha }}
+          SITE_URL: https://pix2qr.xyz/sw.js
+          DEADLINE_SECONDS: '900'
+          INTERVAL_SECONDS: '30'
+        run: |
+          set -u
+          SHA7="${COMMIT_SHA:0:7}"
+          EXPECTED="pix2qr-pwa-${SHA7}"
+          echo "Esperando ${EXPECTED} em ${SITE_URL} (até ${DEADLINE_SECONDS} s)."
+          START="$(date +%s)"
+          ATTEMPT=0
+          SEEN="nenhuma resposta"
+          while :; do
+            ATTEMPT=$((ATTEMPT + 1))
+            BODY="$(curl -fsS --max-time 20 -H 'Cache-Control: no-cache' \
+              "${SITE_URL}?deploy-check=${SHA7}-${ATTEMPT}" 2>/dev/null || true)"
+            FOUND="$(printf '%s' "$BODY" | grep -oE 'pix2qr-pwa-[A-Za-z0-9]+' | head -n 1 || true)"
+            if [ -n "$FOUND" ]; then SEEN="$FOUND"; fi
+            if [ "$FOUND" = "$EXPECTED" ]; then
+              echo "OK na tentativa ${ATTEMPT}: produção serve ${FOUND}."
+              exit 0
+            fi
+            ELAPSED=$(( $(date +%s) - START ))
+            echo "Tentativa ${ATTEMPT} (${ELAPSED} s): produção serve ${SEEN}."
+            if [ "$ELAPSED" -ge "$DEADLINE_SECONDS" ]; then
+              echo "::error title=Deploy divergente::Depois de ${ELAPSED} s, ${SITE_URL} serve ${SEEN}, não ${EXPECTED}. Confira o build de produção no Workers Builds; o site continua com a versão anterior."
+              exit 1
+            fi
+            sleep "$INTERVAL_SECONDS"
+          done

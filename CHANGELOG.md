@@ -9,6 +9,8 @@ entradas são agrupadas por data.
 
 ## [Não lançado]
 
+- [PIX-32] Publicação só pelo Git, com aviso quando falha. O novo workflow `deploy-check` roda a cada push em `main` e espera até 15 min até `https://pix2qr.xyz/sw.js` trazer `pix2qr-pwa-<sha7>` do commit. Se o site não mostrar o commit, o workflow falha e o GitHub avisa por e-mail. Ele só lê uma URL pública, com `permissions: contents: read` e sem segredo. O `wrangler` 4.167.0 entra em `devDependencies` com versão exata e lockfile, e o `npx wrangler deploy` do Workers Builds usa essa versão em vez de baixar a última. O CONTRIBUTING descreve a publicação pelo Git, o stage protegido (só fast-forward de `main`) e o caminho de emergência com `wrangler deploy` e `wrangler rollback`.
+
 - [PIX-22] Configuração da Cloudflare (Workers com assets estáticos) ao lado da Vercel, sem mudar a produção: `wrangler.jsonc` sem Worker script (404 de verdade, URLs limpas pelo `html_handling`), `_headers` com os mesmos seis cabeçalhos do `vercel.json` e `X-Robots-Tag: noindex, nofollow` no stage e em `*.workers.dev`, e `_redirects` com os três redirects 308 dos `.md`. Build e gate aceitam `WORKERS_CI_COMMIT_SHA` ao lado de `VERCEL_GIT_COMMIT_SHA`; o gate `--post` e `test/hosting-config.test.js` provam a paridade Vercel × Cloudflare. Até o corte do DNS, a Vercel também serve `/_headers` e `/_redirects` como texto (conteúdo já público no repositório).
 
 - [PIX-15] Ícones do app instalado (manifest 192/512 `any` e maskable, `icon-1024`) regenerados com o símbolo S da Salaria por `scripts/render-icons.mjs`; maskable opaco com o S a 0,85 dentro do círculo seguro, e `apple-touch-icon` das quatro páginas apontando para o maskable opaco. `og:image`/`twitter:image` (`icon-512.png`) também passam a mostrar o S.

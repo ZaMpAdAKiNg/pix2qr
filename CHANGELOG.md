@@ -9,6 +9,8 @@ entradas são agrupadas por data.
 
 ## [Não lançado]
 
+- [PIX-22] Configuração da Cloudflare (Workers com assets estáticos) ao lado da Vercel, sem mudar a produção: `wrangler.jsonc` sem Worker script (404 de verdade, URLs limpas pelo `html_handling`), `_headers` com os mesmos seis cabeçalhos do `vercel.json` e `X-Robots-Tag: noindex, nofollow` no stage e em `*.workers.dev`, e `_redirects` com os três redirects 308 dos `.md`. Build e gate aceitam `WORKERS_CI_COMMIT_SHA` ao lado de `VERCEL_GIT_COMMIT_SHA`; o gate `--post` e `test/hosting-config.test.js` provam a paridade Vercel × Cloudflare. Até o corte do DNS, a Vercel também serve `/_headers` e `/_redirects` como texto (conteúdo já público no repositório).
+
 - [PIX-15] Ícones do app instalado (manifest 192/512 `any` e maskable, `icon-1024`) regenerados com o símbolo S da Salaria por `scripts/render-icons.mjs`; maskable opaco com o S a 0,85 dentro do círculo seguro, e `apple-touch-icon` das quatro páginas apontando para o maskable opaco. `og:image`/`twitter:image` (`icon-512.png`) também passam a mostrar o S.
 
 - [PIX-14] Favicon das quatro páginas trocado pelo símbolo S da Salaria: `icons/favicon.svg` (cópia byte a byte do favicon oficial) declarado antes do PNG 32×32 regenerado do mesmo SVG, e precacheado no `sw.js`. Ícones do app instalado (manifest, apple-touch-icon) inalterados.

@@ -34,6 +34,17 @@ O build público fica em `dist/`. Ele deve conter apenas a allowlist verificada
 pelo gate de artefato; testes, workflows e tooling não são publicados.
 Os quatro E2E usam um Chrome local e exercitam o mesmo artefato minificado.
 
+## Hospedagem
+
+A produção ainda é servida pela Vercel (`vercel.json`). A Cloudflare já tem a
+configuração equivalente para Workers com assets estáticos: `wrangler.jsonc`,
+`_headers` e `_redirects`. Enquanto os dois lados existirem, cabeçalhos e
+redirects mudam nos dois arquivos juntos; `test/hosting-config.test.js` e o
+gate `--post` falham se divergirem. Para publicar no endereço `*.workers.dev`,
+depois dos gates: `npx wrangler deploy --env=""`. O ambiente `stage` só é
+publicado quando o domínio `stage.pix2qr.xyz` e o login do Cloudflare Access
+estiverem prontos. Nenhum id de conta entra no repositório.
+
 ## Pull request
 
 - Atualize `CHANGELOG.md` quando o comportamento mudar.

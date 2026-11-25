@@ -30,6 +30,25 @@ test('vercel.json declara um rewrite para toda URL limpa publicada', () => {
   }
 });
 
+// Na Cloudflare a mesma URL limpa não precisa de regra: o html_handling
+// "auto-trailing-slash" do Workers serve privacidade.html em /privacidade. O
+// que quebraria em silêncio é trocar esse modo, ligar um Worker script (que
+// passaria a responder antes dos assets) ou mandar a página para fora do dist.
+test('wrangler.jsonc resolve toda URL limpa publicada pelo html_handling', () => {
+  const { parseJsonc } = require('../scripts/hosting-config.js');
+  const wrangler = parseJsonc(read('wrangler.jsonc'));
+  assert.equal(wrangler.main, undefined, 'Worker script responderia antes dos assets');
+  assert.equal(wrangler.assets.directory, './dist');
+  assert.equal(wrangler.assets.html_handling, 'auto-trailing-slash');
+  assert.equal(wrangler.assets.not_found_handling, 'none', 'rota inexistente precisa dar 404, nunca a home');
+  const build = read('scripts/build.sh');
+  for (const page of PAGES) {
+    const cleanUrl = new URL(page.canonical).pathname;
+    assert.equal(`${cleanUrl}.html`, `/${page.file}`, cleanUrl);
+    assert.match(build, new RegExp(`\\b${page.file.replace('.', '\\.')}\\b`), page.file);
+  }
+});
+
 test('páginas auxiliares têm shell, lang e identidade de SEO próprios', () => {
   for (const page of PAGES) {
     const html = read(page.file);

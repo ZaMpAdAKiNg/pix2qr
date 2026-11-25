@@ -75,11 +75,11 @@ export function createStaticRequestHandler(rootDirectory) {
         assetStat = await stat(assetPath);
       }
     } catch {
-      // Espelha os rewrites declarados em vercel.json: /privacidade serve
-      // privacidade.html. NÃO é default da plataforma — cleanUrls tem default
-      // `false` na Vercel. Sem isto o E2E não consegue exercer as URLs que o
-      // site publica de verdade (rodapé, canonical e sitemap apontam todos
-      // para a forma sem extensão).
+      // Espelha os rewrites declarados em vercel.json e o html_handling do
+      // wrangler.jsonc: /privacidade serve privacidade.html. Na Vercel NÃO é
+      // default da plataforma — cleanUrls tem default `false`. Sem isto o E2E
+      // não consegue exercer as URLs que o site publica de verdade (rodapé,
+      // canonical e sitemap apontam todos para a forma sem extensão).
       const cleanUrlPath = `${assetPath}.html`;
       try {
         if (path.extname(assetPath)) throw new Error('não é candidato a clean URL');

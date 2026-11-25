@@ -1,0 +1,22 @@
+# Cabeçalhos HTTP do pix2qr na Cloudflare (Workers com assets estáticos).
+# Enquanto a Vercel servir a produção, os valores aqui repetem, um a um, o
+# "headers" do vercel.json; test/hosting-config.test.js e o gate
+# scripts/check-artifact.mjs --post falham se os dois divergirem.
+# A CSP também precisa bater com o <meta> das quatro páginas (hash do JSON-LD).
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-Q+xsUuLeMTJCkWe8CE2hLDKrR03AuSgn2330SI5An04='; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://cloud.umami.is https://gateway.umami.is https://api-gateway.umami.dev; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none';
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+# O stage não entra no índice dos buscadores (o login vem do Cloudflare Access).
+https://stage.pix2qr.xyz/*
+  X-Robots-Tag: noindex, nofollow
+
+# Nem o endereço *.workers.dev do Worker nem as URLs de versão: só o domínio
+# próprio é indexável. Os placeholders cobrem qualquer subdomínio de conta, que
+# por isso não aparece neste arquivo público.
+https://:version.:subdomain.workers.dev/*
+  X-Robots-Tag: noindex, nofollow

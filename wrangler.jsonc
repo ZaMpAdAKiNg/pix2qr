@@ -1,0 +1,34 @@
+// Hospedagem do pix2qr na Cloudflare: Workers só com assets estáticos.
+// Não há "main" de propósito: sem Worker script, rota inexistente responde
+// 404 de verdade, e os arquivos _headers e _redirects valem para toda resposta.
+// O conteúdo publicado é o dist/ que scripts/build.sh monta por allowlist; rode
+// o build antes do deploy (npm ci && bash scripts/build.sh && wrangler deploy).
+// Nenhum id de conta mora aqui: a conta vem do login do wrangler ou de
+// CLOUDFLARE_ACCOUNT_ID no ambiente de quem publica.
+{
+  "name": "pix2qr",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist",
+    // /privacidade serve privacidade.html; /privacidade.html e /pagina/
+    // redirecionam para a URL limpa, que é a canônica do sitemap.
+    "html_handling": "auto-trailing-slash",
+    // Rota inexistente responde 404, nunca a home (evita soft 404 no Google).
+    "not_found_handling": "none"
+  },
+  // Produção fica no ar em *.workers.dev, com X-Robots-Tag noindex pelo
+  // _headers, até o domínio próprio entrar no corte do DNS.
+  "workers_dev": true,
+  // Sem URL pública por versão: um preview de branch ainda não revisada não
+  // fica aberto na internet.
+  "preview_urls": false,
+  "env": {
+    // Worker pix2qr-stage (wrangler deploy --env stage), servido só em
+    // stage.pix2qr.xyz atrás do Cloudflare Access. O domínio e o Access entram
+    // no card do corte; até lá este ambiente não é publicado.
+    "stage": {
+      "workers_dev": false,
+      "preview_urls": false
+    }
+  }
+}
